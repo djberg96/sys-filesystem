@@ -1,0 +1,13 @@
+* MANIFEST
+* CHANGES
+* Rakefile
+* README
+* sys-fileystem.gemspec
+* examples/example_stat.rb
+* doc/sys-filesystem.txt
+* ext/extconf.rb
+* ext/filesystem.c
+* lib/sys/filesystem.rb
+* test/test_sys_filesystem.rb
+* test/test_sys_filesystem_unix
+* test/test_sys_filesystem_windows

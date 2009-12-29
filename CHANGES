@@ -1,0 +1,27 @@
+== 0.3.1 - 5-Aug-2009
+* Now compatible with Ruby 1.9.x.
+* Changed license to Artistic 2.0
+* Updated the gemspec, including the explicit addition of a license and
+  test-unit as a development dependency, as well as an updated description. 
+
+== 0.3.0 - 26-Feb-2009
+* Added support for OS X and FreeBSD thanks to an awesome patch by Nobuyoshi
+  Miyokawa.
+* Added the Filesystem.mount_point method that takes a file and returns
+  the mount point its sitting on.
+
+== 0.2.0 - 30-Dec-2008
+* Added the Filesystem.mounts method for iterating over mount or volume
+  information.
+
+== 0.1.1 - 28-Mar-2007
+* Bug fix for BSD flavors.  Thanks go to Jeremy Kemper and Ole Christian
+  Rynning for the spot.
+* Bug fix for OS X (along the same lines as the BSD fix). Thanks go to
+  Aurelian Dehay for the spot.
+* Some Rdoc improvements for the C extension.
+* Tweaks to the gemspec.
+* Added synopsis to the README.
+
+== 0.1.0 - 17-Nov-2006
+* Initial release.  Alpha. Code is stable, but API is not.
