@@ -41,7 +41,8 @@ module Sys
       NAMED_STREAMS              = 0x00040000  
       READ_ONLY_VOLUME           = 0x00080000
       
-      VERSION = '0.3.1'
+      # The version of the sys-filesystem library.
+      VERSION = '0.3.2'
 
       class Mount
          # The name of the volume. This is the device mapping.
@@ -130,7 +131,7 @@ module Sys
       #
       # Example:
       #
-      #    Filesystem.mounts{ |mount|
+      #    Sys::Filesystem.mounts{ |mount|
       #       p mt.name        # => \\Device\\HarddiskVolume1
       #       p mt.mount_point # => C:\
       #       p mt.mount_time  # => Thu Dec 18 20:12:08 -0700 2008
@@ -331,8 +332,8 @@ module Sys
 
       private
 
-      # Used to get the boot time of the system, which is used for mount_time
-      # attribute within the File.mounts method.
+      # This method is used to get the boot time of the system, which is used
+      # for the mount_time attribute within the File.mounts method.
       #
       def self.get_boot_time
          host = Socket.gethostname
