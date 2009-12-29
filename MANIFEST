@@ -6,7 +6,7 @@
 * examples/example_stat.rb
 * doc/sys-filesystem.txt
 * ext/extconf.rb
-* ext/filesystem.c
+* ext/sys/filesystem.c
 * lib/sys/filesystem.rb
 * test/test_sys_filesystem.rb
 * test/test_sys_filesystem_unix
