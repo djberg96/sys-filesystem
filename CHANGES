@@ -1,3 +1,11 @@
+== 0.3.2 - 29-Dec-2009
+* Source has been moved to github.
+* Added the 'gem' task and removed build logic from the gemspec.
+* Updated the install task.
+* Minor correction to the manifest.
+* Removed some junk build files that were inadvertently included in
+  the last gem.
+
 == 0.3.1 - 5-Aug-2009
 * Now compatible with Ruby 1.9.x.
 * Changed license to Artistic 2.0
@@ -8,7 +16,7 @@
 * Added support for OS X and FreeBSD thanks to an awesome patch by Nobuyoshi
   Miyokawa.
 * Added the Filesystem.mount_point method that takes a file and returns
-  the mount point its sitting on.
+  the mount point it's sitting on.
 
 == 0.2.0 - 30-Dec-2008
 * Added the Filesystem.mounts method for iterating over mount or volume
