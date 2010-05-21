@@ -41,6 +41,11 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_kind_of(Fixnum, @stat.block_size)
   end
 
+  def test_block_size_is_a_plausible_value
+    assert_true(@stat.block_size >= 1024)
+    assert_true(@stat.block_size <= 16384)
+  end
+
   def test_stat_fragment_size
     assert_respond_to(@stat, :fragment_size)
     assert_kind_of(Fixnum, @stat.fragment_size)

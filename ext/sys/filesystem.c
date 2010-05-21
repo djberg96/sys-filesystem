@@ -163,7 +163,14 @@ static VALUE fs_stat(VALUE klass, VALUE v_path){
    v_stat = rb_funcall(cStat, rb_intern("new"), 0, 0);
 
    rb_iv_set(v_stat, "@path", v_path);
+
+// You gotta love OS X, right?
+#ifdef __MACH__
+   rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize/256));
+#else
    rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize));
+#endif
+
    rb_iv_set(v_stat, "@fragment_size", ULONG2NUM(fs.f_frsize));
    rb_iv_set(v_stat, "@blocks", LONG2NUM(fs.f_blocks));
    rb_iv_set(v_stat, "@blocks_free", LONG2NUM(fs.f_bfree));
