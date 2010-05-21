@@ -28,7 +28,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('0.3.2', Filesystem::VERSION)
+    assert_equal('0.3.3', Filesystem::VERSION)
   end
 
   def test_stat_path

@@ -2,7 +2,7 @@ require 'rubygems'
 
 spec = Gem::Specification.new do |gem|
   gem.name      = 'sys-filesystem'
-  gem.version   = '0.3.2'
+  gem.version   = '0.3.3'
   gem.author    = 'Daniel J. Berger'
   gem.email     = 'djberg96@gmail.com'
   gem.homepage  = 'http://www.rubyforge.org/projects/sysutils'

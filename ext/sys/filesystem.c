@@ -464,8 +464,8 @@ void Init_filesystem(){
 
    /* Constants */
 
-   /* 0.3.2: The version of this library (a String) */
-   rb_define_const(cFilesys, "VERSION", rb_str_new2("0.3.2"));
+   /* 0.3.3: The version of this library (a String) */
+   rb_define_const(cFilesys, "VERSION", rb_str_new2("0.3.3"));
 
    /* 0x00000001: Read only file system */
    rb_define_const(cStat, "RDONLY", INT2FIX(ST_RDONLY));
