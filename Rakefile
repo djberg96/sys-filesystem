@@ -5,6 +5,9 @@ include Config
 
 desc "Clean the build files for the sys-filesystem source for UNIX systems"
 task :clean do |task|
+  Dir['*.gem'].each{ |f| File.delete(f) }
+  Dir['**/*.rbc'].each{ |f| File.delete(f) } # Rubinius
+
   Dir.chdir('examples') do
     FileUtils.rm_rf('sys') if File.exists?('sys')
   end
@@ -93,3 +96,5 @@ task :gem => [:clean] do |t|
 
   Gem::Builder.new(spec).build
 end
+
+task :default => :test
