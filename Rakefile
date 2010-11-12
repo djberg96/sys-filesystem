@@ -1,5 +1,4 @@
 require 'rake'
-require 'rake/clean'
 require 'rake/testtask'
 include Config
 
@@ -12,7 +11,7 @@ task :clean do |task|
     FileUtils.rm_rf('sys') if File.exists?('sys')
   end
 
-  unless Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
+  unless CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
     file = 'sys/filesystem.' + CONFIG['DLEXT']
     Dir.chdir('ext') do
       sh 'make distclean' rescue nil
@@ -24,7 +23,7 @@ end
 
 desc "Build the sys-filesystem library on UNIX systems (but don't install it)"
 task :build => [:clean] do
-  unless Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
+  unless CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
     file = 'filesystem.' + CONFIG['DLEXT']
     Dir.chdir('ext') do
       ruby 'extconf.rb'
@@ -34,23 +33,9 @@ task :build => [:clean] do
   end
 end
 
-desc "Install the sys-filesystem library"
-task :install do
-  unless Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
-    install_dir = File.join(CONFIG['sitelibdir'], 'sys')
-    Dir.mkdir(install_dir) unless File.exists?(install_dir)
-    FileUtils.cp('lib/sys/filesystem.rb', install_dir, :verbose => true)
-  else
-    task :install => :build
-    Dir.chdir('ext') do
-      sh 'make install'
-    end
-  end
-end
-
 desc "Run the test suite"
 Rake::TestTask.new("test") do |t|
-  unless Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
+  unless CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
     task :test => :build
     t.libs << 'ext'
     t.libs.delete('lib')
@@ -71,30 +56,36 @@ task :example => [:build] do |t|
     Dir.mkdir('sys') unless File.exists?('sys')
   end
 
-  FileUtils.cp('ext/sys/filesystem.' + Config::CONFIG['DLEXT'], 'examples/sys')
+  FileUtils.cp('ext/sys/filesystem.' + CONFIG['DLEXT'], 'examples/sys')
 
   Dir.chdir('examples') do
     ruby 'example_stat.rb'
   end
 end
 
-desc "Build a gem"
-task :gem => [:clean] do |t|
-  spec = eval(IO.read('sys-filesystem.gemspec'))
+namespace :gem do
+  desc "Build the sys-filesystem gem"
+  task :create => [:clean] do |t|
+    spec = eval(IO.read('sys-filesystem.gemspec'))
 
-  if Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
-    spec.required_ruby_version = '>= 1.8.2'
-    spec.files -= Dir['ext/**/*']
-    spec.platform = Gem::Platform::CURRENT
-    spec.add_dependency('windows-pr', '>= 1.0.5')
-  else
-    spec.required_ruby_version = '>= 1.8.0'
-    spec.extensions = ['ext/extconf.rb']
-    spec.files -= Dir['lib/**/*']
-    spec.extra_rdoc_files << 'ext/sys/filesystem.c'
+    if Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
+      spec.files -= Dir['ext/**/*']
+      spec.platform = Gem::Platform::CURRENT
+      spec.add_dependency('windows-pr', '>= 1.0.5')
+    else
+      spec.extensions = ['ext/extconf.rb']
+      spec.files -= Dir['lib/**/*']
+      spec.extra_rdoc_files << 'ext/sys/filesystem.c'
+    end
+
+    Gem::Builder.new(spec).build
   end
 
-  Gem::Builder.new(spec).build
+  desc "Install the sys-filesystem gem"
+  task :install => [:create] do
+    file = Dir['*.gem'].first
+    sh "gem install #{file}"
+  end
 end
 
 task :default => :test
