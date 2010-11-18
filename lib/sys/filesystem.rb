@@ -42,7 +42,7 @@ module Sys
       READ_ONLY_VOLUME           = 0x00080000
       
       # The version of the sys-filesystem library.
-      VERSION = '0.3.3'
+      VERSION = '0.3.4'
 
       class Mount
          # The name of the volume. This is the device mapping.
@@ -171,7 +171,7 @@ module Sys
 
          mounts = block_given? ? nil : []
 
-         # Try again if it fails
+         # Try again if it fails because the buffer is too small
          if length > buffer.size
             buffer = 0.chr * length
             if GetLogicalDriveStrings(buffer.size, buffer) == 0

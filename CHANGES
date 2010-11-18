@@ -1,3 +1,9 @@
+== 0.3.4 - 19-Nov-2010
+* Fixed a bug where negative block counts were happening on very large
+  hard drives. Thanks go to Jonas Pfenniger for the spot.
+* Refactored the clean task in the Rakefile.
+* Some cosmetic source code changes.
+
 == 0.3.3 - 21-May-2010
 * Added a workaround for the Sys::Filesystem#block_size member to deal with
   a bug in OS X. Thanks go to Josh Pasqualetto for the spot.

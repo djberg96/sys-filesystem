@@ -8,15 +8,15 @@
 
 #include <sys/types.h>
 
-#ifdef HAVE_SYS_STATVFS_H /* Most flavors of UNIX */
+#ifdef HAVE_SYS_STATVFS_H // Most flavors of UNIX
 #include <sys/statvfs.h>
-#else                     /* FreeBSD 4.x */
+#else                     // FreeBSD 4.x
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/vnode.h>
 #endif
 
-#ifdef HAVE_SYS_MNTTAB_H  /* Solaris */
+#ifdef HAVE_SYS_MNTTAB_H  // Solaris
 
 #include <sys/mnttab.h>
 #define MNTENT mnttab
@@ -25,7 +25,7 @@
 #define END_MNT(F) fclose(F)
 #define MOUNTFILE "/etc/mnttab"
 
-/* Ruby 1.9.x compatibility */
+// Ruby 1.9.x compatibility
 #ifndef RSTRING_PTR
 #define RSTRING_PTR(v) (RSTRING(v)->ptr)
 #define RSTRING_LEN(v) (RSTRING(v)->len)
@@ -54,7 +54,7 @@ struct _ment {
 #define END_MNT(F) end_mnt(F)
 #define MOUNTFILE "getmntinfo"
 
-#else /* Most flavors of UNIX */
+#else // Most flavors of UNIX
 
 #ifdef HAVE_MNTENT_H
 #include <mntent.h>
@@ -69,7 +69,7 @@ struct _ment {
 
 #ifdef HAVE_GETMNTINFO
 
-/* below table comes from FreeBSD mount.c@1.105 */
+// This table comes from FreeBSD mount.c@1.105
 static struct opt {
   int o_opt;
   const char *o_name;
@@ -102,7 +102,7 @@ static struct opt {
 
 static FILE* start_mnt(const char *filename, const char *type)
 {
-  return (FILE*)!0;     /* do nothing */
+  return (FILE*)!0; // Do nothing
 }
 
 static struct _ment* get_mnt(struct _ment* m)
@@ -111,7 +111,7 @@ static struct _ment* get_mnt(struct _ment* m)
 
   if (m->max == 0) {
     if ((m->max = getmntinfo(&(m->mntbufp), MNT_NOWAIT)) == 0) {
-      return NULL;      /* XXX */
+      return NULL;
     }
     m->current = 0;
   }
@@ -126,7 +126,7 @@ static struct _ment* get_mnt(struct _ment* m)
 
 static void end_mnt(FILE* fp)
 {
-  /* do nothing */
+  // Do nothing
 }
 
 #endif
@@ -143,50 +143,50 @@ static VALUE create_mount_object(struct MNTENT*);
  * file system.
  */
 static VALUE fs_stat(VALUE klass, VALUE v_path){
-   VALUE v_stat;
-   char* path = StringValuePtr(v_path);
+  VALUE v_stat;
+  char* path = StringValuePtr(v_path);
 
 #ifdef HAVE_STATVFS
-   struct statvfs fs;
+  struct statvfs fs;
 
-   if(statvfs(path, &fs) < 0)
-      rb_sys_fail("statvfs");
+  if(statvfs(path, &fs) < 0)
+    rb_sys_fail("statvfs");
 #else
-   struct mount mp;
-   struct statfs fs;
-   struct proc p;
+  struct mount mp;
+  struct statfs fs;
+  struct proc p;
 
-   if(VFS_STATFS(&mp, &fs, &p) < 0)
-      rb_sys_fail("VFS_STATFS");
+  if(VFS_STATFS(&mp, &fs, &p) < 0)
+    rb_sys_fail("VFS_STATFS");
 #endif
 
-   v_stat = rb_funcall(cStat, rb_intern("new"), 0, 0);
+  v_stat = rb_funcall(cStat, rb_intern("new"), 0, 0);
 
-   rb_iv_set(v_stat, "@path", v_path);
+  rb_iv_set(v_stat, "@path", v_path);
 
 // You gotta love OS X, right?
 #ifdef __MACH__
-   rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize/256));
+  rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize/256));
 #else
-   rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize));
+  rb_iv_set(v_stat, "@block_size", ULONG2NUM(fs.f_bsize));
 #endif
 
-   rb_iv_set(v_stat, "@fragment_size", ULONG2NUM(fs.f_frsize));
-   rb_iv_set(v_stat, "@blocks", LONG2NUM(fs.f_blocks));
-   rb_iv_set(v_stat, "@blocks_free", LONG2NUM(fs.f_bfree));
-   rb_iv_set(v_stat, "@blocks_available", LONG2NUM(fs.f_bavail));
-   rb_iv_set(v_stat, "@files", LONG2NUM(fs.f_files));
-   rb_iv_set(v_stat, "@files_free", LONG2NUM(fs.f_ffree));
-   rb_iv_set(v_stat, "@files_available", LONG2NUM(fs.f_favail));
-   rb_iv_set(v_stat, "@filesystem_id", ULONG2NUM(fs.f_fsid));
-   rb_iv_set(v_stat, "@flags", ULONG2NUM(fs.f_flag));
-   rb_iv_set(v_stat, "@name_max", ULONG2NUM(fs.f_namemax));
+  rb_iv_set(v_stat, "@fragment_size", ULONG2NUM(fs.f_frsize));
+  rb_iv_set(v_stat, "@blocks", ULONG2NUM(fs.f_blocks));
+  rb_iv_set(v_stat, "@blocks_free", ULONG2NUM(fs.f_bfree));
+  rb_iv_set(v_stat, "@blocks_available", ULONG2NUM(fs.f_bavail));
+  rb_iv_set(v_stat, "@files", ULONG2NUM(fs.f_files));
+  rb_iv_set(v_stat, "@files_free", ULONG2NUM(fs.f_ffree));
+  rb_iv_set(v_stat, "@files_available", ULONG2NUM(fs.f_favail));
+  rb_iv_set(v_stat, "@filesystem_id", ULONG2NUM(fs.f_fsid));
+  rb_iv_set(v_stat, "@flags", ULONG2NUM(fs.f_flag));
+  rb_iv_set(v_stat, "@name_max", ULONG2NUM(fs.f_namemax));
 
 #ifdef HAVE_ST_F_BASETYPE
-   rb_iv_set(v_stat, "@base_type", rb_str_new2(fs.f_basetype));
+  rb_iv_set(v_stat, "@base_type", rb_str_new2(fs.f_basetype));
 #endif
 
-   return rb_obj_freeze(v_stat);
+  return rb_obj_freeze(v_stat);
 }
 
 /* Convenient methods for converting bytes to kilobytes, megabytes or
@@ -200,7 +200,7 @@ static VALUE fs_stat(VALUE klass, VALUE v_path){
  * Returns +fix+ in terms of kilobytes.
  */
 static VALUE fixnum_to_kb(VALUE self){
-   return ULL2NUM(NUM2ULONG(self) / 1024);
+  return ULL2NUM(NUM2ULONG(self) / 1024);
 }
 
 /*
@@ -210,7 +210,7 @@ static VALUE fixnum_to_kb(VALUE self){
  * Returns +fix+ in terms of megabytes.
  */
 static VALUE fixnum_to_mb(VALUE self){
-   return ULL2NUM(NUM2ULONG(self) / 1048576);
+  return ULL2NUM(NUM2ULONG(self) / 1048576);
 }
 
 /*
@@ -220,7 +220,7 @@ static VALUE fixnum_to_mb(VALUE self){
  * Returns +fix+ in terms of gigabytes.
  */
 static VALUE fixnum_to_gb(VALUE self){
-   return ULL2NUM(NUM2ULONG(self) / 1073741824);
+  return ULL2NUM(NUM2ULONG(self) / 1073741824);
 }
 
 /*
@@ -371,120 +371,122 @@ static VALUE fs_mount_point(VALUE klass, VALUE v_file){
 }
 
 void Init_filesystem(){
-   /* The toplevel namespace */
-   mSys = rb_define_module("Sys");
+  /* The toplevel namespace */
+  mSys = rb_define_module("Sys");
 
-   /* The Filesystem class serves an abstract base class. It's methods return
-    * objects of other types. Do not instantiate.
-    */
-   cFilesys = rb_define_class_under(mSys, "Filesystem", rb_cObject);
+  /* The Filesystem class serves an abstract base class. It's methods return
+   * objects of other types. Do not instantiate.
+   */
+  cFilesys = rb_define_class_under(mSys, "Filesystem", rb_cObject);
 
-   /* Instances of this class are returned by the Filesystem.mount method */
-   cMount = rb_define_class_under(cFilesys, "Mount", rb_cObject);
+  /* Instances of this class are returned by the Filesystem.mount method */
+  cMount = rb_define_class_under(cFilesys, "Mount", rb_cObject);
 
-   /* Instances of this class are returned by the Filesystem.stat method */
-   cStat = rb_define_class_under(cFilesys, "Stat", rb_cObject);
+  /* Instances of this class are returned by the Filesystem.stat method */
+  cStat = rb_define_class_under(cFilesys, "Stat", rb_cObject);
 
-   /* Singleton methods */
-   rb_define_singleton_method(cFilesys, "mount_point", fs_mount_point, 1);
-   rb_define_singleton_method(cFilesys, "mounts", fs_mounts, 0);
-   rb_define_singleton_method(cFilesys, "stat", fs_stat, 1);
+  /* Singleton methods */
+  rb_define_singleton_method(cFilesys, "mount_point", fs_mount_point, 1);
+  rb_define_singleton_method(cFilesys, "mounts", fs_mounts, 0);
+  rb_define_singleton_method(cFilesys, "stat", fs_stat, 1);
 
-   /* Filesystem::Mount accessors */
+  /* Filesystem::Mount accessors */
 
-   /* The name of the mounted resource */
-   rb_define_attr(cMount, "name", 1, 0);
+  /* The name of the mounted resource */
+  rb_define_attr(cMount, "name", 1, 0);
 
-   /* The mount point/directory */
-   rb_define_attr(cMount, "mount_point", 1, 0);
+  /* The mount point/directory */
+  rb_define_attr(cMount, "mount_point", 1, 0);
 
-   /* The type of the file system mount, e.g. 'ufs', 'nfs', etc */
-   rb_define_attr(cMount, "mount_type", 1, 0);
+  /* The type of the file system mount, e.g. 'ufs', 'nfs', etc */
+  rb_define_attr(cMount, "mount_type", 1, 0);
 
-   /* A list of comma separated options for the mount, e.g. 'rw', etc */
-   rb_define_attr(cMount, "options", 1, 0);
+  /* A list of comma separated options for the mount, e.g. 'rw', etc */
+  rb_define_attr(cMount, "options", 1, 0);
 
-   /* The time the file system was mounted or nil if not supported */
-   rb_define_attr(cMount, "mount_time", 1, 0);
+  /* The time the file system was mounted or nil if not supported */
+  rb_define_attr(cMount, "mount_time", 1, 0);
 
-   /* The dump frequency in days (or nil if not supported) */
-   rb_define_attr(cMount, "dump_frequency", 1, 0);
+  /* The dump frequency in days (or nil if not supported) */
+  rb_define_attr(cMount, "dump_frequency", 1, 0);
 
-   /* The pass number of the file system check or nil if not supported */
-   rb_define_attr(cMount, "pass_number", 1, 0);
+  /* The pass number of the file system check or nil if not supported */
+  rb_define_attr(cMount, "pass_number", 1, 0);
 
-   /* Filesystem::Mount Aliases */
+  /* Filesystem::Mount Aliases */
 
-   rb_define_alias(cMount, "fsname", "name");
-   rb_define_alias(cMount, "dir", "mount_point");
-   rb_define_alias(cMount, "opts", "options");
-   rb_define_alias(cMount, "passno", "pass_number");
-   rb_define_alias(cMount, "freq", "dump_frequency");
+  rb_define_alias(cMount, "fsname", "name");
+  rb_define_alias(cMount, "dir", "mount_point");
+  rb_define_alias(cMount, "opts", "options");
+  rb_define_alias(cMount, "passno", "pass_number");
+  rb_define_alias(cMount, "freq", "dump_frequency");
 
-   /* Filesystem::Stat accessors */
+  /* Filesystem::Stat accessors */
 
-   /* The path of the file system */
-   rb_define_attr(cStat, "path", 1, 0);
+  /* The path of the file system */
+  rb_define_attr(cStat, "path", 1, 0);
 
-   /* The preferred system block size */
-   rb_define_attr(cStat, "block_size", 1, 0);
+  /* The preferred system block size */
+  rb_define_attr(cStat, "block_size", 1, 0);
 
-   /* The fragment size, i.e. fundamental file system block size */
-   rb_define_attr(cStat, "fragment_size", 1, 0);
+  /* The fragment size, i.e. fundamental file system block size */
+  rb_define_attr(cStat, "fragment_size", 1, 0);
 
-   /* The total number of +fragment_size+ blocks in the file system */
-   rb_define_attr(cStat, "blocks", 1, 0);
+  /* The total number of +fragment_size+ blocks in the file system */
+  rb_define_attr(cStat, "blocks", 1, 0);
 
-   /* The total number of free blocks in the file system */
-   rb_define_attr(cStat, "blocks_free", 1, 0);
+  /* The total number of free blocks in the file system */
+  rb_define_attr(cStat, "blocks_free", 1, 0);
 
-   /* The number of free blocks available to unprivileged processes */
-   rb_define_attr(cStat, "blocks_available", 1, 0);
+  /* The number of free blocks available to unprivileged processes */
+  rb_define_attr(cStat, "blocks_available", 1, 0);
 
-   /* The total number of files/inodes that can be created */
-   rb_define_attr(cStat, "files", 1, 0);
+  /* The total number of files/inodes that can be created */
+  rb_define_attr(cStat, "files", 1, 0);
 
-   /* The total number of free files/inodes on the file system */
-   rb_define_attr(cStat, "files_free", 1, 0);
+  /* The total number of free files/inodes on the file system */
+  rb_define_attr(cStat, "files_free", 1, 0);
 
-   /* The number of free files/inodes available to unprivileged processes */
-   rb_define_attr(cStat, "files_available", 1, 0);
+  /* The number of free files/inodes available to unprivileged processes */
+  rb_define_attr(cStat, "files_available", 1, 0);
 
-   /* The file system identifier */
-   rb_define_attr(cStat, "filesystem_id", 1, 0);
+  /* The file system identifier */
+  rb_define_attr(cStat, "filesystem_id", 1, 0);
 
-   /* The file system type, e.g. UFS */
-   rb_define_attr(cStat, "base_type", 1, 0);
+  /* The file system type, e.g. UFS */
+  rb_define_attr(cStat, "base_type", 1, 0);
 
-   /* A bit mask of flags.  See the <tt>Constants</tt> for a list of flags */
-   rb_define_attr(cStat, "flags", 1, 0);
+  /* A bit mask of flags.  See the <tt>Constants</tt> for a list of flags */
+  rb_define_attr(cStat, "flags", 1, 0);
 
-   /* The maximum length of a file name permitted on the file system */
-   rb_define_attr(cStat, "name_max", 1, 0);
+  /* The maximum length of a file name permitted on the file system */
+  rb_define_attr(cStat, "name_max", 1, 0);
 
-   /* Constants */
+  // Constants
 
-   /* 0.3.3: The version of this library (a String) */
-   rb_define_const(cFilesys, "VERSION", rb_str_new2("0.3.3"));
+  /* 0.3.4: The version of this library (a String) */
+  rb_define_const(cFilesys, "VERSION", rb_str_new2("0.3.4"));
 
-   /* 0x00000001: Read only file system */
-   rb_define_const(cStat, "RDONLY", INT2FIX(ST_RDONLY));
+  /* 0x00000001: Read only file system */
+  rb_define_const(cStat, "RDONLY", INT2FIX(ST_RDONLY));
 
-   /* 0x00000002: File system does not support suid or sgid semantics */
-   rb_define_const(cStat, "NOSUID", INT2FIX(ST_NOSUID));
+  /* 0x00000002: File system does not support suid or sgid semantics */
+  rb_define_const(cStat, "NOSUID", INT2FIX(ST_NOSUID));
 
 #ifdef ST_NOTRUNC
-   /* 0x00000003: File system does not truncate file names longer than +name_max+ */
-   rb_define_const(cStat, "NOTRUNC", INT2FIX(ST_NOTRUNC));
+  /* 0x00000003: File system does not truncate file names longer than +name_max+ */
+  rb_define_const(cStat, "NOTRUNC", INT2FIX(ST_NOTRUNC));
 #endif
 
-   /* Aliases */
-   rb_define_alias(cStat, "inodes", "files");
-   rb_define_alias(cStat, "inodes_free", "files_free");
-   rb_define_alias(cStat, "inodes_available", "files_available");
+  // Aliases
 
-   /* Convenient methods for Fixnum */
-   rb_define_method(rb_cFixnum, "to_kb", fixnum_to_kb, 0);
-   rb_define_method(rb_cFixnum, "to_mb", fixnum_to_mb, 0);
-   rb_define_method(rb_cFixnum, "to_gb", fixnum_to_gb, 0);
+  rb_define_alias(cStat, "inodes", "files");
+  rb_define_alias(cStat, "inodes_free", "files_free");
+  rb_define_alias(cStat, "inodes_available", "files_available");
+
+  // Convenient methods for Fixnum
+
+  rb_define_method(rb_cFixnum, "to_kb", fixnum_to_kb, 0);
+  rb_define_method(rb_cFixnum, "to_mb", fixnum_to_mb, 0);
+  rb_define_method(rb_cFixnum, "to_gb", fixnum_to_gb, 0);
 }
