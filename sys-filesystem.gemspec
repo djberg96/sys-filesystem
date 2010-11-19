@@ -1,24 +1,24 @@
 require 'rubygems'
 
-spec = Gem::Specification.new do |gem|
-  gem.name      = 'sys-filesystem'
-  gem.version   = '0.3.3'
-  gem.author    = 'Daniel J. Berger'
-  gem.email     = 'djberg96@gmail.com'
-  gem.homepage  = 'http://www.rubyforge.org/projects/sysutils'
-  gem.platform  = Gem::Platform::RUBY
-  gem.summary   = 'A Ruby interface for getting file system information.'
-  gem.test_file = 'test/test_sys_filesystem.rb'
-  gem.has_rdoc  = true
-  gem.files     = Dir['**/*'].reject{ |f| f.include?('git') }
-  gem.license   = 'Artistic 2.0'
+Gem::Specification.new do |spec|
+  spec.name      = 'sys-filesystem'
+  spec.version   = '0.3.4'
+  spec.author    = 'Daniel J. Berger'
+  spec.email     = 'djberg96@gmail.com'
+  spec.homepage  = 'http://www.rubyforge.org/projects/sysutils'
+  spec.platform  = Gem::Platform::RUBY
+  spec.summary   = 'A Ruby interface for getting file system information.'
+  spec.test_file = 'test/test_sys_filesystem.rb'
+  spec.has_rdoc  = true
+  spec.files     = Dir['**/*'].reject{ |f| f.include?('git') }
+  spec.license   = 'Artistic 2.0'
    
-  gem.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
-  gem.rubyforge_project = 'sysutils'
+  spec.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
+  spec.rubyforge_project = 'sysutils'
    
-  gem.add_development_dependency('test-unit', '>= 2.0.3')
+  spec.add_development_dependency('test-unit', '>= 2.1.1')
 
-  gem.description = <<-EOF
+  spec.description = <<-EOF
     The sys-filesystem library provides an interface for gathering filesystem
     information, such as disk space and mount point data.
   EOF
