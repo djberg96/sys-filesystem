@@ -4,13 +4,13 @@ require 'rake/testtask'
 include Config
 
 CLEAN.include(
-  '**/*/*.gem',               # Gem files
-  '**/*/*.rbc',               # Rubinius
-  '**/*/*.o',                 # C object file
-  '**/*/*.log',               # Ruby extension build log
-  '**/*/Makefile',            # C Makefile
-  '**/*/conftest.DSYM',       # OS X build directory
-  "**/*/*.#{CONFIG['DLEXT']}" # C shared object
+  '**/*.gem',               # Gem files
+  '**/*.rbc',               # Rubinius
+  '**/*.o',                 # C object file
+  '**/*.log',               # Ruby extension build log
+  '**/Makefile',            # C Makefile
+  '**/conftest.dSYM',       # OS X build directory
+  "**/*.#{CONFIG['DLEXT']}" # C shared object
 )
 
 desc "Build the sys-filesystem library on UNIX systems (but don't install it)"
