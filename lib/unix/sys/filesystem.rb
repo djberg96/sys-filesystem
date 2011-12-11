@@ -1,11 +1,15 @@
 require 'ffi'
 require 'rbconfig'
 
+# The Sys module serves as a namespace only.
 module Sys
+  # The Filesystem class serves as an abstract base class. Its methods
+  # return objects of other types. Do not instantiate.
   class Filesystem
     extend FFI::Library
     ffi_lib(FFI::Library::LIBC)
 
+    # The version of the sys-filesystem library.
     VERSION = '1.0.0'
 
     private
@@ -31,28 +35,28 @@ module Sys
       end
     end
 
-    MNT_RDONLY      = 0x00000001      # read only filesystem
-    MNT_SYNCHRONOUS = 0x00000002      # file system written synchronously
-    MNT_NOEXEC      = 0x00000004      # can't exec from filesystem
-    MNT_NOSUID      = 0x00000008      # don't honor setuid bits on fs
-    MNT_NODEV       = 0x00000010      # don't interpret special files
-    MNT_UNION       = 0x00000020      # union with underlying filesystem
-    MNT_ASYNC       = 0x00000040      # file system written asynchronously
-    MNT_CPROTECT    = 0x00000080      # file system supports content protection
-    MNT_EXPORTED    = 0x00000100      # file system is exported
-    MNT_QUARANTINE  = 0x00000400      # file system is quarantined
-    MNT_LOCAL       = 0x00001000      # filesystem is stored locally
-    MNT_QUOTA       = 0x00002000      # quotas are enabled on filesystem
-    MNT_ROOTFS      = 0x00004000      # identifies the root filesystem
-    MNT_DOVOLFS     = 0x00008000      # FS supports volfs (deprecated)
-    MNT_DONTBROWSE  = 0x00100000      # file system is not appropriate path to user data
-    MNT_IGNORE_OWNERSHIP = 0x00200000 # VFS will ignore ownership information on filesystem objects
-    MNT_AUTOMOUNTED = 0x00400000      # filesystem was mounted by automounter
-    MNT_JOURNALED   = 0x00800000      # filesystem is journaled
-    MNT_NOUSERXATTR = 0x01000000      # Don't allow user extended attributes
-    MNT_DEFWRITE    = 0x02000000      # filesystem should defer writes
-    MNT_MULTILABEL  = 0x04000000      # MAC support for individual labels
-    MNT_NOATIME     = 0x10000000      # disable update of file access time
+    MNT_RDONLY      = 0x00000001 # read only filesystem
+    MNT_SYNCHRONOUS = 0x00000002 # file system written synchronously
+    MNT_NOEXEC      = 0x00000004 # can't exec from filesystem
+    MNT_NOSUID      = 0x00000008 # don't honor setuid bits on fs
+    MNT_NODEV       = 0x00000010 # don't interpret special files
+    MNT_UNION       = 0x00000020 # union with underlying filesystem
+    MNT_ASYNC       = 0x00000040 # file system written asynchronously
+    MNT_CPROTECT    = 0x00000080 # file system supports content protection
+    MNT_EXPORTED    = 0x00000100 # file system is exported
+    MNT_QUARANTINE  = 0x00000400 # file system is quarantined
+    MNT_LOCAL       = 0x00001000 # filesystem is stored locally
+    MNT_QUOTA       = 0x00002000 # quotas are enabled on filesystem
+    MNT_ROOTFS      = 0x00004000 # identifies the root filesystem
+    MNT_DOVOLFS     = 0x00008000 # FS supports volfs (deprecated)
+    MNT_DONTBROWSE  = 0x00100000 # FS is not appropriate path to user data
+    MNT_IGNORE_OWNERSHIP = 0x00200000 # VFS will ignore ownership info on FS objects
+    MNT_AUTOMOUNTED = 0x00400000 # filesystem was mounted by automounter
+    MNT_JOURNALED   = 0x00800000 # filesystem is journaled
+    MNT_NOUSERXATTR = 0x01000000 # Don't allow user extended attributes
+    MNT_DEFWRITE    = 0x02000000 # filesystem should defer writes
+    MNT_MULTILABEL  = 0x04000000 # MAC support for individual labels
+    MNT_NOATIME     = 0x10000000 # disable update of file access time
 
     MNT_VISFLAGMASK = (
       MNT_RDONLY | MNT_SYNCHRONOUS | MNT_NOEXEC |
@@ -61,7 +65,8 @@ module Sys
       MNT_LOCAL  | MNT_QUOTA |
       MNT_ROOTFS | MNT_DOVOLFS | MNT_DONTBROWSE |
       MNT_IGNORE_OWNERSHIP | MNT_AUTOMOUNTED | MNT_JOURNALED |
-      MNT_NOUSERXATTR | MNT_DEFWRITE  | MNT_MULTILABEL | MNT_NOATIME | MNT_CPROTECT
+      MNT_NOUSERXATTR | MNT_DEFWRITE  | MNT_MULTILABEL |
+      MNT_NOATIME | MNT_CPROTECT
     )
 
     @@opt_names = {
@@ -87,6 +92,7 @@ module Sys
       MNT_NOATIME          => 'noatime'
     }
 
+    # File used to read mount informtion from.
     if File.exists?('/etc/mtab')
       MOUNT_FILE = '/etc/mtab'
     elsif File.exists?('/etc/mnttab')
@@ -143,6 +149,7 @@ module Sys
       end
     end
 
+    # The Statvfs struct represents struct statvfs from sys/statvfs.h.
     class Statvfs < FFI::Struct
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         layout(
@@ -209,55 +216,91 @@ module Sys
       end
     end
 
-    # On Solaris this is really struct mnttab
+    # The Mnttab struct represents struct mnnttab from sys/mnttab.h on Solaris.
+    class Mnttab < FFI::Struct
+      layout(
+        :mnt_special, :string,
+        :mnt_mountp, :string,
+        :mnt_fstype, :string,
+        :mnt_mntopts, :string,
+        :mnt_time, :string
+      )
+    end
+
+    # The Mntent struct represents struct mntent from sys/mount.h on Unix.
     class Mntent < FFI::Struct
-      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-        layout(
-          :mnt_special, :string,
-          :mnt_mountp, :string,
-          :mnt_fstype, :string,
-          :mnt_mntopts, :string,
-          :mnt_time, :string
-        )
-      else
-        layout(
-          :mnt_fsname, :string,
-          :mnt_dir, :string,
-          :mnt_type, :string,
-          :mnt_opts, :string,
-          :mnt_freq, :int,
-          :mnt_passno, :int
-        )
-      end
+      layout(
+        :mnt_fsname, :string,
+        :mnt_dir, :string,
+        :mnt_type, :string,
+        :mnt_opts, :string,
+        :mnt_freq, :int,
+        :mnt_passno, :int
+      )
     end
 
     public
 
+    # The error raised if any of the Filesystem methods fail.
     class Error < StandardError; end
 
+    # Stat objects are returned by the Sys::Filesystem.stat method.
     class Stat
+      # Read-only filesystem
       RDONLY  = 1
+
+      # Filesystem does not support suid or sgid semantics.
       NOSUID  = 2
+
+      # Filesystem does not truncate file names longer than +name_max+.
       NOTRUNC = 3
 
+      # The path of the filesystem.
       attr_accessor :path
+
+      # The preferred system block size.
       attr_accessor :block_size
+
+      # The fragment size, i.e. fundamental filesystem block size.
       attr_accessor :fragment_size
+
+      # The total number of +fragment_size+ blocks in the filesystem.
       attr_accessor :blocks
+
+      # The total number of free blocks in the filesystem.
       attr_accessor :blocks_free
+
+      # The number of free blocks available to unprivileged processes.
       attr_accessor :blocks_available
+
+      # The total number of files/inodes that can be created.
       attr_accessor :files
+
+      # The total number of files/inodes on the filesystem.
       attr_accessor :files_free
+
+      # The number of free files/inodes available to unprivileged processes.
       attr_accessor :files_available
+
+      # The filesystem identifier.
       attr_accessor :filesystem_id
+
+      # A bit mask of flags.
       attr_accessor :flags
+
+      # The maximum length of a file name permitted on the filesystem.
       attr_accessor :name_max
+
+      # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
 
+      # Creates a new Sys::Filesystem::Stat object. This is meant for
+      # internal use only. Do not instantiate directly.
+      #
       def initialize
         @path             = nil
         @block_size       = nil
@@ -275,13 +318,27 @@ module Sys
       end
     end
 
+    # Mount objects are returned by the Sys::Filesystem.mounts method.
     class Mount
+      # The name of the mounted resource.
       attr_accessor :name
+
+      # The mount point/directory.
       attr_accessor :mount_point
+
+      # The type of filesystem mount, e.g. ufs, nfs, etc.
       attr_accessor :mount_type
+
+      # A list of comma separated options for the mount, e.g. nosuid, etc.
       attr_accessor :options
+
+      # The time the filesystem was mounted. May be nil.
       attr_accessor :mount_time
+
+      # The dump frequency in days. May be nil.
       attr_accessor :dump_frequency
+
+      # The pass number of the filessytem check. May be nil.
       attr_accessor :pass_number
 
       alias fsname name
@@ -290,6 +347,9 @@ module Sys
       alias passno pass_number
       alias freq dump_frequency
 
+      # Creates a Sys::Filesystem::Mount object. This is meant for internal
+      # use only. Do no instantiate directly.
+      #
       def initialize
         @name = nil
         @mount_point = nil
@@ -301,6 +361,9 @@ module Sys
       end
     end
 
+    # Returns a Sys::Filesystem::Stat object containing information about the
+    # +path+ on the filesystem.
+    #
     def self.stat(path)
       fs = Statvfs.new
 
@@ -322,6 +385,7 @@ module Sys
       obj.flags = fs[:f_flag]
       obj.name_max = fs[:f_namemax]
 
+      # OSX does things a little differently
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         obj.block_size /= 256
       end
@@ -333,6 +397,19 @@ module Sys
       obj.freeze
     end
 
+    # In block form, yields a Sys::Filesystem::Mount object for each mounted
+    # filesytem on the host. Otherwise it returns an array of Mount objects.
+    #
+    # Example:
+    #
+    # Sys::Filesystem.mounts{ |fs|
+    #   p fs.name        # => '/dev/dsk/c0t0d0s0'
+    #   p fs.mount_time  # => Thu Dec 11 15:07:23 -0700 2008
+    #   p fs.mount_type  # => 'ufs'
+    #   p fs.mount_point # => '/'
+    #   p fs.options     # => local, noowner, nosuid
+    # }
+    #
     def self.mounts
       array = block_given? ? nil : []
 
@@ -387,7 +464,7 @@ module Sys
           end
 
           if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-            mt = Mntent.new
+            mt = Mnttab.new
             while getmntent(fp, mt) == 0
               obj = Sys::Filesystem::Mount.new
               obj.name = mt[:mnt_special].to_s
@@ -437,6 +514,13 @@ module Sys
       array
     end
 
+    # Returns the mount point of the given +file+, or itself if it cannot
+    # be found.
+    #
+    # Example:
+    #
+    #  Sys::Filesystem.mount_point('/home/some_user') # => /home
+    #
     def self.mount_point(file)
       dev = File.stat(file).dev
       val = file
@@ -455,14 +539,17 @@ module Sys
 end
 
 class Fixnum
+  # Converts a number to kilobytes.
   def to_kb
     self / 1024
   end
 
+  # Converts a number to megabytes.
   def to_mb
     self / 1048576
   end
 
+  # Converts a number to gigabytes.
   def to_gb
     self / 1073741824
   end
