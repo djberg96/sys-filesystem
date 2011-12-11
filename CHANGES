@@ -1,3 +1,7 @@
+== 1.0.0 - ???
+* Converted everything from C to FFI for the Unix flavors. The Windows
+  source code remains untouched.
+
 == 0.3.4 - 19-Nov-2010
 * Fixed a bug where negative block counts were happening on very large
   hard drives. Thanks go to Jonas Pfenniger for the spot.
