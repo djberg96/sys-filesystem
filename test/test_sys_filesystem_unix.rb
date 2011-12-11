@@ -211,7 +211,8 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_mount_dump_frequency
-    omit_if(@@solaris || @@freebsd || @@darwin, 'dump_frequency test skipped on this platform')
+    msg = 'dump_frequency test skipped on this platform'
+    omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :dump_frequency)
     assert_kind_of(Fixnum, @mnt.dump_frequency)
   end
@@ -222,7 +223,8 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_mount_pass_number
-    omit_if(@@solaris || @@freebsd || @@darwin, 'pass_number test skipped on this platform')
+    msg = 'pass_number test skipped on this platform'
+    omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :pass_number)
     assert_kind_of(Fixnum, @mnt.pass_number)
   end
@@ -236,6 +238,12 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_respond_to(Filesystem, :mount_point)
     assert_nothing_raised{ Filesystem.mount_point(Dir.pwd) }
     assert_kind_of(String, Filesystem.mount_point(Dir.pwd))
+  end
+
+  def test_ffi_functions_are_private
+    methods = Filesystem.methods(false).map{ |e| e.to_s }
+    assert_false(Filesystem.methods.include?('statvfs'))
+    assert_false(Filesystem.methods.include?('strerror'))
   end
 
   def teardown
