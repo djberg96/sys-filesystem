@@ -42,7 +42,7 @@ module Sys
       READ_ONLY_VOLUME           = 0x00080000
       
       # The version of the sys-filesystem library.
-      VERSION = '0.3.4'
+      VERSION = '1.0.0'
 
       class Mount
          # The name of the volume. This is the device mapping.
