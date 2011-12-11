@@ -17,11 +17,12 @@ module Sys
       if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
         attach_function(:fopen, [:string, :string], :pointer)
         attach_function(:fclose, [:pointer], :int)
+        attach_function(:getmntent, [:pointer, :pointer], :int)
       else
+        attach_function(:getmntent, [:pointer], :pointer)
         attach_function(:setmntent, [:string, :string], :pointer)
         attach_function(:endmntent, [:pointer], :int)
       end
-      attach_function(:getmntent, [:pointer], :pointer)
     rescue FFI::NotFoundError
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
@@ -180,7 +181,7 @@ module Sys
           :f_bavail, :uint64,
           :f_files, :uint64,
           :f_ffree, :uint64,
-          :f_avail, :uint64,
+          :f_favail, :uint64,
           :f_fsid, :ulong,
           :f_basetype, [:char, 16],
           :f_flag, :uint32,
@@ -326,7 +327,7 @@ module Sys
       end
 
       if fs.members.include?(:f_basetype)
-        obj.base_type = fs[:f_basetype]
+        obj.base_type = fs[:f_basetype].to_s
       end
 
       obj.freeze
@@ -385,23 +386,41 @@ module Sys
             fp = fopen(MOUNT_FILE, 'r')
           end
 
-          while ptr = getmntent(fp)
-            break if ptr.null?
-            mt = Mntent.new(ptr)
+          if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
+            mt = Mntent.new
+            while getmntent(fp, mt) == 0
+              obj = Sys::Filesystem::Mount.new
+              obj.name = mt[:mnt_special].to_s
+              obj.mount_point = mt[:mnt_mountp].to_s
+              obj.mount_type = mt[:mnt_fstype].to_s
+              obj.options = mt[:mnt_mntopts].to_s
+              obj.mount_time = Time.at(Integer(mt[:mnt_time]))
 
-            obj = Sys::Filesystem::Mount.new
-            obj.name = mt[:mnt_fsname]
-            obj.mount_point = mt[:mnt_dir]
-            obj.mount_type = mt[:mnt_type]
-            obj.options = mt[:mnt_opts]
-            obj.mount_time = nil
-            obj.dump_frequency = mt[:mnt_freq]
-            obj.pass_number = mt[:mnt_passno]
+              if block_given?
+                yield obj.freeze
+              else
+                array << obj.freeze
+              end
+            end
+          else
+            while ptr = getmntent(fp)
+              break if ptr.null?
+              mt = Mntent.new(ptr)
 
-            if block_given?
-              yield obj.freeze
-            else
-              array << obj.freeze
+              obj = Sys::Filesystem::Mount.new
+              obj.name = mt[:mnt_fsname]
+              obj.mount_point = mt[:mnt_dir]
+              obj.mount_type = mt[:mnt_type]
+              obj.options = mt[:mnt_opts]
+              obj.mount_time = nil
+              obj.dump_frequency = mt[:mnt_freq]
+              obj.pass_number = mt[:mnt_passno]
+
+              if block_given?
+                yield obj.freeze
+              else
+                array << obj.freeze
+              end
             end
           end
         ensure
