@@ -14,8 +14,13 @@ module Sys
     attach_function(:strerror, [:int], :string)
 
     begin
-      attach_function(:setmntent, [:string, :string], :pointer)
-      attach_function(:endmntent, [:pointer], :int)
+      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
+        attach_function(:fopen, [:string, :string], :pointer)
+        attach_function(:fclose, [:pointer], :int)
+      else
+        attach_function(:setmntent, [:string, :string], :pointer)
+        attach_function(:endmntent, [:pointer], :int)
+      end
       attach_function(:getmntent, [:pointer], :pointer)
     rescue FFI::NotFoundError
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
@@ -166,6 +171,23 @@ module Sys
           :f_fsid, :ulong,
           :f_namemax, :ulong
         )
+      elsif RbConfig::CONFIG['host'] =~ /sunos|solaris/i
+        layout(
+          :f_bsize, :ulong,
+          :f_frsize, :ulong,
+          :f_blocks, :uint64,
+          :f_bfree, :uint64,
+          :f_bavail, :uint64,
+          :f_files, :uint64,
+          :f_ffree, :uint64,
+          :f_avail, :uint64,
+          :f_fsid, :ulong,
+          :f_basetype, [:char, 16],
+          :f_flag, :uint32,
+          :f_namemax, :uint32,
+          :f_fstr, [:char, 32],
+          :f_filler, [:uint32, 16]
+        )
       else
         layout(
           :f_bsize, :ulong,
@@ -186,15 +208,26 @@ module Sys
       end
     end
 
+    # On Solaris this is really struct mnttab
     class Mntent < FFI::Struct
-      layout(
-        :mnt_fsname, :string,
-        :mnt_dir, :string,
-        :mnt_type, :string,
-        :mnt_opts, :string,
-        :mnt_freq, :int,
-        :mnt_passno, :int
-      )
+      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
+        layout(
+          :mnt_special, :string,
+          :mnt_mountp, :string,
+          :mnt_fstype, :string,
+          :mnt_mntopts, :string,
+          :mnt_time, :string
+        )
+      else
+        layout(
+          :mnt_fsname, :string,
+          :mnt_dir, :string,
+          :mnt_type, :string,
+          :mnt_opts, :string,
+          :mnt_freq, :int,
+          :mnt_passno, :int
+        )
+      end
     end
 
     public
@@ -346,7 +379,11 @@ module Sys
         }
       else
         begin
-          fp = setmntent(MOUNT_FILE, 'r')
+          if method_defined?(:setmntent)
+            fp = setmntent(MOUNT_FILE, 'r')
+          else
+            fp = fopen(MOUNT_FILE, 'r')
+          end
 
           while ptr = getmntent(fp)
             break if ptr.null?
@@ -368,7 +405,13 @@ module Sys
             end
           end
         ensure
-          endmntent(fp) if fp && !fp.null?
+          if fp && !fp.null?
+            if method_defined?(:endmntent)
+              endmntent(fp)
+            else
+              fclose(fp)
+            end
+          end
         end
       end
 
