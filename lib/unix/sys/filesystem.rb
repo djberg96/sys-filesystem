@@ -1,4 +1,5 @@
 require 'ffi'
+require 'rbconfig'
 
 module Sys
   class Filesystem
@@ -17,7 +18,11 @@ module Sys
       attach_function(:endmntent, [:pointer], :int)
       attach_function(:getmntent, [:pointer], :pointer)
     rescue FFI::NotFoundError
-      attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
+        attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
+      else
+        attach_function(:getmntinfo, [:pointer, :int], :int)
+      end
     end
 
     MNT_RDONLY      = 0x00000001      # read only filesystem
