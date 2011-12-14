@@ -90,24 +90,51 @@ module Sys
     end
 
     class Statfs < FFI::Struct
-      layout(
-        :f_bsize, :uint32,
-        :f_iosize, :int32,
-        :f_blocks, :uint64,
-        :f_bfree, :uint64,
-        :f_bavail, :uint64,
-        :f_files, :uint64,
-        :f_ffree, :uint64,
-        :f_fsid, [:int32, 2],
-        :f_owner, :int32,
-        :f_type, :uint32,
-        :f_flags, :uint32,
-        :f_fssubtype, :uint32,
-        :f_fstypename, [:char, 16],
-        :f_mntonname, [:char, 1024],
-        :f_mntfromname, [:char, 1024],
-        :f_reserved, [:uint32, 8]
-      )
+      if RbConfig::CONFIG['host_os'] =~ /bsd/i
+        layout(
+          :f_version, :uint32,
+          :f_type, :uint32,
+          :f_flags, :uint64,
+          :f_bsize, :uint64,
+          :f_iosize, :int64,
+          :f_blocks, :uint64,
+          :f_bfree, :uint64,
+          :f_bavail, :int64,
+          :f_files, :uint64,
+          :f_ffree, :uint64,
+          :f_syncwrites, :uint64,
+          :f_asyncwrites, :uint64,
+          :f_syncreads, :uint64,
+          :f_asyncreads, :uint64,
+          :f_spare, [:uint64, 10],
+          :f_namemax, :uint32,
+          :f_owner, :int32,
+          :f_fsid,  [:int32, 2],
+          :f_charspare, [:char, 80],
+          :f_fstypename, [:char, 16],
+          :f_mntonname, [:char, 88],
+          :f_mntfromname, [:char, 88]
+        )
+      else
+        layout(
+          :f_bsize, :uint32,
+          :f_iosize, :int32,
+          :f_blocks, :uint64,
+          :f_bfree, :uint64,
+          :f_bavail, :uint64,
+          :f_files, :uint64,
+          :f_ffree, :uint64,
+          :f_fsid, [:int32, 2],
+          :f_owner, :int32,
+          :f_type, :uint32,
+          :f_flags, :uint32,
+          :f_fssubtype, :uint32,
+          :f_fstypename, [:char, 16],
+          :f_mntonname, [:char, 1024],
+          :f_mntfromname, [:char, 1024],
+          :f_reserved, [:uint32, 8]
+        )
+      end
     end
 
     class Statvfs < FFI::Struct
@@ -123,6 +150,20 @@ module Sys
           :f_favail, :uint,
           :f_fsid, :ulong,
           :f_flag, :ulong,
+          :f_namemax, :ulong
+        )
+      elsif RbConfig::CONFIG['host'] =~ /bsd/i
+        layout(
+          :f_bavail, :uint64,
+          :f_bfree, :uint64,
+          :f_blocks, :uint64,
+          :f_favail, :uint64,
+          :f_ffree, :uint64,
+          :f_files, :uint64,
+          :f_bsize, :ulong,
+          :f_flag, :ulong,
+          :f_frsize, :ulong,
+          :f_fsid, :ulong,
           :f_namemax, :ulong
         )
       else
@@ -249,7 +290,9 @@ module Sys
 
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         obj.block_size /= 256
-      else
+      end
+
+      if fs.members.include?(:f_basetype)
         obj.base_type = fs[:f_basetype]
       end
 
