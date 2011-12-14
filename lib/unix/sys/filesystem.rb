@@ -112,8 +112,8 @@ module Sys
           :f_fsid,  [:int32, 2],
           :f_charspare, [:char, 80],
           :f_fstypename, [:char, 16],
-          :f_mntonname, [:char, 88],
-          :f_mntfromname, [:char, 88]
+          :f_mntfromname, [:char, 88],
+          :f_mntonname, [:char, 88]
         )
       else
         layout(
