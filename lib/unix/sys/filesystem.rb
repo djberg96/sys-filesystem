@@ -103,6 +103,12 @@ module Sys
       attr_accessor :dump_frequency
       attr_accessor :pass_number
 
+      alias fsname name
+      alias dir mount_point
+      alias opts options
+      alias passno pass_number
+      alias freq dump_frequency
+
       def initialize
         @name = nil
         @mount_point = nil
