@@ -12,9 +12,13 @@ module Sys
     attach_function(:statvfs, [:string, :pointer], :int)
     attach_function(:strerror, [:int], :string)
 
-    attach_function(:setmntent, [:string, :string], :pointer)
-    attach_function(:endmntent, [:pointer], :int)
-    attach_function(:getmntent, [:pointer], :pointer)
+    begin
+      attach_function(:setmntent, [:string, :string], :pointer)
+      attach_function(:endmntent, [:pointer], :int)
+      attach_function(:getmntent, [:pointer], :pointer)
+    rescue FFI::NotFoundError
+      attach_function(:getmntinfo, [:pointer, :int], :int)
+    end
 
     if File.exists?('/etc/mtab')
       MOUNT_FILE = '/etc/mtab'
@@ -22,6 +26,27 @@ module Sys
       MOUNT_FILE = '/etc/mnttab'
     else
       MOUNT_FILE = 'getmntinfo'
+    end
+
+    class Statfs < FFI::Struct
+      layout(
+        :f_bsize, :uint32,
+        :f_iosize, :int32,
+        :f_blocks, :uint64,
+        :f_bfree, :uint64,
+        :f_bavail, :uint64,
+        :f_files, :uint64,
+        :f_ffree, :uint64,
+        :f_fsid, :int32,
+        :f_owner, :int32,
+        :f_type, :uint32,
+        :f_flags, :uint32,
+        :f_fssubtype, :uint32,
+        :f_fstypename, [:char, 16],
+        :f_mntonname, [:char, 1024],
+        :f_mntfromname, [:char, 1024],
+        :f_reserved, [:uint32, 8]
+      )
     end
 
     class Statvfs < FFI::Struct
