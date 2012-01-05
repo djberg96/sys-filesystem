@@ -67,7 +67,8 @@ module Sys
       obj = self.new
       obj.block_size = fs[:f_bsize]
       obj.fragment_size = fs[:f_frsize]
-      obj.blocks = fs[:f_bfree]
+      obj.blocks = fs[:f_blocks]
+      obj.blocks_free = fs[:f_bfree]
       obj.blocks_available = fs[:f_bavail]
       obj.files = fs[:f_files]
       obj.files_free = fs[:f_ffree]
