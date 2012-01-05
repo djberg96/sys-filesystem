@@ -176,6 +176,21 @@ module Sys
 
       array
     end
+
+    def self.mount_point(file)
+      dev = File.stat(file).dev
+      val = file
+
+      self.mounts.each{ |mnt|
+        mp = mnt.mount_point
+        if File.stat(mp).dev == dev
+          val = mp
+          break
+        end
+      }
+
+      val
+    end
   end
 end
 
