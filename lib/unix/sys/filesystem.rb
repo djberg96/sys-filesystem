@@ -59,6 +59,10 @@ module Sys
     class Error < StandardError; end
 
     class Stat
+      RDONLY  = 1
+      NOSUID  = 2
+      NOTRUNC = 3
+
       attr_accessor :path
       attr_accessor :block_size
       attr_accessor :fragment_size
