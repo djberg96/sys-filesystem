@@ -37,7 +37,7 @@ module Sys
         :f_bavail, :uint64,
         :f_files, :uint64,
         :f_ffree, :uint64,
-        :f_fsid, :int32,
+        :f_fsid, [:int32, 2],
         :f_owner, :int32,
         :f_type, :uint32,
         :f_flags, :uint32,
