@@ -5,6 +5,8 @@ module Sys
     extend FFI::Library
     ffi_lib(FFI::Library::LIBC)
 
+    VERSION = '1.0.0'
+
     private
 
     attach_function(:statvfs, [:string, :pointer], :int)
@@ -70,6 +72,10 @@ module Sys
       attr_accessor :flags
       attr_accessor :name_max
       attr_accessor :base_type
+
+      alias inodes files
+      alias inodes_free files_free
+      alias inodes_available files_available
 
       def initialize
         @path             = nil
@@ -164,5 +170,19 @@ module Sys
 
       array
     end
+  end
+end
+
+class Fixnum
+  def to_kb
+    self / 1024
+  end
+
+  def to_mb
+    self / 1048576
+  end
+
+  def to_gb
+    self / 1073741824
   end
 end
