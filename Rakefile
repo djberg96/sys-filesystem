@@ -1,36 +1,15 @@
 require 'rake'
 require 'rake/clean'
 require 'rake/testtask'
-include Config
 
-CLEAN.include(
-  '**/*.gem',               # Gem files
-  '**/*.rbc',               # Rubinius
-  '**/*.o',                 # C object file
-  '**/*.log',               # Ruby extension build log
-  '**/Makefile',            # C Makefile
-  '**/conftest.dSYM',       # OS X build directory
-  "**/*.#{CONFIG['DLEXT']}" # C shared object
-)
-
-desc "Build the sys-filesystem library on UNIX systems (but don't install it)"
-task :build => [:clean] do
-  unless CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
-    file = 'filesystem.' + CONFIG['DLEXT']
-    Dir.chdir('ext') do
-      ruby 'extconf.rb'
-      sh 'make'
-      mv file, 'sys'
-    end
-  end
-end
+CLEAN.include('**/*.gem', '**/*.rbc', '**/*.rbx')
 
 desc "Run the test suite"
 Rake::TestTask.new("test") do |t|
-  unless CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
-    task :test => :build
-    t.libs << 'ext'
-    t.libs.delete('lib')
+  if File::ALT_SEPARATOR
+    t.libs << 'lib/windows'
+  else
+    t.libs << 'lib/unix'
   end
 
   t.warning = true
@@ -38,36 +17,19 @@ Rake::TestTask.new("test") do |t|
   t.test_files = FileList['test/test_sys_filesystem.rb']
 end
 
-task :test do
-  Rake.application[:clean].execute
-end
-
 desc "Run the example program"
-task :example => [:build] do |t|
-  Dir.chdir('examples') do
-    Dir.mkdir('sys') unless File.exists?('sys')
-  end
-
-  FileUtils.cp('ext/sys/filesystem.' + CONFIG['DLEXT'], 'examples/sys')
-
-  Dir.chdir('examples') do
-    ruby 'example_stat.rb'
-  end
+task :example do |t|
+  sh "ruby -Ilib -Ilib/unix -Ilib/windows examples/example_stat.rb"
 end
 
 namespace :gem do
   desc "Build the sys-filesystem gem"
-  task :create => [:clean] do |t|
+  task :create do |t|
     spec = eval(IO.read('sys-filesystem.gemspec'))
 
-    if Config::CONFIG['host_os'] =~ /mswin32|mingw|cygwin|windows|dos/i
-      spec.files -= Dir['ext/**/*']
+    if File::ALT_SEPARATOR
       spec.platform = Gem::Platform::CURRENT
       spec.add_dependency('windows-pr', '>= 1.0.5')
-    else
-      spec.extensions = ['ext/extconf.rb']
-      spec.files -= Dir['lib/**/*']
-      spec.extra_rdoc_files << 'ext/sys/filesystem.c'
     end
 
     Gem::Builder.new(spec).build
