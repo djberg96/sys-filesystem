@@ -13,10 +13,10 @@ include Sys
 
 class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   def self.startup
-    @@solaris = Config::CONFIG['host_os'] =~ /solaris/i
-    @@linux   = Config::CONFIG['host_os'] =~ /linux/i
-    @@freebsd = Config::CONFIG['host_os'] =~ /freebsd/i
-    @@darwin  = Config::CONFIG['host_os'] =~ /darwin/i
+    @@solaris = RbConfig::CONFIG['host_os'] =~ /solaris/i
+    @@linux   = RbConfig::CONFIG['host_os'] =~ /linux/i
+    @@freebsd = RbConfig::CONFIG['host_os'] =~ /freebsd/i
+    @@darwin  = RbConfig::CONFIG['host_os'] =~ /darwin/i
   end
 
   def setup
@@ -28,7 +28,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('0.3.4', Filesystem::VERSION)
+    assert_equal('1.0.0', Filesystem::VERSION)
   end
 
   def test_stat_path
