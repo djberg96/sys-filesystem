@@ -30,6 +30,8 @@ namespace :gem do
     if File::ALT_SEPARATOR
       spec.platform = Gem::Platform::CURRENT
       spec.add_dependency('windows-pr', '>= 1.0.5')
+    else
+      spec.add_dependency('ffi', '>= 1.0.0')
     end
 
     Gem::Builder.new(spec).build
