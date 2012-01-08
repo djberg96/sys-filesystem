@@ -17,7 +17,7 @@ module Sys
       attach_function(:endmntent, [:pointer], :int)
       attach_function(:getmntent, [:pointer], :pointer)
     rescue FFI::NotFoundError
-      attach_function(:getmntinfo, [:pointer, :int], :int)
+      attach_function(:getmntinfo64, [:pointer, :int], :int)
     end
 
     if File.exists?('/etc/mtab')
@@ -174,33 +174,75 @@ module Sys
       obj.freeze
     end
 
+    private
+
+    def self.start_mnt
+    end
+
+    def self.end_mnt
+    end
+
+    def self.get_mnt
+    end
+
+    public
+
     def self.mounts
       array = block_given? ? nil : []
 
-      begin
-        fp = setmntent(MOUNT_FILE, 'r')
+      if method_defined?(:getmntinfo64)
+        buf = FFI::MemoryPointer.new(:pointer)
 
-        while ptr = getmntent(fp)
-          break if ptr.null?
-          mt = Mntent.new(ptr)
+        num = getmntinfo64(buf, 2)
 
+        if num == 0
+          raise Error, 'getmntinfo64() function failed: ' + strerror(FFI.errno)
+        end
+
+        ptr = buf.get_pointer(0)
+
+        num.times{ |i|
+          mnt = Statfs.new(ptr)
           obj = Sys::Filesystem::Mount.new
-          obj.name = mt[:mnt_fsname]
-          obj.mount_point = mt[:mnt_dir]
-          obj.mount_type = mt[:mnt_type]
-          obj.options = mt[:mnt_opts]
-          obj.mount_time = nil
-          obj.dump_frequency = mt[:mnt_freq]
-          obj.pass_number = mt[:mnt_passno]
+          obj.name = mnt[:f_mntfromname]
+          obj.mount_point = mnt[:f_mntonname]
+          obj.mount_type = mnt[:f_fstypename]
+          obj.options = mnt[:f_flags] # TODO: convert to strings
 
           if block_given?
             yield obj.freeze
           else
             array << obj.freeze
           end
+
+          ptr += Statfs.size
+        }
+      else
+        begin
+          fp = setmntent(MOUNT_FILE, 'r')
+
+          while ptr = getmntent(fp)
+            break if ptr.null?
+            mt = Mntent.new(ptr)
+
+            obj = Sys::Filesystem::Mount.new
+            obj.name = mt[:mnt_fsname]
+            obj.mount_point = mt[:mnt_dir]
+            obj.mount_type = mt[:mnt_type]
+            obj.options = mt[:mnt_opts]
+            obj.mount_time = nil
+            obj.dump_frequency = mt[:mnt_freq]
+            obj.pass_number = mt[:mnt_passno]
+
+            if block_given?
+              yield obj.freeze
+            else
+              array << obj.freeze
+            end
+          end
+        ensure
+          endmntent(fp) if fp && !fp.null?
         end
-      ensure
-        endmntent(fp) if fp && !fp.null?
       end
 
       array
