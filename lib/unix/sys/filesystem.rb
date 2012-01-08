@@ -50,22 +50,38 @@ module Sys
     end
 
     class Statvfs < FFI::Struct
-      layout(
-        :f_bsize, :ulong,
-        :f_frsize, :ulong,
-        :f_blocks, :ulong,
-        :f_bfree, :ulong,
-        :f_bavail, :ulong,
-        :f_files, :ulong,
-        :f_ffree, :ulong,
-        :f_favail, :ulong,
-        :f_fsid, :ulong,
-        :f_flag, :ulong,
-        :f_namemax, :ulong,
-        :f_ftype, :ulong,
-        :f_basetype, [:char, 16],
-        :f_str, [:char, 16]
-      )
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
+        layout(
+          :f_bsize, :ulong,
+          :f_frsize, :ulong,
+          :f_blocks, :uint,
+          :f_bfree, :uint,
+          :f_bavail, :uint,
+          :f_files, :uint,
+          :f_ffree, :uint,
+          :f_favail, :uint,
+          :f_fsid, :ulong,
+          :f_flag, :ulong,
+          :f_namemax, :ulong
+        )
+      else
+        layout(
+          :f_bsize, :ulong,
+          :f_frsize, :ulong,
+          :f_blocks, :ulong,
+          :f_bfree, :ulong,
+          :f_bavail, :ulong,
+          :f_files, :ulong,
+          :f_ffree, :ulong,
+          :f_favail, :ulong,
+          :f_fsid, :ulong,
+          :f_flag, :ulong,
+          :f_namemax, :ulong,
+          :f_ftype, :ulong,
+          :f_basetype, [:char, 16],
+          :f_str, [:char, 16]
+        )
+      end
     end
 
     class Mntent < FFI::Struct
@@ -169,23 +185,15 @@ module Sys
       obj.filesystem_id = fs[:f_fsid]
       obj.flags = fs[:f_flag]
       obj.name_max = fs[:f_namemax]
-      obj.base_type = fs[:f_basetype]
+
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
+        obj.block_size /= 256
+      else
+        obj.base_type = fs[:f_basetype]
+      end
 
       obj.freeze
     end
-
-    private
-
-    def self.start_mnt
-    end
-
-    def self.end_mnt
-    end
-
-    def self.get_mnt
-    end
-
-    public
 
     def self.mounts
       array = block_given? ? nil : []
