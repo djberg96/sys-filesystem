@@ -212,9 +212,9 @@ module Sys
         num.times{ |i|
           mnt = Statfs.new(ptr)
           obj = Sys::Filesystem::Mount.new
-          obj.name = mnt[:f_mntfromname]
-          obj.mount_point = mnt[:f_mntonname]
-          obj.mount_type = mnt[:f_fstypename]
+          obj.name = mnt[:f_mntfromname].to_s
+          obj.mount_point = mnt[:f_mntonname].to_s
+          obj.mount_type = mnt[:f_fstypename].to_s
           obj.options = mnt[:f_flags] # TODO: convert to strings
 
           if block_given?
