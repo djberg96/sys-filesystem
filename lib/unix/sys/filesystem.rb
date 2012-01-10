@@ -272,22 +272,21 @@ module Sys
           obj.mount_point = mnt[:f_mntonname].to_s
           obj.mount_type = mnt[:f_fstypename].to_s
 
-          opts  = ""
+          string = ""
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
-          # BUG: Seems to repeat some values
           @@opt_names.each{ |key,val|
             if flags & key > 0
-              if opts.empty?
-                opts = val
+              if string.empty?
+                string << val
               else
-                opts << ",#{val}"
+                string << ", #{val}"
               end
-              flags &= ~key
             end
+            flags &= ~key
           }
 
-          obj.options = opts
+          obj.options = string
 
           if block_given?
             yield obj.freeze
