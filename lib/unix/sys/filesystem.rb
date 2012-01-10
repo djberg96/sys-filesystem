@@ -17,7 +17,7 @@ module Sys
       attach_function(:endmntent, [:pointer], :int)
       attach_function(:getmntent, [:pointer], :pointer)
     rescue FFI::NotFoundError
-      attach_function(:getmntinfo64, [:pointer, :int], :int)
+      attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
     end
 
     MNT_RDONLY      = 0x00000001      # read only filesystem
@@ -254,13 +254,13 @@ module Sys
     def self.mounts
       array = block_given? ? nil : []
 
-      if method_defined?(:getmntinfo64)
+      if method_defined?(:getmntinfo)
         buf = FFI::MemoryPointer.new(:pointer)
 
-        num = getmntinfo64(buf, 2)
+        num = getmntinfo(buf, 2)
 
         if num == 0
-          raise Error, 'getmntinfo64() function failed: ' + strerror(FFI.errno)
+          raise Error, 'getmntinfo() function failed: ' + strerror(FFI.errno)
         end
 
         ptr = buf.get_pointer(0)
