@@ -418,7 +418,7 @@ module Sys
     def self.mounts
       array = block_given? ? nil : []
 
-      if method_defined?(:getmntinfo)
+      if respond_to?(:getmntinfo, true)
         buf = FFI::MemoryPointer.new(:pointer)
 
         num = getmntinfo(buf, 2)
@@ -462,7 +462,7 @@ module Sys
         }
       else
         begin
-          if method_defined?(:setmntent)
+          if respond_to?(:setmntent, true)
             fp = setmntent(MOUNT_FILE, 'r')
           else
             fp = fopen(MOUNT_FILE, 'r')
@@ -507,7 +507,7 @@ module Sys
           end
         ensure
           if fp && !fp.null?
-            if method_defined?(:endmntent)
+            if respond_to?(:endmntent, true)
               endmntent(fp)
             else
               fclose(fp)
