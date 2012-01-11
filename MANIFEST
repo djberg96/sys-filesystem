@@ -4,10 +4,9 @@
 * README
 * sys-fileystem.gemspec
 * examples/example_stat.rb
-* doc/sys-filesystem.txt
-* ext/extconf.rb
-* ext/sys/filesystem.c
 * lib/sys/filesystem.rb
+* lib/unix/sys/filesystem.rb
+* lib/windows/sys/filesystem.rb
 * test/test_sys_filesystem.rb
 * test/test_sys_filesystem_unix
 * test/test_sys_filesystem_windows
