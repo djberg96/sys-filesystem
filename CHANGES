@@ -1,4 +1,4 @@
-== 1.0.0 - ???
+== 1.0.0 - 11-Jan-2012
 * Converted everything from C to FFI for the Unix flavors. The Windows
   source code remains untouched.
 
