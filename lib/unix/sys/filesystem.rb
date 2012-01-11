@@ -34,11 +34,10 @@ module Sys
     rescue FFI::NotFoundError
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
-        private_class_method :getmntinfo, :getmntinfo64
       else
         attach_function(:getmntinfo, [:pointer, :int], :int)
-        private_class_method :getmntinfo
       end
+      private_class_method :getmntinfo
     end
 
     MNT_RDONLY      = 0x00000001 # read only filesystem
