@@ -46,7 +46,7 @@
   turn wraps native Windows functions.
 
 === UNIX
-  This is a C extension that wraps statvfs, etc.
+  This is a pure Ruby implementation that uses FFI.
 
 = Sample code
   Run 'rake example' if you want to see a basic sample run. The actual code
@@ -54,7 +54,7 @@
 
 = Known Bugs
   None that I'm aware of.  Please report bugs on the project page at
-  http://www.rubyforge.org/projects/sysutils.
+  https://github.com/djberg96/sys-filesystem
 
 = Future Plans
   Suggestions welcome.
@@ -71,7 +71,7 @@
   Artistic 2.0
 
 = Copyright
-  (C) 2003-2010 Daniel J. Berger
+  (C) 2003-2012 Daniel J. Berger
   All Rights Reserved
 
 = Warranty
