@@ -1,9 +1,7 @@
-require 'windows/error'
-require 'windows/path'
-require 'windows/filesystem'
-require 'windows/volume'
-require 'windows/handle'
-require 'windows/limits'
+require File.join(File.dirname(__FILE__), 'filesystem', 'constants')
+require File.join(File.dirname(__FILE__), 'filesystem', 'functions')
+require File.join(File.dirname(__FILE__), 'filesystem', 'helper')
+
 require 'socket'
 require 'win32ole'
 require 'date'
@@ -14,35 +12,14 @@ module Sys
 
   # The Filesystem class encapsulates information about your filesystem.
   class Filesystem
-    include Windows::Error
-    include Windows::Handle
-    include Windows::Limits
-
-    extend Windows::Error
-    extend Windows::FileSystem
-    extend Windows::Volume
-    extend Windows::Path
+    include Sys::Filesystem::Constants
+    extend Sys::Filesystem::Functions
 
     # Error typically raised if any of the Sys::Filesystem methods fail.
     class Error < StandardError; end
 
-    CASE_SENSITIVE_SEARCH      = 0x00000001
-    CASE_PRESERVED_NAMES       = 0x00000002
-    UNICODE_ON_DISK            = 0x00000004
-    PERSISTENT_ACLS            = 0x00000008
-    FILE_COMPRESSION           = 0x00000010
-    VOLUME_QUOTAS              = 0x00000020
-    SUPPORTS_SPARSE_FILES      = 0x00000040
-    SUPPORTS_REPARSE_POINTS    = 0x00000080
-    SUPPORTS_REMOTE_STORAGE    = 0x00000100
-    VOLUME_IS_COMPRESSED       = 0x00008000
-    SUPPORTS_OBJECT_IDS        = 0x00010000
-    SUPPORTS_ENCRYPTION        = 0x00020000
-    NAMED_STREAMS              = 0x00040000
-    READ_ONLY_VOLUME           = 0x00080000
-
     # The version of the sys-filesystem library.
-    VERSION = '1.0.0'
+    VERSION = '1.1.0'
 
     class Mount
       # The name of the volume. This is the device mapping.
@@ -162,20 +139,20 @@ module Sys
     # compressed   => The filesystem is compressed.
     #
     def self.mounts
-      buffer = 0.chr * MAXPATH
+      buffer = FFI::MemoryPointer.new(:char, MAXPATH)
       length = GetLogicalDriveStrings(buffer.size, buffer)
 
       if length == 0
-        raise Error, get_last_error
+        raise SystemCallError.new('GetLogicalDriveStrings', FFI.errno)
       end
 
       mounts = block_given? ? nil : []
 
       # Try again if it fails because the buffer is too small
       if length > buffer.size
-        buffer = 0.chr * length
+        buffer = FFI::MemoryPointer.new(:char, length)
         if GetLogicalDriveStrings(buffer.size, buffer) == 0
-          raise Error, get_last_error
+          raise SystemCallError.new('GetLogicalDriveStrings', FFI.errno)
         end
       end
 
@@ -185,15 +162,15 @@ module Sys
 
       drives.each{ |drive|
         mount  = Mount.new
-        volume = 0.chr * MAXPATH
-        fsname = 0.chr * MAXPATH
+        volume = FFI::MemoryPointer.new(:char, MAXPATH)
+        fsname = FFI::MemoryPointer.new(:char, MAXPATH)
 
         mount.instance_variable_set(:@mount_point, drive)
         mount.instance_variable_set(:@mount_time, boot_time)
 
-        volume_serial_number = [0].pack('L')
-        max_component_length = [0].pack('L')
-        filesystem_flags     = [0].pack('L')
+        volume_serial_number = FFI::MemoryPointer.new(:ulong)
+        max_component_length = FFI::MemoryPointer.new(:ulong)
+        filesystem_flags     = FFI::MemoryPointer.new(:ulong)
 
         bool = GetVolumeInformation(
            drive,
@@ -260,44 +237,46 @@ module Sys
     #    File.stat("C:\\Documents and Settings\\some_user")
     #
     def self.stat(path)
-      bytes_avail = [0].pack('Q')
-      bytes_free  = [0].pack('Q')
-      total_bytes = [0].pack('Q')
+      bytes_avail = FFI::MemoryPointer.new(:ulong_long)
+      bytes_free  = FFI::MemoryPointer.new(:ulong_long)
+      total_bytes = FFI::MemoryPointer.new(:ulong_long)
 
-      unless GetDiskFreeSpaceEx(path, bytes_avail, total_bytes, bytes_free)
-        raise Error, get_last_error
+      wpath = path.wincode
+
+      unless GetDiskFreeSpaceExW(wpath, bytes_avail, total_bytes, bytes_free)
+        raise SystemCallError.new('GetDiskFreeSpaceEx', FFI.errno)
       end
 
-      bytes_avail = bytes_avail.unpack('Q').first
-      bytes_free  = bytes_free.unpack('Q').first
-      total_bytes = total_bytes.unpack('Q').first
+      bytes_avail = bytes_avail.read_ulong_long
+      bytes_free  = bytes_free.read_ulong_long
+      total_bytes = total_bytes.read_ulong_long
 
-      sectors = [0].pack('Q')
-      bytes   = [0].pack('Q')
-      free    = [0].pack('Q')
-      total   = [0].pack('Q')
+      sectors = FFI::MemoryPointer.new(:ulong_long)
+      bytes   = FFI::MemoryPointer.new(:ulong_long)
+      free    = FFI::MemoryPointer.new(:ulong_long)
+      total   = FFI::MemoryPointer.new(:ulong_long)
 
-      unless GetDiskFreeSpace(path, sectors, bytes, free, total)
-        raise Error, get_last_error
+      unless GetDiskFreeSpaceW(wpath, sectors, bytes, free, total)
+        raise SystemCallError.new('GetDiskFreeSpace', FFI.errno)
       end
 
-      sectors = sectors.unpack('Q').first
-      bytes   = bytes.unpack('Q').first
-      free    = free.unpack('Q').first
-      total   = total.unpack('Q').first
+      sectors = sectors.read_ulong_long
+      bytes   = bytes.read_ulong_long
+      free    = free.read_ulong_long
+      total   = total.read_ulong_long
 
       block_size   = sectors * bytes
       blocks_avail = total_bytes / block_size
       blocks_free  = bytes_free / block_size
 
-      vol_name   = 0.chr * 260
-      base_type  = 0.chr * 260
-      vol_serial = [0].pack('L')
-      name_max   = [0].pack('L')
-      flags      = [0].pack('L')
+      vol_name   = FFI::MemoryPointer.new(:char, MAXPATH)
+      base_type  = FFI::MemoryPointer.new(:char, MAXPATH)
+      vol_serial = FFI::MemoryPointer.new(:ulong)
+      name_max   = FFI::MemoryPointer.new(:ulong)
+      flags      = FFI::MemoryPointer.new(:ulong)
 
-      bool = GetVolumeInformation(
-        path,
+      bool = GetVolumeInformationW(
+        wpath,
         vol_name,
         vol_name.size,
         vol_serial,
@@ -308,13 +287,13 @@ module Sys
       )
 
       unless bool
-        raise Error, get_last_error
+        raise SystemCallError.new('GetVolumInformation', FFI.errno)
       end
 
-      vol_serial = vol_serial.unpack('L').first
-      name_max   = name_max.unpack('L').first
-      flags      = flags.unpack('L').first
-      base_type  = base_type[/^[^\0]*/]
+      vol_serial = vol_serial.read_ulong
+      name_max   = name_max.read_ulong
+      flags      = flags.read_ulong
+      base_type  = base_type.read_string(base_type.size).tr(0.chr, '')
 
       stat_obj = Stat.new
       stat_obj.instance_variable_set(:@path, path)
@@ -328,7 +307,7 @@ module Sys
       stat_obj.instance_variable_set(:@filesystem_id, vol_serial)
 
       stat_obj.freeze # Read-only object
-   end
+    end
 
     private
 
@@ -405,3 +384,5 @@ class Fixnum
     self / 1073741824
   end
 end
+
+p Sys::Filesystem.stat("C:\\")
