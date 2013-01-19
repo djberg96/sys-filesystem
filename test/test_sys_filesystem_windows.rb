@@ -134,67 +134,66 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
    # Filesystem.mounts
 
-   def test_mounts_constructor_basic
-      assert_respond_to(Filesystem, :mounts)
-      assert_nothing_raised{ Filesystem.mounts }
-      assert_nothing_raised{ Filesystem.mounts{} }
-   end
+  test "mounts singleton method basic functionality" do
+    assert_respond_to(Filesystem, :mounts)
+    assert_nothing_raised{ Filesystem.mounts }
+    assert_nothing_raised{ Filesystem.mounts{} }
+  end
 
-   def test_mounts
-      assert_kind_of(Array, Filesystem.mounts)
-      assert_kind_of(Filesystem::Mount, Filesystem.mounts[0])
-   end
+  test "mounts singleton method returns the expected value" do
+    assert_kind_of(Array, Filesystem.mounts)
+    assert_kind_of(Filesystem::Mount, Filesystem.mounts[0])
+  end
 
-   def test_mounts_block_form
-      assert_nil(Filesystem.mounts{})
-      assert_nothing_raised{ Filesystem.mounts{ |mt| @array << mt }}
-      assert_kind_of(Filesystem::Mount, @array[0])
-   end
+  test "mounts singleton method works as expected when a block is provided" do
+    assert_nil(Filesystem.mounts{})
+    assert_nothing_raised{ Filesystem.mounts{ |mt| @array << mt }}
+    assert_kind_of(Filesystem::Mount, @array[0])
+  end
 
-   def test_mount_name
-      assert_respond_to(@mount, :name)
-      assert_kind_of(String, @mount.name)
-   end
+  test "mount name works as expected" do
+    assert_respond_to(@mount, :name)
+    assert_kind_of(String, @mount.name)
+  end
 
-   def test_mount_time
-      assert_respond_to(@mount, :mount_time)
-      assert_kind_of(Time, @mount.mount_time)
-   end
+  test "mount time works as expected" do
+    assert_respond_to(@mount, :mount_time)
+    assert_kind_of(Time, @mount.mount_time)
+  end
 
-   def test_mount_type
-      assert_respond_to(@mount, :mount_type)
-      assert_kind_of(String, @mount.mount_type)
-   end
+  test "mount type works as expected" do
+    assert_respond_to(@mount, :mount_type)
+    assert_kind_of(String, @mount.mount_type)
+  end
 
-   def test_mount_point
-      assert_respond_to(@mount, :mount_point)
-      assert_kind_of(String, @mount.mount_point)
-   end
+  test "mount point works as expected" do
+    assert_respond_to(@mount, :mount_point)
+    assert_kind_of(String, @mount.mount_point)
+  end
 
-   def test_mount_options
-      assert_respond_to(@mount, :options)
-      assert_kind_of(String, @mount.options)
-   end
+  test "mount options works as expected" do
+    assert_respond_to(@mount, :options)
+    assert_kind_of(String, @mount.options)
+  end
 
-   def test_pass_number
-      assert_respond_to(@mount, :pass_number)
-      assert_nil(@mount.pass_number)
-   end
+  test "mount pass_number works as expected" do
+    assert_respond_to(@mount, :pass_number)
+    assert_nil(@mount.pass_number)
+  end
 
-   def test_frequency
-      assert_respond_to(@mount, :frequency)
-      assert_nil(@mount.frequency)
-   end
+  test "mount frequency works as expected" do
+    assert_respond_to(@mount, :frequency)
+    assert_nil(@mount.frequency)
+  end
 
-   def test_mounts_expected_errors
-      assert_raise(ArgumentError){ Filesystem.mounts("C:\\") }
-   end
+  test "mounts singleton method does not accept any arguments" do
+    assert_raise(ArgumentError){ Filesystem.mounts("C:\\") }
+  end
 
   test "custom Fixnum#to_kb method works as expected" do
     assert_respond_to(@size, :to_kb)
     assert_equal(57344, @size.to_kb)
   end
-
 
   test "custom Fixnum#to_mb method works as expected" do
     assert_respond_to(@size, :to_mb)
