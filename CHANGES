@@ -1,3 +1,7 @@
+== 1.1.0 - 19-Jan-2013
+* Converted the Windows source code to use FFI.
+* Revamped the Windows tests.
+
 == 1.0.0 - 11-Jan-2012
 * Converted everything from C to FFI for the Unix flavors. The Windows
   source code remains untouched.

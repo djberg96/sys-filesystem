@@ -4,11 +4,6 @@
 = Installation
   gem install sys-filesystem
 
-== Windows
-  If the installation command above doesn't work try this:
-
-  gem install sys-filesystem --platform x86-mingw32
-
 = Synopsis
   require 'sys/filesystem'
   include Sys
@@ -41,11 +36,6 @@
   puts Filesystem.mount_point('/home/djberge/some_file.txt') => '/home'
 
 = Notes
-=== MS Windows
-  This is a pure Ruby implementation using the windows-pr library, which in
-  turn wraps native Windows functions.
-
-=== UNIX
   This is a pure Ruby implementation that uses FFI. This means it should work
   with JRuby, too.
 
@@ -72,7 +62,7 @@
   Artistic 2.0
 
 = Copyright
-  (C) 2003-2012 Daniel J. Berger
+  (C) 2003-2013 Daniel J. Berger
   All Rights Reserved
 
 = Warranty
