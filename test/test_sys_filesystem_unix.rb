@@ -4,10 +4,7 @@
 # Test case for the Sys::Filesystem.stat method and related stuff.
 # This test suite should be run via the 'rake test' task.
 ####################################################################
-require 'rubygems'
-gem 'test-unit'
-
-require 'test/unit'
+require 'test-unit'
 require 'sys/filesystem'
 include Sys
 
@@ -28,7 +25,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.0.0', Filesystem::VERSION)
+    assert_equal('1.1.0', Filesystem::VERSION)
   end
 
   def test_stat_path
@@ -241,7 +238,6 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_ffi_functions_are_private
-    methods = Filesystem.methods(false).map{ |e| e.to_s }
     assert_false(Filesystem.methods.include?('statvfs'))
     assert_false(Filesystem.methods.include?('strerror'))
   end
