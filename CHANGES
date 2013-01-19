@@ -1,5 +1,6 @@
 == 1.1.0 - 19-Jan-2013
-* Converted the Windows source code to use FFI.
+* Converted the Windows source code to use FFI. Consequently, there is now
+  a single gem rather than separate gems for Windows and Unix.
 * Revamped the Windows tests.
 
 == 1.0.0 - 11-Jan-2012
