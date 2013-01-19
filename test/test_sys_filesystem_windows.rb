@@ -99,13 +99,18 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_kind_of(String, @stat.base_type)
   end
 
-=begin
-   def test_mount_point_singleton
-      assert_respond_to(Filesystem, :mount_point)
-      assert_nothing_raised{ Filesystem.mount_point(Dir.pwd) }
-      assert_kind_of(String, Filesystem.mount_point(Dir.pwd))
-   end
+  test "mount_point singleton method basic functionality" do
+    assert_respond_to(Filesystem, :mount_point)
+    assert_nothing_raised{ Filesystem.mount_point(Dir.pwd) }
+    assert_kind_of(String, Filesystem.mount_point(Dir.pwd))
+  end
 
+  test "mount_point singleton method returns expected value" do
+    assert_equal("C:\\", Filesystem.mount_point("C:\\Users\\foo"))
+    assert_equal("\\\\foo\\bar", Filesystem.mount_point("//foo/bar/baz"))
+  end
+
+=begin
    def test_constants
       assert_not_nil(Filesystem::CASE_SENSITIVE_SEARCH)
       assert_not_nil(Filesystem::CASE_PRESERVED_NAMES)

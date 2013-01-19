@@ -223,9 +223,13 @@ module Sys
     #    File.mount_point("C:\\Documents and Settings") # => "C:\\'
     #
     def self.mount_point(file)
-      file = file.tr(File::SEPARATOR, File::ALT_SEPARATOR)
-      PathStripToRoot(file)
-      file[/^[^\0]*/]
+      wfile = FFI::MemoryPointer.from_string(file.wincode)
+
+      if PathStripToRootW(wfile)
+        wfile.read_string(wfile.size).split("\000\000").first.tr(0.chr, '')
+      else
+        nil
+      end
     end
 
     # Returns a Filesystem::Stat object that contains information about the
@@ -385,4 +389,4 @@ class Fixnum
   end
 end
 
-p Sys::Filesystem.stat("C:\\")
+p Sys::Filesystem.mount_point("C:/Users/djberge")

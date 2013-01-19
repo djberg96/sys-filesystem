@@ -18,7 +18,7 @@ module Sys
 
       ffi_lib :shlwapi
 
-      attach_function :PathStripToRootW, [:buffer_in], :bool
+      attach_function :PathStripToRootW, [:pointer], :bool
     end
   end
 end
