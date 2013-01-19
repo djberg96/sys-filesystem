@@ -138,27 +138,31 @@ module Sys
     # unicode      => The filesystem supports Unicode in file names as they appear on disk.
     # compressed   => The filesystem is compressed.
     #
+    #--
+    # I couldn't really find a good reason to use the wide functions for this
+    # method. If you have one, patches welcome.
+    #
     def self.mounts
-      buffer = FFI::MemoryPointer.new(:char, MAXPATH)
-      length = GetLogicalDriveStrings(buffer.size, buffer)
+      # First call, get needed buffer size
+      buffer = 0.chr
+      length = GetLogicalDriveStringsA(buffer.size, buffer)
 
       if length == 0
         raise SystemCallError.new('GetLogicalDriveStrings', FFI.errno)
+      else
+        buffer = 0.chr * length
       end
 
       mounts = block_given? ? nil : []
 
-      # Try again if it fails because the buffer is too small
-      if length > buffer.size
-        buffer = FFI::MemoryPointer.new(:char, length)
-        if GetLogicalDriveStrings(buffer.size, buffer) == 0
-          raise SystemCallError.new('GetLogicalDriveStrings', FFI.errno)
-        end
+      # Try again with new buffer size
+      if GetLogicalDriveStringsA(buffer.size, buffer) == 0
+        raise SystemCallError.new('GetLogicalDriveStrings', FFI.errno)
       end
 
-      boot_time = get_boot_time
+      drives = buffer.split(0.chr)
 
-      drives = buffer.strip.split("\0")
+      boot_time = get_boot_time
 
       drives.each{ |drive|
         mount  = Mount.new
@@ -172,7 +176,7 @@ module Sys
         max_component_length = FFI::MemoryPointer.new(:ulong)
         filesystem_flags     = FFI::MemoryPointer.new(:ulong)
 
-        bool = GetVolumeInformation(
+        bool = GetVolumeInformationA(
            drive,
            volume,
            volume.size,
@@ -183,26 +187,26 @@ module Sys
            fsname.size
         )
 
-        # Skip unmounted floppies or cd-roms
+        # Skip unmounted floppies or cd-roms, or inaccessible drives
         unless bool
-          errnum = GetLastError()
-          if errnum == ERROR_NOT_READY
+          if [5,21].include?(FFI.errno) # ERROR_NOT_READY or ERROR_ACCESS_DENIED
             next
           else
-            raise Error, get_last_error(errnum)
+            raise SystemCallError.new('GetVolumeInformation', FFI.errno)
           end
         end
 
-        filesystem_flags = filesystem_flags.unpack('L')[0]
+        filesystem_flags = filesystem_flags.read_ulong
+        fsname = fsname.read_string
 
         name = 0.chr * MAXPATH
 
-        if QueryDosDevice(drive[0,2], name, name.size) == 0
-          raise Error, get_last_error
+        if QueryDosDeviceA(drive[0,2], name, name.size) == 0
+          raise SystemCallError.new('QueryDosDevice', FFI.errno)
         end
 
         mount.instance_variable_set(:@name, name.strip)
-        mount.instance_variable_set(:@mount_type, fsname.strip)
+        mount.instance_variable_set(:@mount_type, fsname)
         mount.instance_variable_set(:@options, get_options(filesystem_flags))
 
         if block_given?
@@ -388,5 +392,3 @@ class Fixnum
     self / 1073741824
   end
 end
-
-p Sys::Filesystem.mount_point("C:/Users/djberge")

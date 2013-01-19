@@ -13,7 +13,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   def setup
     @dir   = '/'
     @stat  = Filesystem.stat(@dir)
-    #@mount = Filesystem.mounts[0]
+    @mount = Filesystem.mounts[0]
     @size  = 58720256
     @array = []
   end
@@ -110,27 +110,27 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_equal("\\\\foo\\bar", Filesystem.mount_point("//foo/bar/baz"))
   end
 
-=begin
-   def test_constants
-      assert_not_nil(Filesystem::CASE_SENSITIVE_SEARCH)
-      assert_not_nil(Filesystem::CASE_PRESERVED_NAMES)
-      assert_not_nil(Filesystem::UNICODE_ON_DISK)
-      assert_not_nil(Filesystem::PERSISTENT_ACLS)
-      assert_not_nil(Filesystem::FILE_COMPRESSION)
-      assert_not_nil(Filesystem::VOLUME_QUOTAS)
-      assert_not_nil(Filesystem::SUPPORTS_SPARSE_FILES)
-      assert_not_nil(Filesystem::SUPPORTS_REPARSE_POINTS)
-      assert_not_nil(Filesystem::SUPPORTS_REMOTE_STORAGE)
-      assert_not_nil(Filesystem::VOLUME_IS_COMPRESSED)
-      assert_not_nil(Filesystem::SUPPORTS_OBJECT_IDS)
-      assert_not_nil(Filesystem::SUPPORTS_ENCRYPTION)
-      assert_not_nil(Filesystem::NAMED_STREAMS)
-      assert_not_nil(Filesystem::READ_ONLY_VOLUME)
-   end
+  test "filesystem constants are defined" do
+    assert_not_nil(Filesystem::CASE_SENSITIVE_SEARCH)
+    assert_not_nil(Filesystem::CASE_PRESERVED_NAMES)
+    assert_not_nil(Filesystem::UNICODE_ON_DISK)
+    assert_not_nil(Filesystem::PERSISTENT_ACLS)
+    assert_not_nil(Filesystem::FILE_COMPRESSION)
+    assert_not_nil(Filesystem::VOLUME_QUOTAS)
+    assert_not_nil(Filesystem::SUPPORTS_SPARSE_FILES)
+    assert_not_nil(Filesystem::SUPPORTS_REPARSE_POINTS)
+    assert_not_nil(Filesystem::SUPPORTS_REMOTE_STORAGE)
+    assert_not_nil(Filesystem::VOLUME_IS_COMPRESSED)
+    assert_not_nil(Filesystem::SUPPORTS_OBJECT_IDS)
+    assert_not_nil(Filesystem::SUPPORTS_ENCRYPTION)
+    assert_not_nil(Filesystem::NAMED_STREAMS)
+    assert_not_nil(Filesystem::READ_ONLY_VOLUME)
+  end
 
-   def test_stat_expected_errors
-      assert_raises(ArgumentError){ Filesystem.stat }
-   end
+  test "stat singleton method requires a single argument" do
+    assert_raise(ArgumentError){ Filesystem.stat }
+    assert_raise(ArgumentError){ Filesystem.stat(Dir.pwd, Dir.pwd) }
+  end
 
    # Filesystem.mounts
 
@@ -190,16 +190,21 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
       assert_raise(ArgumentError){ Filesystem.mounts("C:\\") }
    end
 
-   def test_fixnum_methods
-      assert_respond_to(@size, :to_kb)
-      assert_respond_to(@size, :to_mb)
-      assert_respond_to(@size, :to_gb)
+  test "custom Fixnum#to_kb method works as expected" do
+    assert_respond_to(@size, :to_kb)
+    assert_equal(57344, @size.to_kb)
+  end
 
-      assert_equal(57344, @size.to_kb)
-      assert_equal(56, @size.to_mb)
-      assert_equal(0, @size.to_gb)
-   end
-=end
+
+  test "custom Fixnum#to_mb method works as expected" do
+    assert_respond_to(@size, :to_mb)
+    assert_equal(56, @size.to_mb)
+  end
+
+  test "custom Fixnum#to_gb method works as expected" do
+    assert_respond_to(@size, :to_gb)
+    assert_equal(0, @size.to_gb)
+  end
 
   def teardown
     @array = nil
