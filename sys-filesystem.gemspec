@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
   spec.rubyforge_project = 'sysutils'
 
+  spec.add_dependency('ffi')
   spec.add_development_dependency('test-unit', '>= 2.5.0')
 
   spec.description = <<-EOF

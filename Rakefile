@@ -26,16 +26,6 @@ namespace :gem do
   desc "Build the sys-filesystem gem"
   task :create do |t|
     spec = eval(IO.read('sys-filesystem.gemspec'))
-
-    if File::ALT_SEPARATOR
-      spec.add_dependency('windows-pr', '>= 1.0.5')
-      spec.platform = Gem::Platform::CURRENT
-      spec.platform.cpu = 'universal'
-      spec.platform.version = nil
-    else
-      spec.add_dependency('ffi', '>= 1.0.0')
-    end
-
     Gem::Builder.new(spec).build
   end
 
