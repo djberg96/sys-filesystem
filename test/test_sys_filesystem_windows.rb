@@ -205,6 +205,13 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_equal(0, @size.to_gb)
   end
 
+  # FFI
+
+  test "internal ffi functions are not public" do
+    assert_false(Filesystem.methods.include?(:GetVolumeInformationA))
+    assert_false(Filesystem.instance_methods.include?(:GetVolumeInformationA))
+  end
+
   def teardown
     @array = nil
     @dir   = nil

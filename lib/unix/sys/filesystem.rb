@@ -10,7 +10,7 @@ module Sys
     ffi_lib(FFI::Library::LIBC)
 
     # The version of the sys-filesystem library.
-    VERSION = '1.0.0'
+    VERSION = '1.1.0'
 
     private
 

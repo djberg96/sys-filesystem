@@ -6,23 +6,31 @@ module Sys
       extend FFI::Library
       ffi_lib :kernel32
 
-      attach_function :GetDiskFreeSpaceW, [:buffer_in, :pointer, :pointer, :pointer, :pointer], :bool
-      attach_function :GetDiskFreeSpaceExW, [:buffer_in, :pointer, :pointer, :pointer], :bool
-      attach_function :GetLogicalDriveStringsA, [:ulong, :pointer], :ulong
+      # Make FFI functions private
+      module FFI::Library
+        def attach_pfunc(*args)
+          attach_function(*args)
+          private args[0]
+        end
+      end
 
-      attach_function :GetVolumeInformationA,
+      attach_pfunc :GetDiskFreeSpaceW, [:buffer_in, :pointer, :pointer, :pointer, :pointer], :bool
+      attach_pfunc :GetDiskFreeSpaceExW, [:buffer_in, :pointer, :pointer, :pointer], :bool
+      attach_pfunc :GetLogicalDriveStringsA, [:ulong, :pointer], :ulong
+
+      attach_pfunc :GetVolumeInformationA,
         [:buffer_in, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong],
         :bool
 
-      attach_function :GetVolumeInformationW,
+      attach_pfunc :GetVolumeInformationW,
         [:buffer_in, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong],
         :bool
 
-      attach_function :QueryDosDeviceA, [:buffer_in, :buffer_out, :ulong], :ulong
+      attach_pfunc :QueryDosDeviceA, [:buffer_in, :buffer_out, :ulong], :ulong
 
       ffi_lib :shlwapi
 
-      attach_function :PathStripToRootW, [:pointer], :bool
+      attach_pfunc :PathStripToRootW, [:pointer], :bool
     end
   end
 end
