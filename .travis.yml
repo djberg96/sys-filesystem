@@ -1,5 +1,4 @@
 language: ruby
-script: "bundle exec rake test"
 env:
   - CI=true
 rvm:
@@ -14,3 +13,4 @@ gemfile:
 branches:
   only:
     - ffi
+script: "bundle exec rake test"
