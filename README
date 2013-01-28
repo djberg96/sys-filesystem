@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/bbradbury/sys-filesystem.png?branch=ffi)](https://travis-ci.org/bbradbury/sys-filesystem)
-
 = Description
   A Ruby interface for getting file system information.
 
