@@ -13,4 +13,4 @@ gemfile:
   - Gemfile
 branches:
   only:
-    - master
+    - ffi

@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'rake'
+gemspec
 
 # Specify your gem's dependencies in hasherize_csv.gemspec
-gemspec
+gem 'rake'
