@@ -7,14 +7,20 @@ module Sys
   # return objects of other types. Do not instantiate.
   class Filesystem
     extend FFI::Library
-    ffi_lib(FFI::Library::LIBC)
+    ffi_lib FFI::Library::LIBC
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.0'
+    VERSION = '1.1.1'
 
     private
 
-    attach_function(:statvfs, [:string, :pointer], :int)
+    # Use statvfs64 where available.
+    begin
+      attach_function(:statvfs, :statvfs64, [:string, :pointer], :int)
+    rescue FFI::NotFoundError
+      attach_function(:statvfs, [:string, :pointer], :int)
+    end
+
     attach_function(:strerror, [:int], :string)
 
     private_class_method :statvfs, :strerror
@@ -188,18 +194,18 @@ module Sys
         layout(
           :f_bsize, :ulong,
           :f_frsize, :ulong,
-          :f_blocks, :ulong_t,
-          :f_bfree, :ulong_t,
-          :f_bavail, :ulong_t,
-          :f_files, :ulong_t,
-          :f_ffree, :ulong_t,
-          :f_favail, :ulong_t,
+          :f_blocks, :uint64_t,
+          :f_bfree, :uint64_t,
+          :f_bavail, :uint64_t,
+          :f_files, :uint64_t,
+          :f_ffree, :uint64_t,
+          :f_favail, :uint64_t,
           :f_fsid, :ulong,
           :f_basetype, [:char, 16],
-          :f_flag, :uint32,
-          :f_namemax, :uint32,
+          :f_flag, :ulong,
+          :f_namemax, :ulong,
           :f_fstr, [:char, 32],
-          :f_filler, [:uint32, 16]
+          :f_filler, [:ulong, 16]
         )
       else
         layout(
