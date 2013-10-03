@@ -48,7 +48,8 @@
   https://github.com/djberg96/sys-filesystem
 
 = Future Plans
-  Suggestions welcome.
+  Add better 64-bit support for Linux and BSD.
+  Other suggestions welcome.
 
 = Acknowledgements
   Mike Hall, for ideas and code that I borrowed from his 'filesystem'

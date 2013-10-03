@@ -1,3 +1,7 @@
+== 1.1.1 - 3-Oct-2013
+* Solaris now always uses statvfs64 on Solaris for better 64-bit support.
+  Thanks go to Jeff Shantz for the spot.
+
 == 1.1.0 - 19-Jan-2013
 * Converted the Windows source code to use FFI. Consequently, there is now
   a single gem rather than separate gems for Windows and Unix.
