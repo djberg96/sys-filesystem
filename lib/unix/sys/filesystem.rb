@@ -14,10 +14,9 @@ module Sys
 
     private
 
-    # Use statvfs64 where available.
-    begin
+    if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
       attach_function(:statvfs, :statvfs64, [:string, :pointer], :int)
-    rescue FFI::NotFoundError
+    else
       attach_function(:statvfs, [:string, :pointer], :int)
     end
 
