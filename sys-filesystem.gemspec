@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name      = 'sys-filesystem'
-  spec.version   = '1.1.0'
+  spec.version   = '1.1.1'
   spec.author    = 'Daniel J. Berger'
   spec.email     = 'djberg96@gmail.com'
   spec.homepage  = 'https://github.com/djberg96/sys-filesystem'
@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency('ffi')
   spec.add_development_dependency('test-unit', '>= 2.5.0')
+  spec.add_development_dependency('rake')
 
   spec.description = <<-EOF
     The sys-filesystem library provides an interface for gathering filesystem
