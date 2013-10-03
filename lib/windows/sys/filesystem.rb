@@ -19,7 +19,7 @@ module Sys
     class Error < StandardError; end
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.0'
+    VERSION = '1.1.1'
 
     class Mount
       # The name of the volume. This is the device mapping.
