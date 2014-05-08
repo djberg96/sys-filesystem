@@ -24,7 +24,7 @@ end
 
 namespace :gem do
   desc "Build the sys-filesystem gem"
-  task :create do |t|
+  task :create => [:clean] do |t|
     spec = eval(IO.read('sys-filesystem.gemspec'))
     if Gem::VERSION >= "2.0.0"
       require 'rubygems/package'
@@ -37,7 +37,7 @@ namespace :gem do
   desc "Install the sys-filesystem gem"
   task :install => [:create] do
     file = Dir['*.gem'].first
-    sh "gem install #{file}"
+    sh "gem install -l #{file}"
   end
 end
 
