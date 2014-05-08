@@ -124,19 +124,19 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_not_nil(Filesystem::Stat::NOTRUNC)
   end
 
-  def test_stat_total_space
-    assert_respond_to(@stat, :total_space)
-    assert_kind_of(Numeric, @stat.total_space)
+  def test_stat_bytes_total
+    assert_respond_to(@stat, :bytes_total)
+    assert_kind_of(Numeric, @stat.bytes_total)
   end
 
-  def test_stat_free_space
-    assert_respond_to(@stat, :free_space)
-    assert_kind_of(Numeric, @stat.free_space)
+  def test_stat_bytes_free
+    assert_respond_to(@stat, :bytes_free)
+    assert_kind_of(Numeric, @stat.bytes_free)
   end
 
-  def test_stat_used_space
-    assert_respond_to(@stat, :used_space)
-    assert_kind_of(Numeric, @stat.used_space)
+  def test_stat_bytes_used
+    assert_respond_to(@stat, :bytes_used)
+    assert_kind_of(Numeric, @stat.bytes_used)
   end
 
   def test_stat_percent_used

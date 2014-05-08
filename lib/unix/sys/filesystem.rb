@@ -328,23 +328,23 @@ module Sys
       end
 
       # Returns the total space on the partition.
-      def total_space
+      def bytes_total
         blocks * block_size
       end
 
       # Returns the total amount of free space on the partition.
-      def free_space
+      def bytes_free
         blocks_available * block_size
       end
 
       # Returns the total amount of used space on the partition.
-      def used_space
-        total_space - free_space
+      def bytes_used
+        bytes_total - bytes_free
       end
 
       # Returns the percentage of the partition that has been used.
       def percent_used
-        100 - (100.0 * free_space.to_f / total_space.to_f)
+        100 - (100.0 * bytes_free.to_f / bytes_total.to_f)
       end
     end
 
