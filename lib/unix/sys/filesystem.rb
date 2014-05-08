@@ -326,6 +326,26 @@ module Sys
         @name_max         = nil
         @base_type        = nil
       end
+
+      # Returns the total space on the partition.
+      def total_space
+        blocks * block_size
+      end
+
+      # Returns the total amount of free space on the partition.
+      def free_space
+        blocks_available * block_size
+      end
+
+      # Returns the total amount of used space on the partition.
+      def used_space
+        total_space - free_space
+      end
+
+      # Returns the percentage of the partition that has been used.
+      def percent_used
+        100 - (100.0 * free_space.to_f / total_space.to_f)
+      end
     end
 
     # Mount objects are returned by the Sys::Filesystem.mounts method.
@@ -548,7 +568,7 @@ module Sys
   end
 end
 
-class Fixnum
+class Numeric
   # Converts a number to kilobytes.
   def to_kb
     self / 1024
@@ -562,5 +582,10 @@ class Fixnum
   # Converts a number to gigabytes.
   def to_gb
     self / 1073741824
+  end
+
+  # Converts a number to terabytes.
+  def to_tb
+    self / 1099511627776
   end
 end
