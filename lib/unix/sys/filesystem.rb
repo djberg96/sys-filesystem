@@ -103,9 +103,9 @@ module Sys
     }
 
     # File used to read mount informtion from.
-    if File.exists?('/etc/mtab')
+    if File.exist?('/etc/mtab')
       MOUNT_FILE = '/etc/mtab'
-    elsif File.exists?('/etc/mnttab')
+    elsif File.exist?('/etc/mnttab')
       MOUNT_FILE = '/etc/mnttab'
     else
       MOUNT_FILE = 'getmntinfo'
