@@ -25,7 +25,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.1.1', Filesystem::VERSION)
+    assert_equal('1.1.2', Filesystem::VERSION)
   end
 
   def test_stat_path
@@ -124,14 +124,35 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_not_nil(Filesystem::Stat::NOTRUNC)
   end
 
+  def test_stat_total_space
+    assert_respond_to(@stat, :total_space)
+    assert_kind_of(Numeric, @stat.total_space)
+  end
+
+  def test_stat_free_space
+    assert_respond_to(@stat, :free_space)
+    assert_kind_of(Numeric, @stat.free_space)
+  end
+
+  def test_stat_used_space
+    assert_respond_to(@stat, :used_space)
+    assert_kind_of(Numeric, @stat.used_space)
+  end
+
+  def test_stat_percent_used
+    assert_respond_to(@stat, :percent_used)
+    assert_kind_of(Float, @stat.percent_used)
+  end
+
   def test_stat_expected_errors
     assert_raises(ArgumentError){ Filesystem.stat }
   end
 
-  def test_fixnum_methods_basic
+  def test_numeric_methods_basic
     assert_respond_to(@size, :to_kb)
     assert_respond_to(@size, :to_mb)
     assert_respond_to(@size, :to_gb)
+    assert_respond_to(@size, :to_tb)
   end
 
   def test_to_kb
