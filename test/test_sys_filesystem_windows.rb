@@ -19,7 +19,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.1.1', Filesystem::VERSION)
+    assert_equal('1.1.2', Filesystem::VERSION)
   end
 
   test "stat path works as expected" do
@@ -97,6 +97,26 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   test "stat base_type works as expected" do
     assert_respond_to(@stat, :base_type)
     assert_kind_of(String, @stat.base_type)
+  end
+
+  test "stat bytes_total basic functionality" do
+    assert_respond_to(@stat, :bytes_total)
+    assert_kind_of(Numeric, @stat.bytes_total)
+  end
+
+  test "stat bytes_free basic functionality" do
+    assert_respond_to(@stat, :bytes_free)
+    assert_kind_of(Numeric, @stat.bytes_free)
+  end
+
+  test "stat bytes_used basic functionality" do
+    assert_respond_to(@stat, :bytes_used)
+    assert_kind_of(Numeric, @stat.bytes_used)
+  end
+
+  test "stat percent_used basic functionality" do
+    assert_respond_to(@stat, :percent_used)
+    assert_kind_of(Float, @stat.percent_used)
   end
 
   test "mount_point singleton method basic functionality" do
