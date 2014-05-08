@@ -19,7 +19,7 @@ module Sys
     class Error < StandardError; end
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.1'
+    VERSION = '1.1.2'
 
     class Mount
       # The name of the volume. This is the device mapping.
@@ -55,7 +55,7 @@ module Sys
       # The path of the file system.
       attr_reader :path
 
-      # The file system block size.  MS Windows typically defaults to 4096.
+      # The file system block size. MS Windows typically defaults to 4096.
       attr_reader :block_size
 
       # Fragment size. Meaningless at the moment.
@@ -77,7 +77,7 @@ module Sys
       attr_reader :files
 
       # Total number of free files/inodes that can be created on the file
-      # system.  This attribute is always nil on MS Windows.
+      # system. This attribute is always nil on MS Windows.
       attr_reader :files_free
 
       # Total number of available files/inodes for unprivileged processes
@@ -100,6 +100,26 @@ module Sys
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
+
+      # Returns the total space on the partition.
+      def bytes_total
+        blocks * block_size
+      end
+
+      # Returns the total amount of free space on the partition.
+      def bytes_free
+        blocks_available * block_size
+      end
+
+      # Returns the total amount of used space on the partition.
+      def bytes_used
+        bytes_total - bytes_free
+      end
+
+      # Returns the percentage of the partition that has been used.
+      def percent_used
+        100 - (100.0 * bytes_free.to_f / bytes_total.to_f)
+      end
     end
 
     # Yields a Filesystem::Mount object for each volume on your system in
@@ -367,28 +387,36 @@ end
 
 # Some convenient methods for converting bytes to kb, mb, and gb.
 #
-class Fixnum
+class Numeric
   # call-seq:
-  #  <tt>fix</tt>.to_kb
+  #  <tt>num</tt>.to_kb
   #
-  # Returns +fix+ in terms of kilobytes.
+  # Returns +num+ in terms of kilobytes.
   def to_kb
     self / 1024
   end
 
   # call-seq:
-  #  <tt>fix</tt>.to_mb
+  #  <tt>num</tt>.to_mb
   #
-  # Returns +fix+ in terms of megabytes.
+  # Returns +num+ in terms of megabytes.
   def to_mb
     self / 1048576
   end
 
   # call-seq:
-  #  <tt>fix</tt>.to_gb
+  #  <tt>num</tt>.to_gb
   #
-  # Returns +fix+ in terms of gigabytes.
+  # Returns +num+ in terms of gigabytes.
   def to_gb
     self / 1073741824
+  end
+
+  # call-seq:
+  #  <tt>num</tt>.to_gb
+  #
+  # Returns +num+ in terms of terabytes.
+  def to_tb
+    self / 1099511627776
   end
 end
