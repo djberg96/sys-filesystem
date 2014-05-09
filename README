@@ -44,7 +44,7 @@
   is 'example_stat.rb' in the 'examples' directory. Modify it as you see fit.
 
 = Known Bugs
-  None that I'm aware of.  Please report bugs on the project page at
+  None that I'm aware of. Please report bugs on the project page at
   https://github.com/djberg96/sys-filesystem
 
 = Future Plans
@@ -52,8 +52,7 @@
   Other suggestions welcome.
 
 = Acknowledgements
-  Mike Hall, for ideas and code that I borrowed from his 'filesystem'
-  library.
+  Mike Hall, for ideas and code that I borrowed from his 'filesystem' library.
    
   Park Heesob, for implementation and API ideas for the MS Windows version.
    
@@ -69,7 +68,7 @@
   http://www.gittip.com/djberg96/
 
 = Copyright
-  (C) 2003-2013 Daniel J. Berger
+  (C) 2003-2014 Daniel J. Berger
   All Rights Reserved
 
 = Warranty
