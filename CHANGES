@@ -1,4 +1,4 @@
-== 1.1.2 - ???
+== 1.1.2 - 9-May-2014
 * Added the percent_used, bytes_total, bytes_free and bytes_used methods
   to the Filesystem::Stat class. Thanks go to xanview for the suggestion.
 * Changed File.exists? to File.exist? to avoid warnings in Ruby 2.1.x.
