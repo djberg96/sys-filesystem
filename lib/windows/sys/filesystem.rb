@@ -97,6 +97,9 @@ module Sys
       # The file system type, e.g. NTFS, FAT, etc.
       attr_reader :base_type
 
+      # Returns the total amount of free space on the partition.
+      attr_reader :bytes_free
+
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
@@ -104,11 +107,6 @@ module Sys
       # Returns the total space on the partition.
       def bytes_total
         blocks * block_size
-      end
-
-      # Returns the total amount of free space on the partition.
-      def bytes_free
-        blocks_available * block_size
       end
 
       # Returns the total amount of used space on the partition.
@@ -333,6 +331,7 @@ module Sys
       stat_obj.instance_variable_set(:@base_type, base_type)
       stat_obj.instance_variable_set(:@flags, flags)
       stat_obj.instance_variable_set(:@filesystem_id, vol_serial)
+      stat_obj.instance_variable_set(:@bytes_free, bytes_free)
 
       stat_obj.freeze # Read-only object
     end
