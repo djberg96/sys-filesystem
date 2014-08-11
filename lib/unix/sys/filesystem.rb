@@ -555,13 +555,16 @@ module Sys
       dev = File.stat(file).dev
       val = file
 
-      self.mounts.each{ |mnt|
-        mp = mnt.mount_point
-        if File.stat(mp).dev == dev
-          val = mp
-          break
+      self.mounts.each do |mnt|
+        begin
+          mp = mnt.mount_point
+          if File.stat(mp).dev == dev
+            val = mp
+            break
+          end
+        rescue Errno::EPERM
         end
-      }
+      end
 
       val
     end
