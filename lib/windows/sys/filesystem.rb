@@ -255,7 +255,8 @@ module Sys
     end
 
     # Returns a Filesystem::Stat object that contains information about the
-    # +path+ file system.
+    # +path+ file system. On Windows this will default to using the root
+    # path for volume information.
     #
     # Examples:
     #
@@ -270,6 +271,7 @@ module Sys
       mpoint = mount_point(path)
       wpath  = path.wincode
 
+      # We need this call for the 64 bit support
       unless GetDiskFreeSpaceExW(wpath, bytes_avail, total_bytes, bytes_free)
         raise SystemCallError.new('GetDiskFreeSpaceEx', FFI.errno)
       end
@@ -283,6 +285,7 @@ module Sys
       free    = FFI::MemoryPointer.new(:ulong_long)
       total   = FFI::MemoryPointer.new(:ulong_long)
 
+      # We need this call for the total/cluster info, which is not in the Ex call.
       unless GetDiskFreeSpaceW(wpath, sectors, bytes, free, total)
         raise SystemCallError.new('GetDiskFreeSpace', FFI.errno)
       end
