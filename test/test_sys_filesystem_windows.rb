@@ -11,7 +11,7 @@ include Sys
 
 class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   def setup
-    @dir   = '/'
+    @dir   = 'C:/'
     @stat  = Filesystem.stat(@dir)
     @mount = Filesystem.mounts[0]
     @size  = 58720256
@@ -24,7 +24,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
   test "stat path works as expected" do
     assert_respond_to(@stat, :path)
-    assert_equal("/", @stat.path)
+    assert_equal("C:/", @stat.path)
   end
 
   test "stat block_size works as expected" do
