@@ -259,15 +259,16 @@ module Sys
     #
     # Examples:
     #
-    #    File.stat("C:\\")
-    #    File.stat("C:\\Documents and Settings\\some_user")
+    #    Sys::Filesystem.stat("C:\\")
+    #    Sys::Filesystem.stat("C:\\Documents and Settings\\some_user")
     #
     def self.stat(path)
       bytes_avail = FFI::MemoryPointer.new(:ulong_long)
       bytes_free  = FFI::MemoryPointer.new(:ulong_long)
       total_bytes = FFI::MemoryPointer.new(:ulong_long)
 
-      wpath = path.wincode
+      mpoint = mount_point(path)
+      wpath  = path.wincode
 
       unless GetDiskFreeSpaceExW(wpath, bytes_avail, total_bytes, bytes_free)
         raise SystemCallError.new('GetDiskFreeSpaceEx', FFI.errno)
@@ -295,31 +296,37 @@ module Sys
       blocks_avail = total_bytes / block_size
       blocks_free  = bytes_free / block_size
 
-      vol_name   = FFI::MemoryPointer.new(:char, MAXPATH)
-      base_type  = FFI::MemoryPointer.new(:char, MAXPATH)
-      vol_serial = FFI::MemoryPointer.new(:ulong)
-      name_max   = FFI::MemoryPointer.new(:ulong)
-      flags      = FFI::MemoryPointer.new(:ulong)
+      vol_name_ptr   = FFI::MemoryPointer.new(:char, MAXPATH)
+      base_type_ptr  = FFI::MemoryPointer.new(:char, MAXPATH)
+      vol_serial_ptr = FFI::MemoryPointer.new(:ulong)
+      name_max_ptr   = FFI::MemoryPointer.new(:ulong)
+      flags_ptr      = FFI::MemoryPointer.new(:ulong)
 
       bool = GetVolumeInformationW(
-        wpath,
-        vol_name,
-        vol_name.size,
-        vol_serial,
-        name_max,
-        flags,
-        base_type,
-        base_type.size
+        mpoint.wincode,
+        vol_name_ptr,
+        vol_name_ptr.size,
+        vol_serial_ptr,
+        name_max_ptr,
+        flags_ptr,
+        base_type_ptr,
+        base_type_ptr.size
       )
 
       unless bool
         raise SystemCallError.new('GetVolumInformation', FFI.errno)
       end
 
-      vol_serial = vol_serial.read_ulong
-      name_max   = name_max.read_ulong
-      flags      = flags.read_ulong
-      base_type  = base_type.read_string(base_type.size).tr(0.chr, '')
+      vol_serial = vol_serial_ptr.read_ulong
+      name_max   = name_max_ptr.read_ulong
+      flags      = flags_ptr.read_ulong
+      base_type  = base_type_ptr.read_string(base_type_ptr.size).tr(0.chr, '')
+
+      vol_name_ptr.free
+      vol_serial_ptr.free
+      name_max_ptr.free
+      flags_ptr.free
+      base_type_ptr.free
 
       stat_obj = Stat.new
       stat_obj.instance_variable_set(:@path, path)
@@ -418,4 +425,8 @@ class Numeric
   def to_tb
     self / 1099511627776
   end
+end
+
+if $0 == __FILE__
+  p Sys::Filesystem.stat("C:/Users/djberge")
 end
