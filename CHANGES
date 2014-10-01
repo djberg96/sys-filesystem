@@ -1,6 +1,8 @@
 == 1.1.3 - ???
-Now ignores EPERM errors when trying to find the mount point for a path.
+* Now ignores EPERM errors when trying to find the mount point for a path.
 Thanks go to petersen for the patch.
+* The Filesystem.stat method now defaults to using the root path on Windows,
+  or the current path if a relative path is used.
 
 == 1.1.2 - 9-May-2014
 * Added the percent_used, bytes_total, bytes_free and bytes_used methods
