@@ -147,9 +147,17 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_not_nil(Filesystem::READ_ONLY_VOLUME)
   end
 
+  test "stat singleton method defaults to root path if proviced" do
+    assert_nothing_raised{ Filesystem.stat("C://Program Files") }
+  end
+
   test "stat singleton method requires a single argument" do
     assert_raise(ArgumentError){ Filesystem.stat }
     assert_raise(ArgumentError){ Filesystem.stat(Dir.pwd, Dir.pwd) }
+  end
+
+  test "stat singleton method raises an error if path is not found" do
+    assert_raise(Errno::ESRCH){ Filesystem.stat("C://Bogus//Dir") }
   end
 
    # Filesystem.mounts
