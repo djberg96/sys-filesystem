@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name      = 'sys-filesystem'
-  spec.version   = '1.1.2'
+  spec.version   = '1.1.3'
   spec.author    = 'Daniel J. Berger'
   spec.email     = 'djberg96@gmail.com'
   spec.homepage  = 'https://github.com/djberg96/sys-filesystem'
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rake')
 
   spec.description = <<-EOF
-    The sys-filesystem library provides an interface for gathering filesystem
-    information, such as disk space and mount point data.
+    The sys-filesystem library provides a cross-platform interface for
+    gathering filesystem information, such as disk space and mount point data.
   EOF
 end
