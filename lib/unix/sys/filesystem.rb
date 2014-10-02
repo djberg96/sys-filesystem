@@ -557,7 +557,7 @@ module Sys
 
       self.mounts.each{ |mnt|
         mp = mnt.mount_point
-        if File.stat(mp).dev == dev
+        if !mp[/gvfs/] && File.stat(mp).dev == dev
           val = mp
           break
         end
