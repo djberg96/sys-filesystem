@@ -557,9 +557,13 @@ module Sys
 
       self.mounts.each{ |mnt|
         mp = mnt.mount_point
-        if File.stat(mp).dev == dev
-          val = mp
-          break
+        begin
+          if File.stat(mp).dev == dev
+            val = mp
+            break
+          end
+        rescue Errno::EACCES
+          next
         end
       }
 
