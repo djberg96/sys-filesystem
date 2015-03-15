@@ -6,7 +6,13 @@
 * examples/example_stat.rb
 * lib/sys/filesystem.rb
 * lib/unix/sys/filesystem.rb
+* lib/unix/sys/filesystem/constants.rb
+* lib/unix/sys/filesystem/functions.rb
+* lib/unix/sys/filesystem/structs.rb
 * lib/windows/sys/filesystem.rb
+* lib/windows/sys/filesystem/constants.rb
+* lib/windows/sys/filesystem/functions.rb
+* lib/windows/sys/filesystem/helper.rb
 * test/test_sys_filesystem.rb
 * test/test_sys_filesystem_unix
 * test/test_sys_filesystem_windows
