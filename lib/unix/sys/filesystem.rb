@@ -1,84 +1,22 @@
-require 'ffi'
-require 'rbconfig'
+require_relative 'filesystem/constants'
+require_relative 'filesystem/structs'
+require_relative 'filesystem/functions'
 
 # The Sys module serves as a namespace only.
 module Sys
   # The Filesystem class serves as an abstract base class. Its methods
   # return objects of other types. Do not instantiate.
   class Filesystem
-    extend FFI::Library
-    ffi_lib FFI::Library::LIBC
+    include Unix::FilesystemConstants
+    include Unix::FilesystemStructs
+    extend Unix::FilesystemFunctions
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.3'
+    VERSION = '1.1.4'
 
     private
 
-    if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-      attach_function(:statvfs, :statvfs64, [:string, :pointer], :int)
-    else
-      attach_function(:statvfs, [:string, :pointer], :int)
-    end
-
-    attach_function(:strerror, [:int], :string)
-
-    private_class_method :statvfs, :strerror
-
-    begin
-      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-        attach_function(:fopen, [:string, :string], :pointer)
-        attach_function(:fclose, [:pointer], :int)
-        attach_function(:getmntent, [:pointer, :pointer], :int)
-        private_class_method :fopen, :fclose, :getmntent
-      else
-        attach_function(:getmntent, [:pointer], :pointer)
-        attach_function(:setmntent, [:string, :string], :pointer)
-        attach_function(:endmntent, [:pointer], :int)
-        private_class_method :getmntent, :setmntent, :endmntent
-      end
-    rescue FFI::NotFoundError
-      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
-        attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
-      else
-        attach_function(:getmntinfo, [:pointer, :int], :int)
-      end
-      private_class_method :getmntinfo
-    end
-
-    MNT_RDONLY      = 0x00000001 # read only filesystem
-    MNT_SYNCHRONOUS = 0x00000002 # file system written synchronously
-    MNT_NOEXEC      = 0x00000004 # can't exec from filesystem
-    MNT_NOSUID      = 0x00000008 # don't honor setuid bits on fs
-    MNT_NODEV       = 0x00000010 # don't interpret special files
-    MNT_UNION       = 0x00000020 # union with underlying filesystem
-    MNT_ASYNC       = 0x00000040 # file system written asynchronously
-    MNT_CPROTECT    = 0x00000080 # file system supports content protection
-    MNT_EXPORTED    = 0x00000100 # file system is exported
-    MNT_QUARANTINE  = 0x00000400 # file system is quarantined
-    MNT_LOCAL       = 0x00001000 # filesystem is stored locally
-    MNT_QUOTA       = 0x00002000 # quotas are enabled on filesystem
-    MNT_ROOTFS      = 0x00004000 # identifies the root filesystem
-    MNT_DOVOLFS     = 0x00008000 # FS supports volfs (deprecated)
-    MNT_DONTBROWSE  = 0x00100000 # FS is not appropriate path to user data
-    MNT_IGNORE_OWNERSHIP = 0x00200000 # VFS will ignore ownership info on FS objects
-    MNT_AUTOMOUNTED = 0x00400000 # filesystem was mounted by automounter
-    MNT_JOURNALED   = 0x00800000 # filesystem is journaled
-    MNT_NOUSERXATTR = 0x01000000 # Don't allow user extended attributes
-    MNT_DEFWRITE    = 0x02000000 # filesystem should defer writes
-    MNT_MULTILABEL  = 0x04000000 # MAC support for individual labels
-    MNT_NOATIME     = 0x10000000 # disable update of file access time
-
-    MNT_VISFLAGMASK = (
-      MNT_RDONLY | MNT_SYNCHRONOUS | MNT_NOEXEC |
-      MNT_NOSUID | MNT_NODEV | MNT_UNION |
-      MNT_ASYNC  | MNT_EXPORTED | MNT_QUARANTINE |
-      MNT_LOCAL  | MNT_QUOTA |
-      MNT_ROOTFS | MNT_DOVOLFS | MNT_DONTBROWSE |
-      MNT_IGNORE_OWNERSHIP | MNT_AUTOMOUNTED | MNT_JOURNALED |
-      MNT_NOUSERXATTR | MNT_DEFWRITE  | MNT_MULTILABEL |
-      MNT_NOATIME | MNT_CPROTECT
-    )
-
+    # Readable versions of constant names
     @@opt_names = {
       MNT_RDONLY           => 'read-only',
       MNT_SYNCHRONOUS      => 'synchronous',
@@ -109,144 +47,6 @@ module Sys
       MOUNT_FILE = '/etc/mnttab'
     else
       MOUNT_FILE = 'getmntinfo'
-    end
-
-    class Statfs < FFI::Struct
-      if RbConfig::CONFIG['host_os'] =~ /bsd/i
-        layout(
-          :f_version, :uint32,
-          :f_type, :uint32,
-          :f_flags, :uint64,
-          :f_bsize, :uint64,
-          :f_iosize, :int64,
-          :f_blocks, :uint64,
-          :f_bfree, :uint64,
-          :f_bavail, :int64,
-          :f_files, :uint64,
-          :f_ffree, :uint64,
-          :f_syncwrites, :uint64,
-          :f_asyncwrites, :uint64,
-          :f_syncreads, :uint64,
-          :f_asyncreads, :uint64,
-          :f_spare, [:uint64, 10],
-          :f_namemax, :uint32,
-          :f_owner, :int32,
-          :f_fsid,  [:int32, 2],
-          :f_charspare, [:char, 80],
-          :f_fstypename, [:char, 16],
-          :f_mntfromname, [:char, 88],
-          :f_mntonname, [:char, 88]
-        )
-      else
-        layout(
-          :f_bsize, :uint32,
-          :f_iosize, :int32,
-          :f_blocks, :uint64,
-          :f_bfree, :uint64,
-          :f_bavail, :uint64,
-          :f_files, :uint64,
-          :f_ffree, :uint64,
-          :f_fsid, [:int32, 2],
-          :f_owner, :int32,
-          :f_type, :uint32,
-          :f_flags, :uint32,
-          :f_fssubtype, :uint32,
-          :f_fstypename, [:char, 16],
-          :f_mntonname, [:char, 1024],
-          :f_mntfromname, [:char, 1024],
-          :f_reserved, [:uint32, 8]
-        )
-      end
-    end
-
-    # The Statvfs struct represents struct statvfs from sys/statvfs.h.
-    class Statvfs < FFI::Struct
-      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
-        layout(
-          :f_bsize, :ulong,
-          :f_frsize, :ulong,
-          :f_blocks, :uint,
-          :f_bfree, :uint,
-          :f_bavail, :uint,
-          :f_files, :uint,
-          :f_ffree, :uint,
-          :f_favail, :uint,
-          :f_fsid, :ulong,
-          :f_flag, :ulong,
-          :f_namemax, :ulong
-        )
-      elsif RbConfig::CONFIG['host'] =~ /bsd/i
-        layout(
-          :f_bavail, :uint64,
-          :f_bfree, :uint64,
-          :f_blocks, :uint64,
-          :f_favail, :uint64,
-          :f_ffree, :uint64,
-          :f_files, :uint64,
-          :f_bsize, :ulong,
-          :f_flag, :ulong,
-          :f_frsize, :ulong,
-          :f_fsid, :ulong,
-          :f_namemax, :ulong
-        )
-      elsif RbConfig::CONFIG['host'] =~ /sunos|solaris/i
-        layout(
-          :f_bsize, :ulong,
-          :f_frsize, :ulong,
-          :f_blocks, :uint64_t,
-          :f_bfree, :uint64_t,
-          :f_bavail, :uint64_t,
-          :f_files, :uint64_t,
-          :f_ffree, :uint64_t,
-          :f_favail, :uint64_t,
-          :f_fsid, :ulong,
-          :f_basetype, [:char, 16],
-          :f_flag, :ulong,
-          :f_namemax, :ulong,
-          :f_fstr, [:char, 32],
-          :f_filler, [:ulong, 16]
-        )
-      else
-        layout(
-          :f_bsize, :ulong,
-          :f_frsize, :ulong,
-          :f_blocks, :ulong,
-          :f_bfree, :ulong,
-          :f_bavail, :ulong,
-          :f_files, :ulong,
-          :f_ffree, :ulong,
-          :f_favail, :ulong,
-          :f_fsid, :ulong,
-          :f_flag, :ulong,
-          :f_namemax, :ulong,
-          :f_ftype, :ulong,
-          :f_basetype, [:char, 16],
-          :f_str, [:char, 16]
-        )
-      end
-    end
-
-    # The Mnttab struct represents struct mnnttab from sys/mnttab.h on Solaris.
-    class Mnttab < FFI::Struct
-      layout(
-        :mnt_special, :string,
-        :mnt_mountp, :string,
-        :mnt_fstype, :string,
-        :mnt_mntopts, :string,
-        :mnt_time, :string
-      )
-    end
-
-    # The Mntent struct represents struct mntent from sys/mount.h on Unix.
-    class Mntent < FFI::Struct
-      layout(
-        :mnt_fsname, :string,
-        :mnt_dir, :string,
-        :mnt_type, :string,
-        :mnt_opts, :string,
-        :mnt_freq, :int,
-        :mnt_passno, :int
-      )
     end
 
     public
