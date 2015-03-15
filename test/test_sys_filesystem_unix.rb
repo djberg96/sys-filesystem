@@ -25,7 +25,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.1.3', Filesystem::VERSION)
+    assert_equal('1.1.4', Filesystem::VERSION)
   end
 
   def test_stat_path
