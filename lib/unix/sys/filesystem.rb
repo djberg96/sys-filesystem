@@ -7,9 +7,9 @@ module Sys
   # The Filesystem class serves as an abstract base class. Its methods
   # return objects of other types. Do not instantiate.
   class Filesystem
-    include Unix::FilesystemConstants
-    include Unix::FilesystemStructs
-    extend Unix::FilesystemFunctions
+    include Sys::Filesystem::Constants
+    include Sys::Filesystem::Structs
+    extend Sys::Filesystem::Functions
 
     # The version of the sys-filesystem library.
     VERSION = '1.1.4'
