@@ -1,6 +1,6 @@
-require File.join(File.dirname(__FILE__), 'filesystem', 'constants')
-require File.join(File.dirname(__FILE__), 'filesystem', 'functions')
-require File.join(File.dirname(__FILE__), 'filesystem', 'helper')
+require_relative 'filesystem/constants'
+require_relative 'filesystem/functions'
+require_relative 'filesystem/helper'
 
 require 'socket'
 require 'win32ole'
@@ -19,7 +19,7 @@ module Sys
     class Error < StandardError; end
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.3'
+    VERSION = '1.1.4'
 
     class Mount
       # The name of the volume. This is the device mapping.
@@ -428,8 +428,4 @@ class Numeric
   def to_tb
     self / 1099511627776
   end
-end
-
-if $0 == __FILE__
-  p Sys::Filesystem.stat("C:/Users/djberge")
 end
