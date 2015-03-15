@@ -19,7 +19,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.1.3', Filesystem::VERSION)
+    assert_equal('1.1.4', Filesystem::VERSION)
   end
 
   test "stat path works as expected" do
