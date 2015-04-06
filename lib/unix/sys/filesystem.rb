@@ -220,6 +220,11 @@ module Sys
         obj.block_size /= 256
       end
 
+      # FreeBSD 10 does things a little differently too
+      if RbConfig::CONFIG['host_os'] =~ /freebsd10/i
+        obj.block_size = obj.fragment_size
+      end
+
       if fs.members.include?(:f_basetype)
         obj.base_type = fs[:f_basetype].to_s
       end
