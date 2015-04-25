@@ -12,7 +12,7 @@ module Sys
     extend Sys::Filesystem::Functions
 
     # The version of the sys-filesystem library.
-    VERSION = '1.1.4'
+    VERSION = '1.2.0'
 
     private
 
@@ -171,6 +171,17 @@ module Sys
       # The pass number of the filessytem check. May be nil.
       attr_accessor :pass_number
 
+      attr_accessor :filesystem_type
+      attr_accessor :block_size
+      attr_accessor :blocks
+      attr_accessor :blocks_available
+      attr_accessor :blocks_free
+      attr_accessor :files
+      attr_accessor :files_free
+      attr_accessor :filesystem_id
+      attr_accessor :max_name_length
+      attr_accessor :fragment_size
+
       alias fsname name
       alias dir mount_point
       alias opts options
@@ -328,6 +339,23 @@ module Sys
               obj.dump_frequency = mt[:mnt_freq]
               obj.pass_number = mt[:mnt_passno]
 
+              fs = Statfs.new
+
+              if statfs(obj.mount_point, fs) != 0
+                raise SystemCallError.new('statfs', FFI.errno)
+              end
+
+              obj.filesystem_type = fs[:f_type]
+              obj.block_size = fs[:f_bsize]
+              obj.blocks = fs[:f_blocks]
+              obj.blocks_free = fs[:f_bfree]
+              obj.blocks_available = fs[:f_bavail]
+              obj.files = fs[:f_files]
+              obj.files_free = fs[:f_ffree]
+              obj.filesystem_id = fs[:f_fsid]
+              obj.max_name_length = fs[:f_namelen]
+              obj.fragment_size = fs[:f_frsize]
+
               if block_given?
                 yield obj.freeze
               else
@@ -397,4 +425,12 @@ class Numeric
   def to_tb
     self / 1099511627776
   end
+end
+
+if $0 == __FILE__
+  Sys::Filesystem.mounts{ |m|
+    #next if m.blocks_available == 0
+    p m if m.name =~ /mapper/i
+    #p m
+  }
 end
