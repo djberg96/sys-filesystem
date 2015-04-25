@@ -32,22 +32,17 @@ module Sys
           )
         else
           layout(
-            :f_bsize, :uint32,
-            :f_iosize, :int32,
-            :f_blocks, :uint64,
-            :f_bfree, :uint64,
-            :f_bavail, :uint64,
-            :f_files, :uint64,
-            :f_ffree, :uint64,
-            :f_fsid, [:int32, 2],
-            :f_owner, :int32,
-            :f_type, :uint32,
-            :f_flags, :uint32,
-            :f_fssubtype, :uint32,
-            :f_fstypename, [:char, 16],
-            :f_mntonname, [:char, 1024],
-            :f_mntfromname, [:char, 1024],
-            :f_reserved, [:uint32, 8]
+            :f_type, :long,
+            :f_bsize, :long,
+            :f_blocks, :ulong,
+            :f_bfree, :ulong,
+            :f_bavail, :ulong,
+            :f_files, :ulong,
+            :f_ffree, :ulong,
+            :f_fsid, :ulong,
+            :f_namelen, :long,
+            :f_frsize, :long,
+            :f_spare, [:long, 5]
           )
         end
       end
