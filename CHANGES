@@ -2,6 +2,8 @@
 * This gem is now signed.
 * The gem related tasks in the Rakefile now assume Rubygems 2.x.
 * Updates to the gemspec, added cert_chain, removed rubyforge_project.
+* Internal reorganization, and use of relative_require as appropriate.
+* Added a sys-filesystem.rb file for convenience.
 
 == 1.1.4 - 15-Mar-2015
 * The File.mounts method no longer raises an error if a mount point
