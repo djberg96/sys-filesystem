@@ -1,5 +1,12 @@
+module Sys
+  class Filesystem
+    # The version of the sys-filesystem library
+    VERSION = '1.1.5'
+  end
+end
+
 if File::ALT_SEPARATOR
-  require 'windows/sys/filesystem'
+  require_relative 'windows/sys/filesystem'
 else
-  require 'unix/sys/filesystem'
+  require_relative 'unix/sys/filesystem'
 end

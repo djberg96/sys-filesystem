@@ -11,9 +11,6 @@ module Sys
     include Sys::Filesystem::Structs
     extend Sys::Filesystem::Functions
 
-    # The version of the sys-filesystem library.
-    VERSION = '1.1.4'
-
     private
 
     # Readable versions of constant names

@@ -18,9 +18,6 @@ module Sys
     # Error typically raised if any of the Sys::Filesystem methods fail.
     class Error < StandardError; end
 
-    # The version of the sys-filesystem library.
-    VERSION = '1.1.4'
-
     class Mount
       # The name of the volume. This is the device mapping.
       attr_reader :name
