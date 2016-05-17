@@ -1,7 +1,7 @@
 module Sys
   class Filesystem
     # The version of the sys-filesystem library
-    VERSION = '1.1.6'
+    VERSION = '1.1.6'.freeze
   end
 end
 
