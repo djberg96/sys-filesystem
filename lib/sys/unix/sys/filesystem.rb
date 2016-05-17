@@ -290,9 +290,15 @@ module Sys
       else
         begin
           if respond_to?(:setmntent, true)
+            method_name = 'setmntent'
             fp = setmntent(MOUNT_FILE, 'r')
           else
+            method_name = 'fopen'
             fp = fopen(MOUNT_FILE, 'r')
+          end
+
+          if fp.null?
+            raise SystemCallError.new(method_name, FFI.errno)
           end
 
           if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
