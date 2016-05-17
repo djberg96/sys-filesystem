@@ -1,3 +1,7 @@
+== 1.1.6 - 17-May-2016
+* On versions that use setmntent or fopen, explicitly raise an error if
+  either of those calls return a null value.
+
 == 1.1.5 - 5-Dec-2015
 * This gem is now signed.
 * The gem related tasks in the Rakefile now assume Rubygems 2.x.
