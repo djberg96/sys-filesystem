@@ -52,6 +52,11 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_kind_of(Fixnum, @stat.blocks_available)
   end
 
+  test "block stats return expected relative values" do
+    assert_true(@stat.blocks >= @stat.blocks_free)
+    assert_true(@stat.blocks_free >= @stat.blocks_available)
+  end
+
   test "stat files works as expected" do
     assert_respond_to(@stat, :files)
     assert_nil(@stat.files)

@@ -65,8 +65,7 @@ module Sys
       # The total number of unused blocks.
       attr_reader :blocks_free
 
-      # The total number of unused blocks available to unprivileged
-      # processes. Identical to +blocks+ at the moment.
+      # The total number of unused blocks available to unprivileged processes.
       attr_reader :blocks_available
 
       # Total number of files/inodes that can be created on the file system.
@@ -277,24 +276,26 @@ module Sys
       bytes_free  = bytes_free.read_ulong_long
       total_bytes = total_bytes.read_ulong_long
 
-      sectors = FFI::MemoryPointer.new(:ulong_long)
-      bytes   = FFI::MemoryPointer.new(:ulong_long)
-      free    = FFI::MemoryPointer.new(:ulong_long)
-      total   = FFI::MemoryPointer.new(:ulong_long)
+      sectors_ptr = FFI::MemoryPointer.new(:ulong_long)
+      bytes_ptr   = FFI::MemoryPointer.new(:ulong_long)
+      free_ptr    = FFI::MemoryPointer.new(:ulong_long)
+      total_ptr   = FFI::MemoryPointer.new(:ulong_long)
 
       # We need this call for the total/cluster info, which is not in the Ex call.
-      unless GetDiskFreeSpaceW(wpath, sectors, bytes, free, total)
+      unless GetDiskFreeSpaceW(wpath, sectors_ptr, bytes_ptr, free_ptr, total_ptr)
         raise SystemCallError.new('GetDiskFreeSpace', FFI.errno)
       end
 
-      sectors = sectors.read_ulong_long
-      bytes   = bytes.read_ulong_long
-      free    = free.read_ulong_long
-      total   = total.read_ulong_long
+      sectors_per_cluster = sectors_ptr.read_ulong_long
+      bytes_per_sector    = bytes_ptr.read_ulong_long
 
-      block_size   = sectors * bytes
-      blocks_avail = total_bytes / block_size
+      free_ptr.free
+      total_ptr.free
+
+      block_size   = sectors_per_cluster * bytes_per_sector
+      blocks_avail = bytes_avail / block_size
       blocks_free  = bytes_free / block_size
+      total_blocks = total_bytes / block_size
 
       vol_name_ptr   = FFI::MemoryPointer.new(:char, MAXPATH)
       base_type_ptr  = FFI::MemoryPointer.new(:char, MAXPATH)
@@ -322,16 +323,19 @@ module Sys
       flags      = flags_ptr.read_ulong
       base_type  = base_type_ptr.read_string(base_type_ptr.size).tr(0.chr, '')
 
+      # Lets explicitly free our pointers
       vol_name_ptr.free
       vol_serial_ptr.free
       name_max_ptr.free
       flags_ptr.free
       base_type_ptr.free
+      sectors_ptr.free
+      bytes_ptr.free
 
       stat_obj = Stat.new
       stat_obj.instance_variable_set(:@path, path)
       stat_obj.instance_variable_set(:@block_size, block_size)
-      stat_obj.instance_variable_set(:@blocks, blocks_avail)
+      stat_obj.instance_variable_set(:@blocks, total_blocks)
       stat_obj.instance_variable_set(:@blocks_available, blocks_avail)
       stat_obj.instance_variable_set(:@blocks_free, blocks_free)
       stat_obj.instance_variable_set(:@name_max, name_max)
