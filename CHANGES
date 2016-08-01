@@ -1,3 +1,7 @@
+== 1.1.7 - 1-Aug-2016
+* Fixed an issue in the stat method for MS Windows where the blocks_avail
+  value was not correct. Thanks go to Maxime Lapointe for the spot.
+
 == 1.1.6 - 17-May-2016
 * On versions that use setmntent or fopen, explicitly raise an error if
   either of those calls return a null value.
