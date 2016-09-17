@@ -42,6 +42,8 @@ module Sys
       MOUNT_FILE = '/etc/mtab'
     elsif File.exist?('/etc/mnttab')
       MOUNT_FILE = '/etc/mnttab'
+    elsif File.exist?('/proc/mounts')
+      MOUNT_FILE = '/proc/mounts'
     else
       MOUNT_FILE = 'getmntinfo'
     end
