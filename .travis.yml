@@ -1,0 +1,16 @@
+language: ruby
+env:
+  - CI=true
+rvm:
+  - 1.8.7
+  - rbx-19mode
+  - jruby-19mode
+  - jruby-head
+  - 1.9.2
+  - 1.9.3
+gemfile:
+  - Gemfile
+branches:
+  only:
+    - ffi
+script: "bundle exec rake test"
