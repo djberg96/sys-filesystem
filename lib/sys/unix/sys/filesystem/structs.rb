@@ -5,6 +5,15 @@ module Sys
   class Filesystem
     module Structs
       class Statfs < FFI::Struct
+
+        # FreeBSD 12.0 MNAMELEN from 88 => 1024.
+        MNAMELEN =
+          if RbConfig::CONFIG['host_os'] =~ /freebsd(.*)/i
+            $1.to_f < 12.0 ? 88 : 1024
+          else
+            88
+          end
+
         if RbConfig::CONFIG['host_os'] =~ /bsd/i
           layout(
             :f_version, :uint32,
@@ -27,8 +36,8 @@ module Sys
             :f_fsid,  [:int32, 2],
             :f_charspare, [:char, 80],
             :f_fstypename, [:char, 16],
-            :f_mntfromname, [:char, 88],
-            :f_mntonname, [:char, 88]
+            :f_mntfromname, [:char, MNAMELEN],
+            :f_mntonname, [:char, MNAMELEN]
           )
         else
           layout(
