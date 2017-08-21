@@ -315,7 +315,7 @@ module Sys
       )
 
       unless bool
-        raise SystemCallError.new('GetVolumInformation', FFI.errno)
+        raise SystemCallError.new('GetVolumeInformation', FFI.errno)
       end
 
       vol_serial = vol_serial_ptr.read_ulong
