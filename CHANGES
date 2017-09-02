@@ -1,3 +1,9 @@
+== 1.1.8 - 2-Sep-2017
+* The stat and mount_point methods now call to_s on the string argument
+  explicitly so that Pathname objects will now work with String#wincode.
+* Updated some tests to avoid Fixnum warnings for Ruby 2.4.
+* Updated the cert.
+
 == 1.1.7 - 1-Aug-2016
 * Fixed an issue in the stat method for MS Windows where the blocks_avail
   value was not correct. Thanks go to Maxime Lapointe for the spot.
