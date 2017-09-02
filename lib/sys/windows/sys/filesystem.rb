@@ -241,7 +241,7 @@ module Sys
     #    File.mount_point("C:\\Documents and Settings") # => "C:\\'
     #
     def self.mount_point(file)
-      wfile = FFI::MemoryPointer.from_string(file.wincode)
+      wfile = FFI::MemoryPointer.from_string(file.to_s.wincode)
 
       if PathStripToRootW(wfile)
         wfile.read_string(wfile.size).split("\000\000").first.tr(0.chr, '')
@@ -265,7 +265,7 @@ module Sys
       total_bytes = FFI::MemoryPointer.new(:ulong_long)
 
       mpoint = mount_point(path)
-      wpath  = path.wincode
+      wpath  = path.to_s.wincode
 
       # We need this call for the 64 bit support
       unless GetDiskFreeSpaceExW(wpath, bytes_avail, total_bytes, bytes_free)
@@ -304,7 +304,7 @@ module Sys
       flags_ptr      = FFI::MemoryPointer.new(:ulong)
 
       bool = GetVolumeInformationW(
-        mpoint.wincode,
+        mpoint.to_s.wincode,
         vol_name_ptr,
         vol_name_ptr.size,
         vol_serial_ptr,

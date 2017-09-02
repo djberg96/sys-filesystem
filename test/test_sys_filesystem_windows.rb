@@ -7,6 +7,7 @@
 require 'test-unit'
 require 'sys/filesystem'
 require 'rbconfig'
+require 'pathname'
 include Sys
 
 class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
@@ -19,7 +20,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.1.7', Filesystem::VERSION)
+    assert_equal('1.1.8', Filesystem::VERSION)
   end
 
   test "stat path works as expected" do
@@ -135,6 +136,12 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_equal("\\\\foo\\bar", Filesystem.mount_point("//foo/bar/baz"))
   end
 
+  test "mount_point works with Pathname object" do
+    assert_nothing_raised{ Filesystem.mount_point(Pathname.new("C:/Users/foo")) }
+    assert_equal("C:\\", Filesystem.mount_point("C:\\Users\\foo"))
+    assert_equal("\\\\foo\\bar", Filesystem.mount_point("//foo/bar/baz"))
+  end
+
   test "filesystem constants are defined" do
     assert_not_nil(Filesystem::CASE_SENSITIVE_SEARCH)
     assert_not_nil(Filesystem::CASE_PRESERVED_NAMES)
@@ -154,6 +161,10 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
   test "stat singleton method defaults to root path if proviced" do
     assert_nothing_raised{ Filesystem.stat("C://Program Files") }
+  end
+
+  test "stat singleton method accepts a Pathname object" do
+    assert_nothing_raised{ Filesystem.stat(Pathname.new("C://Program Files")) }
   end
 
   test "stat singleton method requires a single argument" do
