@@ -25,7 +25,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.1.7', Filesystem::VERSION)
+    assert_equal('1.1.8', Filesystem::VERSION)
   end
 
   def test_stat_path
@@ -35,7 +35,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_block_size
     assert_respond_to(@stat, :block_size)
-    assert_kind_of(Fixnum, @stat.block_size)
+    assert_kind_of(Numeric, @stat.block_size)
   end
 
   def test_block_size_is_a_plausible_value
@@ -45,27 +45,27 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_fragment_size
     assert_respond_to(@stat, :fragment_size)
-    assert_kind_of(Fixnum, @stat.fragment_size)
+    assert_kind_of(Numeric, @stat.fragment_size)
   end
 
   def test_stat_blocks
     assert_respond_to(@stat, :blocks)
-    assert_kind_of(Fixnum, @stat.blocks)
+    assert_kind_of(Numeric, @stat.blocks)
   end
 
   def test_stat_blocks_free
     assert_respond_to(@stat, :blocks_free)
-    assert_kind_of(Fixnum, @stat.blocks_free)
+    assert_kind_of(Numeric, @stat.blocks_free)
   end
 
   def test_stat_blocks_available
     assert_respond_to(@stat, :blocks_available)
-    assert_kind_of(Fixnum, @stat.blocks_available)
+    assert_kind_of(Numeric, @stat.blocks_available)
   end
 
   def test_stat_files
     assert_respond_to(@stat, :files)
-    assert_kind_of(Fixnum, @stat.files)
+    assert_kind_of(Numeric, @stat.files)
   end
 
   def test_inodes_alias
@@ -75,7 +75,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_files_free
     assert_respond_to(@stat, :files_free)
-    assert_kind_of(Fixnum, @stat.files_free)
+    assert_kind_of(Numeric, @stat.files_free)
   end
 
   def test_stat_inodes_free_alias
@@ -85,7 +85,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_files_available
     assert_respond_to(@stat, :files_available)
-    assert_kind_of(Fixnum, @stat.files_available)
+    assert_kind_of(Numeric, @stat.files_available)
   end
 
   def test_stat_inodes_available_alias
@@ -100,12 +100,12 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_flags
     assert_respond_to(@stat, :flags)
-    assert_kind_of(Fixnum, @stat.flags)
+    assert_kind_of(Numeric, @stat.flags)
   end
 
   def test_stat_name_max
     assert_respond_to(@stat, :name_max)
-    assert_kind_of(Fixnum, @stat.name_max)
+    assert_kind_of(Numeric, @stat.name_max)
   end
 
   def test_stat_base_type
@@ -232,7 +232,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     msg = 'dump_frequency test skipped on this platform'
     omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :dump_frequency)
-    assert_kind_of(Fixnum, @mnt.dump_frequency)
+    assert_kind_of(Numeric, @mnt.dump_frequency)
   end
 
   def test_freq_alias
@@ -244,7 +244,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     msg = 'pass_number test skipped on this platform'
     omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :pass_number)
-    assert_kind_of(Fixnum, @mnt.pass_number)
+    assert_kind_of(Numeric, @mnt.pass_number)
   end
 
   def test_passno_alias
