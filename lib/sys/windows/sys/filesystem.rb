@@ -244,7 +244,7 @@ module Sys
       wfile = FFI::MemoryPointer.from_string(file.to_s.wincode)
 
       if PathStripToRootW(wfile)
-        wfile.read_string(wfile.size).split("\000\000").first.tr(0.chr, '')
+        wfile.read_string(wfile.size).split("\000\000").first.tr(0.chr, '').gsub(/(?!\\\\)$/, "\\")
       else
         nil
       end
