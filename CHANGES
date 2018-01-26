@@ -1,3 +1,10 @@
+== 1.1.9 - 26-Jan-2018
+* The bytes_free and bytes_total methods were updated to use the fragment size
+  instead of the block size. This fixes Macs using APFS, as well as Solaris 10.
+  Thanks go to Mikhail Vasin for the spot.
+* Removed the code specific to FreeBSD 10, which was ultimately an attempt
+  to address the issue now resolved by the above change.
+
 == 1.1.8 - 2-Sep-2017
 * The stat and mount_point methods now call to_s on the string argument
   explicitly so that Pathname objects will now work with String#wincode.
