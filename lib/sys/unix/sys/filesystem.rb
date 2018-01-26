@@ -128,12 +128,12 @@ module Sys
 
       # Returns the total space on the partition.
       def bytes_total
-        blocks * block_size
+        blocks * fragment_size
       end
 
       # Returns the total amount of free space on the partition.
       def bytes_free
-        blocks_available * block_size
+        blocks_available * fragment_size
       end
 
       # Returns the total amount of used space on the partition.
@@ -217,11 +217,6 @@ module Sys
       # OSX does things a little differently
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         obj.block_size /= 256
-      end
-
-      # FreeBSD 10 does things a little differently too
-      if RbConfig::CONFIG['host_os'] =~ /freebsd10/i
-        obj.block_size = obj.fragment_size
       end
 
       if fs.members.include?(:f_basetype)
