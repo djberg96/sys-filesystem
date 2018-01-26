@@ -4,6 +4,7 @@
   Thanks go to Mikhail Vasin for the spot.
 * Removed the code specific to FreeBSD 10, which was ultimately an attempt
   to address the issue now resolved by the above change.
+* Updated the cert again.
 
 == 1.1.8 - 2-Sep-2017
 * The stat and mount_point methods now call to_s on the string argument
