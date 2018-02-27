@@ -133,7 +133,7 @@ module Sys
 
       # Returns the total amount of free space on the partition.
       def bytes_free
-        blocks_available * fragment_size
+        blocks_free * fragment_size
       end
 
       # Returns the total amount of used space on the partition.
