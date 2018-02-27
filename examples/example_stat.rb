@@ -15,6 +15,8 @@ puts "Block size: " + stat.block_size.to_s
 puts "Fragment size: " + stat.fragment_size.to_s
 puts "Blocks free: " + stat.blocks_free.to_s
 puts "Blocks available: " + stat.blocks_available.to_s
+puts "Bytes free: " + stat.bytes_free.to_s
+puts "Bytes available: " + stat.bytes_available.to_s
 puts "Files/Inodes: " + stat.files.to_s
 puts "Files/Inodes free: " + stat.files_free.to_s
 puts "Files/Inodes available: " + stat.files_available.to_s
