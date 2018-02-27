@@ -96,6 +96,9 @@ module Sys
       # The total amount of free space on the partition.
       attr_reader :bytes_free
 
+      # The amount of free space available to unprivileged processes.
+      attr_reader :bytes_available
+
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
@@ -343,6 +346,7 @@ module Sys
       stat_obj.instance_variable_set(:@flags, flags)
       stat_obj.instance_variable_set(:@filesystem_id, vol_serial)
       stat_obj.instance_variable_set(:@bytes_free, bytes_free)
+      stat_obj.instance_variable_set(:@bytes_available, bytes_avail)
 
       stat_obj.freeze # Read-only object
     end
