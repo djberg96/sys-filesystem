@@ -93,7 +93,7 @@ module Sys
       # The file system type, e.g. NTFS, FAT, etc.
       attr_reader :base_type
 
-      # Returns the total amount of free space on the partition.
+      # The total amount of free space on the partition.
       attr_reader :bytes_free
 
       alias inodes files
