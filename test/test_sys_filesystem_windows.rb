@@ -113,6 +113,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   test "stat bytes_free basic functionality" do
     assert_respond_to(@stat, :bytes_free)
     assert_kind_of(Numeric, @stat.bytes_free)
+    assert_equal(@stat.bytes_free, @stat.blocks_free * @stat.block_size)
   end
 
   test "stat bytes_used basic functionality" do
