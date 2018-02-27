@@ -135,6 +135,12 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_equal(@stat.bytes_free, @stat.blocks_free * @stat.fragment_size)
   end
 
+  def test_stat_bytes_available
+    assert_respond_to(@stat, :bytes_available)
+    assert_kind_of(Numeric, @stat.bytes_available)
+    assert_equal(@stat.bytes_available, @stat.blocks_available * @stat.fragment_size)
+  end
+
   def test_stat_bytes_used
     assert_respond_to(@stat, :bytes_used)
     assert_kind_of(Numeric, @stat.bytes_used)

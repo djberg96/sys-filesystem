@@ -136,6 +136,11 @@ module Sys
         blocks_free * fragment_size
       end
 
+      # Returns the amount of free space available to unprivileged processes.
+      def bytes_available
+        blocks_available * fragment_size
+      end
+
       # Returns the total amount of used space on the partition.
       def bytes_used
         bytes_total - bytes_free
