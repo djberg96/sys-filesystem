@@ -30,7 +30,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
   test "stat block_size works as expected" do
     assert_respond_to(@stat, :block_size)
-    assert_kind_of(Fixnum, @stat.block_size)
+    assert_kind_of(Numeric, @stat.block_size)
   end
 
   test "stat fragment_size works as expected" do
@@ -40,17 +40,17 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
   test "stat blocks works as expected" do
     assert_respond_to(@stat, :blocks)
-    assert_kind_of(Fixnum, @stat.blocks)
+    assert_kind_of(Numeric, @stat.blocks)
   end
 
   test "stat blocks_free works as expected" do
     assert_respond_to(@stat, :blocks_free)
-    assert_kind_of(Fixnum, @stat.blocks_free)
+    assert_kind_of(Numeric, @stat.blocks_free)
   end
 
   test "stat blocks_available works as expected" do
     assert_respond_to(@stat, :blocks_available)
-    assert_kind_of(Fixnum, @stat.blocks_available)
+    assert_kind_of(Numeric, @stat.blocks_available)
   end
 
   test "block stats return expected relative values" do
@@ -92,12 +92,12 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
 
   test "stat flags works as expected" do
     assert_respond_to(@stat, :flags)
-    assert_kind_of(Fixnum, @stat.flags)
+    assert_kind_of(Numeric, @stat.flags)
   end
 
   test "stat name_max works as expected" do
     assert_respond_to(@stat, :name_max)
-    assert_kind_of(Fixnum, @stat.name_max)
+    assert_kind_of(Numeric, @stat.name_max)
   end
 
   test "stat base_type works as expected" do
@@ -241,17 +241,17 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_raise(ArgumentError){ Filesystem.mounts("C:\\") }
   end
 
-  test "custom Fixnum#to_kb method works as expected" do
+  test "custom Numeric#to_kb method works as expected" do
     assert_respond_to(@size, :to_kb)
     assert_equal(57344, @size.to_kb)
   end
 
-  test "custom Fixnum#to_mb method works as expected" do
+  test "custom Numeric#to_mb method works as expected" do
     assert_respond_to(@size, :to_mb)
     assert_equal(56, @size.to_mb)
   end
 
-  test "custom Fixnum#to_gb method works as expected" do
+  test "custom Numeric#to_gb method works as expected" do
     assert_respond_to(@size, :to_gb)
     assert_equal(0, @size.to_gb)
   end
