@@ -267,7 +267,9 @@ module Sys
       bytes_free  = FFI::MemoryPointer.new(:ulong_long)
       total_bytes = FFI::MemoryPointer.new(:ulong_long)
 
-      mpoint = mount_point(path)
+      mpoint = mount_point(path).to_s
+      mpoint << '/' unless mpoint.end_with?('/')
+
       wpath  = path.to_s.wincode
 
       # We need this call for the 64 bit support
@@ -307,7 +309,7 @@ module Sys
       flags_ptr      = FFI::MemoryPointer.new(:ulong)
 
       bool = GetVolumeInformationW(
-        mpoint.to_s.wincode,
+        mpoint.wincode,
         vol_name_ptr,
         vol_name_ptr.size,
         vol_serial_ptr,
