@@ -19,6 +19,7 @@ module Sys
   class Filesystem
     class Stat
       # Returns true if the filesystem is case sensitive for the current path.
+      # Typically this will be any path on MS Windows or Macs using HFS.
       #
       # For a root path (really any path without actual a-z characters) we
       # take a best guess based on the host operating system. However, as a
@@ -26,7 +27,7 @@ module Sys
       #
       def case_insensitive?
         if path !~ /\w+/
-          if RbConfig::CONFIG['host_os'] =~ /darwin|mac/i
+          if RbConfig::CONFIG['host_os'] =~ /darwin|mac|windows|mswin|mingw/i
             true # Assumes HFS
           else
             false

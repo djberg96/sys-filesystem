@@ -158,6 +158,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   def test_stat_case_insensitive
     expected = @@darwin ? true : false
     assert_equal(expected, @stat.case_insensitive?)
+    assert_false(Filesystem.stat(Dir.home).case_insensitive?)
   end
 
   def test_numeric_methods_basic
