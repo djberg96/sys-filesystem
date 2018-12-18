@@ -25,7 +25,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.1.9', Filesystem::VERSION)
+    assert_equal('1.1.10', Filesystem::VERSION)
   end
 
   def test_stat_path
@@ -153,6 +153,11 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_stat_expected_errors
     assert_raises(ArgumentError){ Filesystem.stat }
+  end
+
+  def test_stat_case_insensitive
+    expected = @@darwin ? true : false
+    assert_equal(expected, @stat.case_insensitive?)
   end
 
   def test_numeric_methods_basic
