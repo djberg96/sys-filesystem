@@ -36,6 +36,12 @@ module Sys
           File.identical?(path, path.swapcase)
         end
       end
+
+      # Opposite of case_insensitive?
+      #
+      def case_sensitive?
+        !case_insensitive?
+      end
     end
   end
 end
