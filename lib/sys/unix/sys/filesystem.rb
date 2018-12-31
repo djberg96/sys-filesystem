@@ -381,25 +381,3 @@ module Sys
     end
   end
 end
-
-class Numeric
-  # Converts a number to kilobytes.
-  def to_kb
-    self / 1024
-  end
-
-  # Converts a number to megabytes.
-  def to_mb
-    self / 1048576
-  end
-
-  # Converts a number to gigabytes.
-  def to_gb
-    self / 1073741824
-  end
-
-  # Converts a number to terabytes.
-  def to_tb
-    self / 1099511627776
-  end
-end
