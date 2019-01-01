@@ -20,7 +20,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.1.9', Filesystem::VERSION)
+    assert_equal('1.2.0', Filesystem::VERSION)
   end
 
   test "stat path works as expected" do
@@ -144,6 +144,11 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   test "stat percent_used basic functionality" do
     assert_respond_to(@stat, :percent_used)
     assert_kind_of(Float, @stat.percent_used)
+  end
+
+  test "case_insensitive returns expected result" do
+    assert_respond_to(@stat, :case_insensitive?)
+    assert_true(@stat.case_insensitive?)
   end
 
   test "mount_point singleton method basic functionality" do

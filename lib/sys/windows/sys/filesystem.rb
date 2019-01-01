@@ -400,39 +400,3 @@ module Sys
     end
   end
 end
-
-# Some convenient methods for converting bytes to kb, mb, and gb.
-#
-class Numeric
-  # call-seq:
-  #  <tt>num</tt>.to_kb
-  #
-  # Returns +num+ in terms of kilobytes.
-  def to_kb
-    self / 1024
-  end
-
-  # call-seq:
-  #  <tt>num</tt>.to_mb
-  #
-  # Returns +num+ in terms of megabytes.
-  def to_mb
-    self / 1048576
-  end
-
-  # call-seq:
-  #  <tt>num</tt>.to_gb
-  #
-  # Returns +num+ in terms of gigabytes.
-  def to_gb
-    self / 1073741824
-  end
-
-  # call-seq:
-  #  <tt>num</tt>.to_gb
-  #
-  # Returns +num+ in terms of terabytes.
-  def to_tb
-    self / 1099511627776
-  end
-end

@@ -1,3 +1,10 @@
+== 1.2.0 - 31-Dec-2018
+* Changed the license to Apache-2.0.
+* Added the case_sensitive? and case_insensitive? instance methods to the
+  Filesystem::Stat class.
+* Refactored the Numeric helper methods into a single location.
+* Fixed the deprecation warnings when running the tests on Windows.
+
 == 1.1.9 - 26-Jan-2018
 * The bytes_free and bytes_total methods were updated to use the fragment size
   instead of the block size. This fixes Macs using APFS, as well as Solaris 10.

@@ -2,13 +2,13 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'sys-filesystem'
-  spec.version    = '1.1.9'
+  spec.version    = '1.2.0'
   spec.author     = 'Daniel J. Berger'
   spec.email      = 'djberg96@gmail.com'
   spec.homepage   = 'https://github.com/djberg96/sys-filesystem'
   spec.summary    = 'A Ruby interface for getting file system information.'
   spec.test_file  = 'test/test_sys_filesystem.rb'
-  spec.license    = 'Artistic 2.0'
+  spec.license    = 'Apache-2.0'
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
   spec.cert_chain = Dir['certs/*']
    
