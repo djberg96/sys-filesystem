@@ -33,6 +33,20 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_kind_of(Numeric, @stat.block_size)
   end
 
+  test "stat works with or without trailing slash on standard paths" do
+    assert_equal("C:/", Filesystem.stat("C:/").path)
+    assert_equal("C:/Users", Filesystem.stat("C:/Users").path)
+    assert_equal("C:/Users/", Filesystem.stat("C:/Users/").path)
+    assert_equal("C:/Users/", Filesystem.stat("C:/Users/").path)
+  end
+
+  test "stat works with or without trailing slash on UNC paths" do
+    assert_equal("//127.0.0.1/C$", Filesystem.stat("//127.0.0.1/C$").path)
+    assert_equal("//127.0.0.1/C$/", Filesystem.stat("//127.0.0.1/C$/").path)
+    assert_equal("\\\\127.0.0.1\\C$", Filesystem.stat("\\\\127.0.0.1\\C$").path)
+    assert_equal("\\\\127.0.0.1\\C$\\", Filesystem.stat("\\\\127.0.0.1\\C$\\").path)
+  end
+
   test "stat fragment_size works as expected" do
     assert_respond_to(@stat, :fragment_size)
     assert_nil(@stat.fragment_size)
