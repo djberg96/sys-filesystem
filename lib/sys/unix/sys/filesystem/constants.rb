@@ -62,6 +62,11 @@ module Sys
       MS_STRICTATIME = 1 << 24
       MS_ACTIVE = 1 << 30
       MS_NOUSER = 1 << 31
+
+      MNT_FORCE = 1
+      MNT_DETACH = 2
+      MNT_EXPIRE = 4
+      UMOUNT_NOFOLLOW = 8
     end
   end
 end
