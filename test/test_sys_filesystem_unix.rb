@@ -25,7 +25,8 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.2.0', Filesystem::VERSION)
+    assert_equal('1.3.0', Filesystem::VERSION)
+    assert_true(Filesystem::VERSION.frozen?)
   end
 
   def test_stat_path
