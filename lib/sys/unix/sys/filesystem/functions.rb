@@ -14,10 +14,10 @@ module Sys
       end
 
       attach_function(:strerror, [:int], :string)
-      attach_function(:mount, [:string, :string, :string, :ulong, :void], :int)
-      attach_function(:umount, [:string], :int)
+      attach_function(:mount_c, :mount, [:string, :string, :string, :ulong, :void], :int)
+      attach_function(:umount_c, :umount, [:string], :int)
 
-      private_class_method :statvfs, :strerror, :mount, :umount
+      private_class_method :statvfs, :strerror, :mount_c, :umount_c
 
       begin
         if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i

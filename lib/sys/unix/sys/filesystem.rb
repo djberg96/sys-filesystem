@@ -379,5 +379,19 @@ module Sys
 
       val
     end
+
+    # Attach the filesystem specified by +source+ to the location (a directory
+    # or file) specified by the pathname in +target+.
+    #
+    # Note that the +source+ is often a pathname referring to a device, but
+    # can also be the pathname of a directory or file, or a dummy string.
+    #
+    # Typically requires admin privileges.
+    #
+    def self.mount(source, target, fstype = nil, flags = 0, data = nil)
+      if mount_c(source, target, fstype, flags, data) != 0
+        raise Error, 'mount() function failed: ' + strerror(FFI.errno)
+      end
+    end
   end
 end
