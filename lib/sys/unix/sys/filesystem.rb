@@ -393,5 +393,25 @@ module Sys
         raise Error, 'mount() function failed: ' + strerror(FFI.errno)
       end
     end
+
+    # Removes the attachment of the (topmost) filesystem mounted on target.
+    # Additional flags may be provided for operating systems that support
+    # the umount2 function. Otherwise this argument is ignored.
+    #
+    # Typically requires admin privileges.
+    #
+    def self.umount(target, flags = 0)
+      if respond_to?(:umount2)
+        function = 'umount2'
+        rv = umount2(target, flags)
+      else
+        function = 'umount'
+        rv = umount(target)
+      end
+
+      if rv != 0
+        raise Error, "#{function} function failed: " + strerror(FFI.errno)
+      end
+    end
   end
 end
