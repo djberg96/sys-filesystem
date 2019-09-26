@@ -14,8 +14,10 @@ module Sys
       end
 
       attach_function(:strerror, [:int], :string)
+      attach_function(:mount, [:string, :string, :string, :ulong, :void], :int)
+      attach_function(:umount, [:string], :int)
 
-      private_class_method :statvfs, :strerror
+      private_class_method :statvfs, :strerror, :mount, :umount
 
       begin
         if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
@@ -27,7 +29,8 @@ module Sys
           attach_function(:getmntent, [:pointer], :pointer)
           attach_function(:setmntent, [:string, :string], :pointer)
           attach_function(:endmntent, [:pointer], :int)
-          private_class_method :getmntent, :setmntent, :endmntent
+          attach_function(:umount2, [:string, :int], :int)
+          private_class_method :getmntent, :setmntent, :endmntent, :umount2
         end
       rescue FFI::NotFoundError
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
