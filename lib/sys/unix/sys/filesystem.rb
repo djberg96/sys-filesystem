@@ -392,6 +392,8 @@ module Sys
       if mount_c(source, target, fstype, flags, data) != 0
         raise Error, 'mount() function failed: ' + strerror(FFI.errno)
       end
+
+      self
     end
 
     # Removes the attachment of the (topmost) filesystem mounted on target.
@@ -400,8 +402,8 @@ module Sys
     #
     # Typically requires admin privileges.
     #
-    def self.umount(target, flags = 0)
-      if respond_to?(:umount2)
+    def self.umount(target, flags = nil)
+      if flags && respond_to?(:umount2)
         function = 'umount2'
         rv = umount2(target, flags)
       else
@@ -412,6 +414,8 @@ module Sys
       if rv != 0
         raise Error, "#{function} function failed: " + strerror(FFI.errno)
       end
+
+      self
     end
   end
 end
