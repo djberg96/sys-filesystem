@@ -14,7 +14,7 @@ module Sys
     private
 
     # Readable versions of constant names
-    @@opt_names = {
+    OPT_NAMES = {
       MNT_RDONLY           => 'read-only',
       MNT_SYNCHRONOUS      => 'synchronous',
       MNT_NOEXEC           => 'noexec',
@@ -35,7 +35,7 @@ module Sys
       MNT_NOUSERXATTR      => 'nouserxattr',
       MNT_DEFWRITE         => 'defwrite',
       MNT_NOATIME          => 'noatime'
-    }
+    }.freeze
 
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')
@@ -268,7 +268,7 @@ module Sys
           string = ""
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
-          @@opt_names.each{ |key,val|
+          OPT_NAMES.each{ |key,val|
             if flags & key > 0
               if string.empty?
                 string << val
