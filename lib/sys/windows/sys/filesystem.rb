@@ -355,11 +355,17 @@ module Sys
 
     # Associate a volume with a drive letter or a directory on another volume.
     #
-    def self.mount(mount_point, volume_name)
-      mount_pointw = mount_point.to_s.wincode
-      volume_namew = volume_name.to_s.wincode
+    def self.mount(target, source)
+      targetw = target.to_s.wincode
+      sourcew = source.to_s.wincode
 
-      unless SetVolumeMountPointW(mount_pointw, volume_namew)
+      volume_namew = (0.chr * 256).wincode
+
+      unless GetVolumeNameForVolumeMountPointW(sourcew, volume_namew, volume_namew.size)
+        raise SystemCallError.new('GetVolumeNameForVolumeMountPoint', FFI.errno)
+      end
+
+      unless SetVolumeMountPointW(targetw, volume_namew)
         raise SystemCallError.new('SetVolumeMountPoint', FFI.errno)
       end
 

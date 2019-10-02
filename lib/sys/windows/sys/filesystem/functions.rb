@@ -27,6 +27,7 @@ module Sys
         [:buffer_in, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong],
         :bool
 
+      attach_pfunc :GetVolumeNameForVolumeMountPointW, [:buffer_in, :buffer_in, :ulong], :bool
       attach_pfunc :QueryDosDeviceA, [:buffer_in, :buffer_out, :ulong], :ulong
       attach_pfunc :SetVolumeMountPointW, [:buffer_in, :buffer_in], :bool
 
