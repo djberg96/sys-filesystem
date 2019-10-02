@@ -405,10 +405,10 @@ module Sys
     def self.umount(target, flags = nil)
       if flags && respond_to?(:umount2)
         function = 'umount2'
-        rv = umount2(target, flags)
+        rv = umount2_c(target, flags)
       else
         function = 'umount'
-        rv = umount(target)
+        rv = umount_c(target)
       end
 
       if rv != 0

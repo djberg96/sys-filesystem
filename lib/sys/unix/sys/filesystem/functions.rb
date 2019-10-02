@@ -14,7 +14,7 @@ module Sys
       end
 
       attach_function(:strerror, [:int], :string)
-      attach_function(:mount_c, :mount, [:string, :string, :string, :ulong, :void], :int)
+      attach_function(:mount_c, :mount, [:string, :string, :string, :ulong, :string], :int)
       attach_function(:umount_c, :umount, [:string], :int)
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
