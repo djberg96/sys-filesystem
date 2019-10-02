@@ -14,6 +14,7 @@ module Sys
         end
       end
 
+      attach_pfunc :DeleteVolumeMountPointA, [:string], :bool
       attach_pfunc :GetDiskFreeSpaceW, [:buffer_in, :pointer, :pointer, :pointer, :pointer], :bool
       attach_pfunc :GetDiskFreeSpaceExW, [:buffer_in, :pointer, :pointer, :pointer], :bool
       attach_pfunc :GetLogicalDriveStringsA, [:ulong, :pointer], :ulong
@@ -27,6 +28,7 @@ module Sys
         :bool
 
       attach_pfunc :QueryDosDeviceA, [:buffer_in, :buffer_out, :ulong], :ulong
+      attach_pfunc :SetVolumeMountPointW, [:buffer_in, :buffer_in], :bool
 
       ffi_lib :shlwapi
 

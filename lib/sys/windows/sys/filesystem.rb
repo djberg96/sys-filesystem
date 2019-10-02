@@ -353,6 +353,29 @@ module Sys
       stat_obj.freeze # Read-only object
     end
 
+    # Associate a volume with a drive letter or a directory on another volume.
+    #
+    def self.mount(mount_point, volume_name)
+      mount_pointw = mount_point.to_s.wincode
+      volume_namew = volume_name.to_s.wincode
+
+      unless SetVolumeMountPointW(mount_pointw, volume_namew)
+        raise SystemCallError.new('SetVolumeMountPoint', FFI.errno)
+      end
+
+      self
+    end
+
+    # Deletes a drive letter or mounted folder.
+    #
+    def self.umount(mount_point)
+      unless DeleteVolumeMountPoint(mount_point)
+        raise SystemCallError.new('DeleteVolumeMountPoint', FFI.errno)
+      end
+
+      self
+    end
+
     private
 
     # This method is used to get the boot time of the system, which is used
