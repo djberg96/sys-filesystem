@@ -386,9 +386,12 @@ module Sys
     # Note that the +source+ is often a pathname referring to a device, but
     # can also be the pathname of a directory or file, or a dummy string.
     #
+    # By default this method will assume 'ext2' as the filesystem type, but
+    # you should update this as needed.
+    #
     # Typically requires admin privileges.
     #
-    def self.mount(source, target, fstype = nil, flags = 0, data = nil)
+    def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
       if mount_c(source, target, fstype, flags, data) != 0
         raise Error, 'mount() function failed: ' + strerror(FFI.errno)
       end
