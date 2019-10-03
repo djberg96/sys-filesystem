@@ -14,7 +14,7 @@ module Sys
     private
 
     # Readable versions of constant names
-    @@opt_names = {
+    OPT_NAMES = {
       MNT_RDONLY           => 'read-only',
       MNT_SYNCHRONOUS      => 'synchronous',
       MNT_NOEXEC           => 'noexec',
@@ -35,7 +35,7 @@ module Sys
       MNT_NOUSERXATTR      => 'nouserxattr',
       MNT_DEFWRITE         => 'defwrite',
       MNT_NOATIME          => 'noatime'
-    }
+    }.freeze
 
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')
@@ -268,7 +268,7 @@ module Sys
           string = ""
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
-          @@opt_names.each{ |key,val|
+          OPT_NAMES.each{ |key,val|
             if flags & key > 0
               if string.empty?
                 string << val
@@ -378,6 +378,51 @@ module Sys
       }
 
       val
+    end
+
+    # Attach the filesystem specified by +source+ to the location (a directory
+    # or file) specified by the pathname in +target+.
+    #
+    # Note that the +source+ is often a pathname referring to a device, but
+    # can also be the pathname of a directory or file, or a dummy string.
+    #
+    # By default this method will assume 'ext2' as the filesystem type, but
+    # you should update this as needed.
+    #
+    # Typically requires admin privileges.
+    #
+    # Example:
+    #
+    #   Sys::Filesystem.mount('/dev/loop0', '/home/you/tmp', 'ext4', Sys::Filesystem::MNT_RDONLY)
+    #
+    def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
+      if mount_c(source, target, fstype, flags, data) != 0
+        raise Error, 'mount() function failed: ' + strerror(FFI.errno)
+      end
+
+      self
+    end
+
+    # Removes the attachment of the (topmost) filesystem mounted on target.
+    # Additional flags may be provided for operating systems that support
+    # the umount2 function. Otherwise this argument is ignored.
+    #
+    # Typically requires admin privileges.
+    #
+    def self.umount(target, flags = nil)
+      if flags && respond_to?(:umount2)
+        function = 'umount2'
+        rv = umount2_c(target, flags)
+      else
+        function = 'umount'
+        rv = umount_c(target)
+      end
+
+      if rv != 0
+        raise Error, "#{function} function failed: " + strerror(FFI.errno)
+      end
+
+      self
     end
   end
 end

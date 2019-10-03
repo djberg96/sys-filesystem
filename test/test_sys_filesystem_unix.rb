@@ -25,7 +25,8 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.2.0', Filesystem::VERSION)
+    assert_equal('1.3.0', Filesystem::VERSION)
+    assert_true(Filesystem::VERSION.frozen?)
   end
 
   def test_stat_path
@@ -280,6 +281,14 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   def test_ffi_functions_are_private
     assert_false(Filesystem.methods.include?('statvfs'))
     assert_false(Filesystem.methods.include?('strerror'))
+  end
+
+  def test_mount_singleton_method
+    assert_respond_to(Sys::Filesystem, :mount)
+  end
+
+  def test_umount_singleton_method
+    assert_respond_to(Sys::Filesystem, :umount)
   end
 
   def teardown

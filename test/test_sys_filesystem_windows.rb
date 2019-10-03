@@ -20,7 +20,8 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.2.0', Filesystem::VERSION)
+    assert_equal('1.3.0', Filesystem::VERSION)
+    assert_true(Filesystem::VERSION.frozen?)
   end
 
   test "stat path works as expected" do
@@ -273,6 +274,16 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   test "custom Numeric#to_gb method works as expected" do
     assert_respond_to(@size, :to_gb)
     assert_equal(0, @size.to_gb)
+  end
+
+  # Mount and Unmount
+
+  test "mount singleton method exists" do
+    assert_respond_to(Sys::Filesystem, :mount)
+  end
+
+  test "umount singleton method exists" do
+    assert_respond_to(Sys::Filesystem, :umount)
   end
 
   # FFI
