@@ -1,4 +1,4 @@
-== 1.3.0 - ???
+== 1.3.0 - 3-Oct-2019
 * Added the mount and umount singleton methods.
 * Changed an internal class variable to a frozen constant.
 
