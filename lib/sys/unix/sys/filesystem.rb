@@ -391,6 +391,10 @@ module Sys
     #
     # Typically requires admin privileges.
     #
+    # Example:
+    #
+    #   Sys::Filesystem.mount('/dev/loop0', '/home/you/tmp', 'ext4', Sys::Filesystem::MNT_RDONLY)
+    #
     def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
       if mount_c(source, target, fstype, flags, data) != 0
         raise Error, 'mount() function failed: ' + strerror(FFI.errno)
