@@ -276,6 +276,16 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
     assert_equal(0, @size.to_gb)
   end
 
+  # Mount and Unmount
+
+  test "mount singleton method exists" do
+    assert_respond_to(Sys::Filesystem, :mount)
+  end
+
+  test "umount singleton method exists" do
+    assert_respond_to(Sys::Filesystem, :umount)
+  end
+
   # FFI
 
   test "internal ffi functions are not public" do
