@@ -283,6 +283,14 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_false(Filesystem.methods.include?('strerror'))
   end
 
+  def test_mount_singleton_method
+    assert_respond_to(Sys::Filesystem, :mount)
+  end
+
+  def test_umount_singleton_method
+    assert_respond_to(Sys::Filesystem, :umount)
+  end
+
   def teardown
     @dir   = nil
     @stat  = nil
