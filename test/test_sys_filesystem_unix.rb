@@ -294,6 +294,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   test "statfs struct is expected size" do
+    omit_if(@@darwin, "statfs test skipped on Darwin")
     assert_equal(check_sizeof('struct statfs', 'sys/statfs.h'), Filesystem::Structs::Statfs.size)
   end
 
