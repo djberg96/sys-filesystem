@@ -15,8 +15,9 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
 
   spec.add_dependency('ffi')
-  spec.add_development_dependency('test-unit', '>= 2.5.0')
   spec.add_development_dependency('rake')
+  spec.add_development_dependency('test-unit', '~> 3.3')
+  spec.add_development_dependency('mkmf-lite', '~> 0.3')
 
   spec.metadata = {
     'homepage_uri'      => 'https://github.com/djberg96/sys-filesystem',
