@@ -112,18 +112,16 @@ module Sys
           layout(
             :f_bsize, :ulong,
             :f_frsize, :ulong,
-            :f_blocks, :ulong,
-            :f_bfree, :ulong,
-            :f_bavail, :ulong,
-            :f_files, :ulong,
-            :f_ffree, :ulong,
-            :f_favail, :ulong,
+            :f_blocks, :uint64,
+            :f_bfree, :uint64,
+            :f_bavail, :uint64,
+            :f_files, :uint64,
+            :f_ffree, :uint64,
+            :f_favail, :uint64,
             :f_fsid, :ulong,
             :f_flag, :ulong,
             :f_namemax, :ulong,
-            :f_ftype, :ulong,
-            :f_basetype, [:char, 16],
-            :f_str, [:char, 16]
+            :f_spare, [:int, 6]
           )
         end
       end
