@@ -118,7 +118,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_kind_of(String, @stat.base_type)
   end
 
-  def test_stat_constants
+  test "stat constants are defined" do
     assert_not_nil(Filesystem::Stat::RDONLY)
     assert_not_nil(Filesystem::Stat::NOSUID)
 
@@ -127,65 +127,65 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_not_nil(Filesystem::Stat::NOTRUNC)
   end
 
-  def test_stat_bytes_total
+  test "stat bytes_total works as expected" do
     assert_respond_to(@stat, :bytes_total)
     assert_kind_of(Numeric, @stat.bytes_total)
   end
 
-  def test_stat_bytes_free
+  test "stat bytes_free works as expected" do
     assert_respond_to(@stat, :bytes_free)
     assert_kind_of(Numeric, @stat.bytes_free)
     assert_equal(@stat.bytes_free, @stat.blocks_free * @stat.fragment_size)
   end
 
-  def test_stat_bytes_available
+  test "stat bytes_available works as expected" do
     assert_respond_to(@stat, :bytes_available)
     assert_kind_of(Numeric, @stat.bytes_available)
     assert_equal(@stat.bytes_available, @stat.blocks_available * @stat.fragment_size)
   end
 
-  def test_stat_bytes_used
+  test "stat bytes works as expected" do
     assert_respond_to(@stat, :bytes_used)
     assert_kind_of(Numeric, @stat.bytes_used)
   end
 
-  def test_stat_percent_used
+  test "stat percent_used works as expected" do
     assert_respond_to(@stat, :percent_used)
     assert_kind_of(Float, @stat.percent_used)
   end
 
-  def test_stat_expected_errors
+  test "stat singleton method requires an argument" do
     assert_raises(ArgumentError){ Filesystem.stat }
   end
 
-  def test_stat_case_insensitive
+  test "stat case_insensitive method works as expected" do
     expected = @@darwin ? true : false
     assert_equal(expected, @stat.case_insensitive?)
     assert_equal(expected, Filesystem.stat(Dir.home).case_insensitive?)
   end
 
-  def test_stat_case_sensitive
+  test "stat case_sensitive method works as expected" do
     expected = @@darwin ? false : true
     assert_equal(expected, @stat.case_sensitive?)
     assert_equal(expected, Filesystem.stat(Dir.home).case_sensitive?)
   end
 
-  def test_numeric_methods_basic
+  test "numeric helper methods are defined" do
     assert_respond_to(@size, :to_kb)
     assert_respond_to(@size, :to_mb)
     assert_respond_to(@size, :to_gb)
     assert_respond_to(@size, :to_tb)
   end
 
-  def test_to_kb
+  test "to_kb works as expected" do
     assert_equal(57344, @size.to_kb)
   end
 
-  def test_to_mb
+  test "to_mb works as expected" do
     assert_equal(56, @size.to_mb)
   end
 
-  def test_to_gb
+  test "to_gb works as expected" do
     assert_equal(0, @size.to_gb)
   end
 
