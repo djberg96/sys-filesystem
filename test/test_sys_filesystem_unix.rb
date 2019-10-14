@@ -26,92 +26,92 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     @array = []
   end
 
-  def test_version
+  test "version number is set to the expected value" do
     assert_equal('1.3.1', Filesystem::VERSION)
     assert_true(Filesystem::VERSION.frozen?)
   end
 
-  def test_stat_path
+  test "stat path works as expected" do
     assert_respond_to(@stat, :path)
     assert_equal("/", @stat.path)
   end
 
-  def test_stat_block_size
+  test "stat block_size works as expected" do
     assert_respond_to(@stat, :block_size)
     assert_kind_of(Numeric, @stat.block_size)
   end
 
-  def test_block_size_is_a_plausible_value
+  test "stat block_size is a plausible value" do
     assert_true(@stat.block_size >= 1024)
     assert_true(@stat.block_size <= 16384)
   end
 
-  def test_stat_fragment_size
+  test "stat fragment_size works as expected" do
     assert_respond_to(@stat, :fragment_size)
     assert_kind_of(Numeric, @stat.fragment_size)
   end
 
-  def test_stat_blocks
+  test "stat blocks works as expected" do
     assert_respond_to(@stat, :blocks)
     assert_kind_of(Numeric, @stat.blocks)
   end
 
-  def test_stat_blocks_free
+  test "stat blocks_free works as expected" do
     assert_respond_to(@stat, :blocks_free)
     assert_kind_of(Numeric, @stat.blocks_free)
   end
 
-  def test_stat_blocks_available
+  test "stat blocks_available works as expected" do
     assert_respond_to(@stat, :blocks_available)
     assert_kind_of(Numeric, @stat.blocks_available)
   end
 
-  def test_stat_files
+  test "stat files works as expected" do
     assert_respond_to(@stat, :files)
     assert_kind_of(Numeric, @stat.files)
   end
 
-  def test_inodes_alias
+  test "stat inodes is an alias for files" do
     assert_respond_to(@stat, :inodes)
     assert_true(@stat.method(:inodes) == @stat.method(:files))
   end
 
-  def test_stat_files_free
+  test "stat files tree works as expected" do
     assert_respond_to(@stat, :files_free)
     assert_kind_of(Numeric, @stat.files_free)
   end
 
-  def test_stat_inodes_free_alias
+  test "stat inodes_free is an alias for files_free" do
     assert_respond_to(@stat, :inodes_free)
     assert_true(@stat.method(:inodes_free) == @stat.method(:files_free))
   end
 
-  def test_stat_files_available
+  test "stat files_available works as expected" do
     assert_respond_to(@stat, :files_available)
     assert_kind_of(Numeric, @stat.files_available)
   end
 
-  def test_stat_inodes_available_alias
+  test "stat inodes_available is an alias for files_available" do
     assert_respond_to(@stat, :inodes_available)
     assert_true(@stat.method(:inodes_available) == @stat.method(:files_available))
   end
 
-  def test_stat_filesystem_id
+  test "stat filesystem_id works as expected" do
     assert_respond_to(@stat, :filesystem_id)
     assert_kind_of(Integer, @stat.filesystem_id)
   end
 
-  def test_stat_flags
+  test "stat flags works as expected" do
     assert_respond_to(@stat, :flags)
     assert_kind_of(Numeric, @stat.flags)
   end
 
-  def test_stat_name_max
+  test "stat name_max works as expected" do
     assert_respond_to(@stat, :name_max)
     assert_kind_of(Numeric, @stat.name_max)
   end
 
-  def test_stat_base_type
+  test "stat base_type works as expected" do
     omit_unless(@@solaris, "base_type test skipped except on Solaris")
 
     assert_respond_to(@stat, :base_type)
