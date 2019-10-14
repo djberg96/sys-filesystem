@@ -191,56 +191,56 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   # Filesystem::Mount tests
 
-  def test_mounts_with_no_block
+  test "mounts singleton method works as expected without a block" do
     assert_nothing_raised{ @array = Filesystem.mounts }
     assert_kind_of(Filesystem::Mount, @array[0])
   end
 
-  def test_mounts_with_block
+  test "mounts singleton method works as expected with a block" do
     assert_nothing_raised{ Filesystem.mounts{ |m| @array << m } }
     assert_kind_of(Filesystem::Mount, @array[0])
   end
 
-  def test_mounts_high_iteration
+  test "calling the mounts singleton method a large number of times does not cause issues" do
     assert_nothing_raised{ 1000.times{ @array = Filesystem.mounts } }
   end
 
-  def test_mount_name
+  test "mount name method works as expected" do
     assert_respond_to(@mnt, :name)
     assert_kind_of(String, @mnt.name)
   end
 
-  def test_fsname_alias
+  test "mount fsname is an alias for name" do
     assert_respond_to(@mnt, :fsname)
     assert_true(@mnt.method(:fsname) == @mnt.method(:name))
   end
 
-  def test_mount_point
+  test "mount point method works as expected" do
     assert_respond_to(@mnt, :mount_point)
     assert_kind_of(String, @mnt.mount_point)
   end
 
-  def test_dir_alias
+  test "mount dir is an alias for mount_point" do
     assert_respond_to(@mnt, :dir)
     assert_true(@mnt.method(:dir) == @mnt.method(:mount_point))
   end
 
-  def test_mount_type
+  test "mount mount_type works as expected" do
     assert_respond_to(@mnt, :mount_type)
     assert_kind_of(String, @mnt.mount_type)
   end
 
-  def test_mount_options
+  test "mount options works as expected" do
     assert_respond_to(@mnt, :options)
     assert_kind_of(String, @mnt.options)
   end
 
-  def test_opts_alias
+  test "mount opts is an alias for options" do
     assert_respond_to(@mnt, :opts)
     assert_true(@mnt.method(:opts) == @mnt.method(:options))
   end
 
-  def test_mount_time
+  test "mount time works as expected" do
     assert_respond_to(@mnt, :mount_time)
 
     if @@solaris
@@ -250,47 +250,49 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     end
   end
 
-  def test_mount_dump_frequency
+  test "mount dump_frequency works as expected" do
     msg = 'dump_frequency test skipped on this platform'
     omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :dump_frequency)
     assert_kind_of(Numeric, @mnt.dump_frequency)
   end
 
-  def test_freq_alias
+  test "mount freq is an alias for dump_frequency" do
     assert_respond_to(@mnt, :freq)
     assert_true(@mnt.method(:freq) == @mnt.method(:dump_frequency))
   end
 
-  def test_mount_pass_number
+  test "mount pass_number works as expected" do
     msg = 'pass_number test skipped on this platform'
     omit_if(@@solaris || @@freebsd || @@darwin, msg)
     assert_respond_to(@mnt, :pass_number)
     assert_kind_of(Numeric, @mnt.pass_number)
   end
 
-  def test_passno_alias
+  test "mount passno is an alias for pass_number" do
     assert_respond_to(@mnt, :passno)
     assert_true(@mnt.method(:passno) == @mnt.method(:pass_number))
   end
 
-  def test_mount_point_singleton
+  test "mount_point singleton method works as expected" do
     assert_respond_to(Filesystem, :mount_point)
     assert_nothing_raised{ Filesystem.mount_point(Dir.pwd) }
     assert_kind_of(String, Filesystem.mount_point(Dir.pwd))
   end
 
-  def test_ffi_functions_are_private
-    assert_false(Filesystem.methods.include?('statvfs'))
-    assert_false(Filesystem.methods.include?('strerror'))
-  end
-
-  def test_mount_singleton_method
+  test "mount singleton method is defined" do
     assert_respond_to(Sys::Filesystem, :mount)
   end
 
-  def test_umount_singleton_method
+  test "umount singleton method is defined" do
     assert_respond_to(Sys::Filesystem, :umount)
+  end
+
+  # FFI
+
+  test "ffi functions are private" do
+    assert_false(Filesystem.methods.include?('statvfs'))
+    assert_false(Filesystem.methods.include?('strerror'))
   end
 
   test "statfs struct is expected size" do
