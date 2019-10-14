@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.email      = 'djberg96@gmail.com'
   spec.homepage   = 'https://github.com/djberg96/sys-filesystem'
   spec.summary    = 'A Ruby interface for getting file system information.'
-  spec.test_files = Dir['test/*.rb']
   spec.license    = 'Apache-2.0'
+  spec.test_files = Dir['test/*.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
   spec.cert_chain = Dir['certs/*']
    
