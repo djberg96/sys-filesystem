@@ -27,7 +27,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('1.3.0', Filesystem::VERSION)
+    assert_equal('1.3.1', Filesystem::VERSION)
     assert_true(Filesystem::VERSION.frozen?)
   end
 
@@ -293,9 +293,22 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_respond_to(Sys::Filesystem, :umount)
   end
 
-  test "structs are expected size" do
-    assert_equal(check_sizeof('struct statvfs', 'sys/statvfs.h'), Filesystem::Structs::Statvfs.size)
+  test "statfs struct is expected size" do
     assert_equal(check_sizeof('struct statfs', 'sys/statfs.h'), Filesystem::Structs::Statfs.size)
+  end
+
+  test "statvfs struct is expected size" do
+    assert_equal(check_sizeof('struct statvfs', 'sys/statvfs.h'), Filesystem::Structs::Statvfs.size)
+  end
+
+  test "mnttab struct is expected size" do
+    omit_unless(@@solaris, "mnttab test skipped except on Solaris")
+    assert_equal(check_sizeof('struct mnttab', 'sys/mnttab.h'), Filesystem::Structs::Mnttab.size)
+  end
+
+  test "mntent struct is expected size" do
+    omit_unless(@@linux, "mnttab test skipped except on Linux")
+    assert_equal(check_sizeof('struct mntent', 'mntent.h'), Filesystem::Structs::Mntent.size)
   end
 
   def teardown
