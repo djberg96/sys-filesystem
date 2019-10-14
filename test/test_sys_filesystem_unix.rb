@@ -5,8 +5,10 @@
 # This test suite should be run via the 'rake test' task.
 ####################################################################
 require 'test-unit'
-require 'sys/filesystem'
+require 'sys-filesystem'
+require 'mkmf-lite'
 include Sys
+include Mkmf::Lite
 
 class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   def self.startup
@@ -289,6 +291,11 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
 
   def test_umount_singleton_method
     assert_respond_to(Sys::Filesystem, :umount)
+  end
+
+  test "structs are expected size" do
+    assert_equal(check_sizeof('struct statvfs', 'sys/statvfs.h'), Filesystem::Structs::Statvfs.size)
+    assert_equal(check_sizeof('struct statfs', 'sys/statfs.h'), Filesystem::Structs::Statfs.size)
   end
 
   def teardown

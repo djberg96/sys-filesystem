@@ -39,6 +39,21 @@ module Sys
             :f_mntfromname, [:char, MNAMELEN],
             :f_mntonname, [:char, MNAMELEN]
           )
+        elsif RbConfig::CONFIG['host_os'] =~ /linux/i
+          layout(
+            :f_type, :ulong,
+            :f_bsize, :ulong,
+            :f_blocks, :uint64,
+            :f_bfree, :uint64,
+            :f_bavail, :uint64,
+            :f_files, :uint64,
+            :f_ffree, :uint64,
+            :f_fsid, [:int, 2],
+            :f_namelen, :ulong,
+            :f_frsize, :ulong,
+            :f_flags, :ulong,
+            :f_spare, [:ulong, 4]
+          )
         else
           layout(
             :f_bsize, :uint32,
