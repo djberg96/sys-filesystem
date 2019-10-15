@@ -41,14 +41,14 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_kind_of(Numeric, @stat.block_size)
   end
 
-  test "stat block_size is a plausible value" do
-    assert_true(@stat.block_size >= 1024)
-    assert_true(@stat.block_size <= 16384)
-  end
-
   test "stat fragment_size works as expected" do
     assert_respond_to(@stat, :fragment_size)
     assert_kind_of(Numeric, @stat.fragment_size)
+  end
+
+  test "stat fragment_size is a plausible value" do
+    assert_true(@stat.fragment_size >= 512)
+    assert_true(@stat.fragment_size <= 16384)
   end
 
   test "stat blocks works as expected" do
