@@ -1,3 +1,10 @@
+== 1.3.1 - 15-Oct-2019
+* Fixed a bug where the Statvfs and Statfs structs were not allocated properly
+  on Linux, which could cause issues. Thanks go to Daniele Orlandi for the spot.
+* Added specs to ensure that the FFI struct size matches the C struct size.
+  This required adding mkmf-lite as a development dependency.
+* Added a slightly more pessimistic version requirement for test-unit.
+
 == 1.3.0 - 3-Oct-2019
 * Added the mount and umount singleton methods.
 * Changed an internal class variable to a frozen constant.
