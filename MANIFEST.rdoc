@@ -1,7 +1,7 @@
-* MANIFEST
-* CHANGES
+* MANIFEST.rdoc
+* CHANGES.rdoc
 * Rakefile
-* README
+* README.rdoc
 * sys-fileystem.gemspec
 * certs/djberg96_pub.pem
 * examples/example_stat.rb
