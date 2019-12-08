@@ -1,10 +1,10 @@
-= Description
-  A Ruby interface for getting file system information.
+== Description
+A Ruby interface for getting file system information.
 
-= Installation
+== Installation
   gem install sys-filesystem
 
-= Synopsis
+== Synopsis
   require 'sys/filesystem'
   include Sys
    
@@ -35,40 +35,42 @@
   # Find the mount point of any particular file
   puts Filesystem.mount_point('/home/djberge/some_file.txt') => '/home'
 
-= Notes
-  This is a pure Ruby implementation that uses FFI. This means it should work
-  with JRuby, too.
+== Notes
+This is a pure Ruby implementation that uses FFI. This means it should work
+with JRuby, too.
 
-= Sample code
-  Run 'rake example' if you want to see a basic sample run. The actual code
-  is 'example_stat.rb' in the 'examples' directory. Modify it as you see fit.
+== Sample code
+Run 'rake example' if you want to see a basic sample run. The actual code
+is 'example_stat.rb' in the 'examples' directory. Modify it as you see fit.
 
-= Known Bugs
-  None that I'm aware of. Please report bugs on the project page at
+== Known Bugs
+None that I'm aware of. Please report bugs on the project page at:
+
   https://github.com/djberg96/sys-filesystem
 
-= Future Plans
-  Add better 64-bit support for Linux and BSD.
-  Other suggestions welcome.
+== Future Plans
 
-= Acknowledgements
-  Mike Hall, for ideas and code that I borrowed from his 'filesystem' library.
+* Add better 64-bit support for Linux and BSD.
+* Other suggestions welcome.
+
+== Acknowledgements
+Mike Hall, for ideas and code that I borrowed from his 'filesystem' library.
+
+Park Heesob, for implementation and API ideas for the MS Windows version.
+
+Nobuyoshi Miyokawa, for adding the original FreeBSD and OS X support.
    
-  Park Heesob, for implementation and API ideas for the MS Windows version.
-   
-  Nobuyoshi Miyokawa, for adding the original FreeBSD and OS X support.
-   
-= License
+== License
   Apache-2.0
 
-= Copyright
+== Copyright
   (C) 2003-2019 Daniel J. Berger
   All Rights Reserved
 
-= Warranty
+== Warranty
   This library is provided "as is" and without any express or
   implied warranties, including, without limitation, the implied
   warranties of merchantability and fitness for a particular purpose.
 
-= Author
+== Author
   Daniel J. Berger
