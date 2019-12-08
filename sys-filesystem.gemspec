@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'sys-filesystem'
-  spec.version    = '1.3.1'
+  spec.version    = '1.3.2'
   spec.author     = 'Daniel J. Berger'
   spec.email      = 'djberg96@gmail.com'
   spec.homepage   = 'https://github.com/djberg96/sys-filesystem'
@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
   spec.cert_chain = Dir['certs/*']
    
-  spec.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
+  spec.extra_rdoc_files = Dir['*.rdoc']
 
   spec.add_dependency('ffi')
   spec.add_development_dependency('rake')
