@@ -1,5 +1,5 @@
 == Description
-A Ruby interface for getting file system information.
+A cross platform Ruby interface for getting file system information.
 
 == Installation
   gem install sys-filesystem
@@ -61,16 +61,16 @@ Park Heesob, for implementation and API ideas for the MS Windows version.
 Nobuyoshi Miyokawa, for adding the original FreeBSD and OS X support.
    
 == License
-  Apache-2.0
+Apache-2.0
 
 == Copyright
-  (C) 2003-2019 Daniel J. Berger
-  All Rights Reserved
+(C) 2003-2019 Daniel J. Berger
+All Rights Reserved
 
 == Warranty
-  This library is provided "as is" and without any express or
-  implied warranties, including, without limitation, the implied
-  warranties of merchantability and fitness for a particular purpose.
+This library is provided "as is" and without any express or
+implied warranties, including, without limitation, the implied
+warranties of merchantability and fitness for a particular purpose.
 
 == Author
-  Daniel J. Berger
+Daniel J. Berger
