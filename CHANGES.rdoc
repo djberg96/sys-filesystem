@@ -1,3 +1,7 @@
+== 1.3.3 - 18-Feb-2020
+* Linux now uses statvfs64 under the hood. This fixes a potential issue with
+  32 bit systems. Thanks go to Tom Smyth for the spot.
+
 == 1.3.2 - 8-Dec-2019
 * Renamed various text files to include .rdoc extension so that github renders
   them nicely.
