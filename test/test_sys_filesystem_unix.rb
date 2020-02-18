@@ -27,7 +27,7 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   end
 
   test "version number is set to the expected value" do
-    assert_equal('1.3.2', Filesystem::VERSION)
+    assert_equal('1.3.3', Filesystem::VERSION)
     assert_true(Filesystem::VERSION.frozen?)
   end
 
