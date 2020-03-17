@@ -1,3 +1,6 @@
+== 1.3.4 - 17-Mar-2020
+* Properly include a LICENSE file as per the Apache-2.0 license.
+
 == 1.3.3 - 18-Feb-2020
 * Linux now uses statvfs64 under the hood. This fixes a potential issue with
   32 bit systems. Thanks go to Tom Smyth for the spot.
