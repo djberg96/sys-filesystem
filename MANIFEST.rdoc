@@ -1,5 +1,6 @@
-* MANIFEST.rdoc
 * CHANGES.rdoc
+* LICENSE
+* MANIFEST.rdoc
 * Rakefile
 * README.rdoc
 * sys-fileystem.gemspec
