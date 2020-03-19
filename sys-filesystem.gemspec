@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     'homepage_uri'      => 'https://github.com/djberg96/sys-filesystem',
     'bug_tracker_uri'   => 'https://github.com/djberg96/sys-filesystem/issues',
-    'changelog_uri'     => 'https://github.com/djberg96/sys-filesystem/blob/ffi/CHANGES',
+    'changelog_uri'     => 'https://github.com/djberg96/sys-filesystem/blob/ffi/CHANGES.rdoc',
     'documentation_uri' => 'https://github.com/djberg96/sys-filesystem/wiki',
     'source_code_uri'   => 'https://github.com/djberg96/sys-filesystem',
     'wiki_uri'          => 'https://github.com/djberg96/sys-filesystem/wiki'
