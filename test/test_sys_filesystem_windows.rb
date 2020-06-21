@@ -14,6 +14,7 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   def setup
     @dir   = 'C:/'
     @stat  = Filesystem.stat(@dir)
+    @fstat = Dir.open(@dir){|dir| Filesystem.fstat(dir)}
     @mount = Filesystem.mounts[0]
     @size  = 58720256
     @array = []
@@ -150,6 +151,27 @@ class TC_Sys_Filesystem_Windows < Test::Unit::TestCase
   test "case_insensitive returns expected result" do
     assert_respond_to(@stat, :case_insensitive?)
     assert_true(@stat.case_insensitive?)
+  end
+
+  test "fstat works as expected" do
+    assert_equal(@stat.class, @fstat.class)
+    assert_equal(@stat.path, @fstat.path)
+    assert_equal(@stat.block_size, @fstat.block_size)
+    assert_equal(@stat.fragment_size, @fstat.fragment_size)
+    assert_equal(@stat.blocks, @fstat.blocks)
+    assert_equal(@stat.blocks_free, @fstat.blocks_free)
+    assert_equal(@stat.blocks_available, @fstat.blocks_available)
+    assert_equal(@stat.files, @fstat.files)
+    assert_equal(@stat.files_free, @fstat.files_free)
+    assert_equal(@stat.files_available, @fstat.files_available)
+    assert_equal(@stat.filesystem_id, @fstat.filesystem_id)
+    assert_equal(@stat.flags, @fstat.flags)
+    assert_equal(@stat.name_max, @fstat.name_max)
+    assert_equal(@stat.base_type, @fstat.base_type)
+  end
+
+  test "fstat singleton method requires an argument" do
+    assert_raises(ArgumentError){ Filesystem.fstat }
   end
 
   test "mount_point singleton method basic functionality" do
