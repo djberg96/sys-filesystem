@@ -259,10 +259,27 @@ module Sys
     #
     # Examples:
     #
+    #    # path
     #    Sys::Filesystem.stat("C:\\")
     #    Sys::Filesystem.stat("C:\\Documents and Settings\\some_user")
+    #    # Pathname
+    #    pathname = Pathname.new("C:\\")
+    #    Sys::Filesystem.stat(pathname)
+    #    # File
+    #    file = File.open("C:\\file", "r")
+    #    Sys::Filesystem.stat(file)
+    #    # Dir
+    #    dir = Dir.open("C:\\")
+    #    Sys::Filesystem.stat(dir)
     #
     def self.stat(path)
+      path = case path
+             when Pathname, File, Dir
+               path.to_path
+             else
+               path
+             end
+
       bytes_avail = FFI::MemoryPointer.new(:ulong_long)
       bytes_free  = FFI::MemoryPointer.new(:ulong_long)
       total_bytes = FFI::MemoryPointer.new(:ulong_long)
@@ -351,19 +368,6 @@ module Sys
       stat_obj.instance_variable_set(:@bytes_available, bytes_avail)
 
       stat_obj.freeze # Read-only object
-    end
-
-    # Returns a Filesystem::Stat object that contains information about the
-    # file system of the pathname of the +file+. On Windows this will default
-    # to using the root path for volume information.
-    #
-    # Examples:
-    #
-    #    file = Dir.open("C:\\")
-    #    Sys::Filesystem.fstat(file)
-    #
-    def self.fstat(file)
-      stat(file.path)
     end
 
     # Associate a volume with a drive letter or a directory on another volume.
