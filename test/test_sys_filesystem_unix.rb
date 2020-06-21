@@ -7,6 +7,7 @@
 require 'test-unit'
 require 'sys-filesystem'
 require 'mkmf-lite'
+require 'pathname'
 include Sys
 include Mkmf::Lite
 

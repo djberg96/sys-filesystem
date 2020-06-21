@@ -202,23 +202,22 @@ module Sys
     #
     #    # path
     #    Sys::Filesystem.stat("path")
+    #
     #    # Pathname
     #    pathname = Pathname.new("path")
     #    Sys::Filesystem.stat(pathname)
+    #
     #    # File
     #    file = File.open("file", "r")
     #    Sys::Filesystem.stat(file)
+    #
     #    # Dir
     #    dir = Dir.open("/")
     #    Sys::Filesystem.stat(dir)
     #
     def self.stat(path)
-      path = case path
-             when Pathname, File, Dir
-               path.to_path
-             else
-               path
-             end
+      path = path.path if path.respond_to?(:path) # File, Dir
+      path = path.to_s if path.respond_to?(:to_s) # Pathname
 
       fs = Statvfs.new
 
