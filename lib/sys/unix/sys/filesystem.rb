@@ -231,6 +231,60 @@ module Sys
       obj.freeze
     end
 
+    # Returns a Sys::Filesystem::Stat object containing information about the
+    # +file+ on the filesystem. The path will be nil when the +file+ is created
+    # using File::TMPFILE flag because it doesn't have a pathname or be void
+    # when the +file+ has been moved or deleted.
+    #
+    # Examples:
+    #
+    #    # normal file
+    #    file = File.open("pathname", "r")
+    #    Sys::Filesystem.fstat(file)
+    #    # directory
+    #    file = Dir.open("/")
+    #    Sys::Filesystem.fstat(file)
+    #    # tmpfile
+    #    file = File.open("/tmp", File::RDWR | File::TMPFILE)
+    #    Sys::Filesystem.fstat(file).path # => nil
+    #
+    def self.fstat(file)
+      fs = Statvfs.new
+
+      if fstatvfs(file.fileno, fs) < 0
+        raise Error, 'fstatvfs() function failed: ' + strerror(FFI.errno)
+      end
+
+      obj = Sys::Filesystem::Stat.new
+      begin
+        obj.path = file.path
+      rescue IOError # For a file created using File::TMPFILE.
+        obj.path = nil
+      end
+      obj.block_size = fs[:f_bsize]
+      obj.fragment_size = fs[:f_frsize]
+      obj.blocks = fs[:f_blocks]
+      obj.blocks_free = fs[:f_bfree]
+      obj.blocks_available = fs[:f_bavail]
+      obj.files = fs[:f_files]
+      obj.files_free = fs[:f_ffree]
+      obj.files_available = fs[:f_favail]
+      obj.filesystem_id = fs[:f_fsid]
+      obj.flags = fs[:f_flag]
+      obj.name_max = fs[:f_namemax]
+
+      # OSX does things a little differently
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
+        obj.block_size /= 256
+      end
+
+      if fs.members.include?(:f_basetype)
+        obj.base_type = fs[:f_basetype].to_s
+      end
+
+      obj.freeze
+    end
+
     # In block form, yields a Sys::Filesystem::Mount object for each mounted
     # filesytem on the host. Otherwise it returns an array of Mount objects.
     #

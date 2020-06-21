@@ -9,8 +9,10 @@ module Sys
 
       if RbConfig::CONFIG['host_os'] =~ /sunos|solaris|linux/i
         attach_function(:statvfs, :statvfs64, [:string, :pointer], :int)
+        attach_function(:fstatvfs, :fstatvfs64, [:int, :pointer], :int)
       else
         attach_function(:statvfs, [:string, :pointer], :int)
+        attach_function(:fstatvfs, [:int, :pointer], :int)
       end
 
       attach_function(:strerror, [:int], :string)
@@ -24,7 +26,7 @@ module Sys
         end
       end
 
-      private_class_method :statvfs, :strerror, :mount_c, :umount_c
+      private_class_method :statvfs, :fstatvfs, :strerror, :mount_c, :umount_c
 
       begin
         if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
