@@ -353,6 +353,19 @@ module Sys
       stat_obj.freeze # Read-only object
     end
 
+    # Returns a Filesystem::Stat object that contains information about the
+    # file system of the pathname of the +file+. On Windows this will default
+    # to using the root path for volume information.
+    #
+    # Examples:
+    #
+    #    file = Dir.open("C:\\")
+    #    Sys::Filesystem.fstat(file)
+    #
+    def self.fstat(file)
+      stat(file.path)
+    end
+
     # Associate a volume with a drive letter or a directory on another volume.
     #
     def self.mount(target, source)
