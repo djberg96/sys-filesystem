@@ -21,10 +21,9 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
   def setup
     @dir   = "/"
     @stat  = Filesystem.stat(@dir)
-    @fstat = Dir.open(@dir){|dir| Filesystem.fstat(dir)}
-    if File.const_defined?(:TMPFILE)
-      @fstat_tmpfile = File.open("/tmp", File::RDWR | File::TMPFILE){|file| Filesystem.fstat(file)}
-    end
+    @stat_pathname = Filesystem.stat(Pathname.new(@dir))
+    @stat_file     = File.open(@dir){|file| Filesystem.stat(file)}
+    @stat_dir      = Dir.open(@dir){|dir| Filesystem.stat(dir)}
     @mnt   = Filesystem.mounts[0]
     @size  = 58720256
     @array = []
@@ -193,32 +192,55 @@ class TC_Sys_Filesystem_Unix < Test::Unit::TestCase
     assert_equal(0, @size.to_gb)
   end
 
-  test "fstat works as expected" do
-    assert_equal(@stat.class, @fstat.class)
-    assert_equal(@stat.path, @fstat.path)
-    assert_equal(@stat.block_size, @fstat.block_size)
-    assert_equal(@stat.fragment_size, @fstat.fragment_size)
-    assert_equal(@stat.blocks, @fstat.blocks)
-    assert_equal(@stat.blocks_free, @fstat.blocks_free)
-    assert_equal(@stat.blocks_available, @fstat.blocks_available)
-    assert_equal(@stat.files, @fstat.files)
-    assert_equal(@stat.files_free, @fstat.files_free)
-    assert_equal(@stat.files_available, @fstat.files_available)
-    assert_equal(@stat.filesystem_id, @fstat.filesystem_id)
-    assert_equal(@stat.flags, @fstat.flags)
-    assert_equal(@stat.name_max, @fstat.name_max)
-    assert_equal(@stat.base_type, @fstat.base_type)
+  test "stat with Pathname argument works as expected" do
+    assert_equal(@stat.class, @stat_pathname.class)
+    assert_equal(@stat.path, @stat_pathname.path)
+    assert_equal(@stat.block_size, @stat_pathname.block_size)
+    assert_equal(@stat.fragment_size, @stat_pathname.fragment_size)
+    assert_equal(@stat.blocks, @stat_pathname.blocks)
+    assert_equal(@stat.blocks_free, @stat_pathname.blocks_free)
+    assert_equal(@stat.blocks_available, @stat_pathname.blocks_available)
+    assert_equal(@stat.files, @stat_pathname.files)
+    assert_equal(@stat.files_free, @stat_pathname.files_free)
+    assert_equal(@stat.files_available, @stat_pathname.files_available)
+    assert_equal(@stat.filesystem_id, @stat_pathname.filesystem_id)
+    assert_equal(@stat.flags, @stat_pathname.flags)
+    assert_equal(@stat.name_max, @stat_pathname.name_max)
+    assert_equal(@stat.base_type, @stat_pathname.base_type)
   end
 
-  test "fstat singleton method requires an argument" do
-    assert_raises(ArgumentError){ Filesystem.fstat }
+  test "stat with File argument works as expected" do
+    assert_equal(@stat.class, @stat_file.class)
+    assert_equal(@stat.path, @stat_file.path)
+    assert_equal(@stat.block_size, @stat_file.block_size)
+    assert_equal(@stat.fragment_size, @stat_file.fragment_size)
+    assert_equal(@stat.blocks, @stat_file.blocks)
+    assert_equal(@stat.blocks_free, @stat_file.blocks_free)
+    assert_equal(@stat.blocks_available, @stat_file.blocks_available)
+    assert_equal(@stat.files, @stat_file.files)
+    assert_equal(@stat.files_free, @stat_file.files_free)
+    assert_equal(@stat.files_available, @stat_file.files_available)
+    assert_equal(@stat.filesystem_id, @stat_file.filesystem_id)
+    assert_equal(@stat.flags, @stat_file.flags)
+    assert_equal(@stat.name_max, @stat_file.name_max)
+    assert_equal(@stat.base_type, @stat_file.base_type)
   end
 
-  if File.const_defined?(:TMPFILE)
-    test "fstat path works as expected for tmpfile" do
-      assert_respond_to(@fstat_tmpfile, :path)
-      assert_equal(nil, @fstat_tmpfile.path)
-    end
+  test "stat with Dir argument works as expected" do
+    assert_equal(@stat.class, @stat_dir.class)
+    assert_equal(@stat.path, @stat_dir.path)
+    assert_equal(@stat.block_size, @stat_dir.block_size)
+    assert_equal(@stat.fragment_size, @stat_dir.fragment_size)
+    assert_equal(@stat.blocks, @stat_dir.blocks)
+    assert_equal(@stat.blocks_free, @stat_dir.blocks_free)
+    assert_equal(@stat.blocks_available, @stat_dir.blocks_available)
+    assert_equal(@stat.files, @stat_dir.files)
+    assert_equal(@stat.files_free, @stat_dir.files_free)
+    assert_equal(@stat.files_available, @stat_dir.files_available)
+    assert_equal(@stat.filesystem_id, @stat_dir.filesystem_id)
+    assert_equal(@stat.flags, @stat_dir.flags)
+    assert_equal(@stat.name_max, @stat_dir.name_max)
+    assert_equal(@stat.base_type, @stat_dir.base_type)
   end
 
   # Filesystem::Mount tests
