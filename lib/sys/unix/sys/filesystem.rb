@@ -198,7 +198,28 @@ module Sys
     # Returns a Sys::Filesystem::Stat object containing information about the
     # +path+ on the filesystem.
     #
+    # Examples:
+    #
+    #    # path
+    #    Sys::Filesystem.stat("path")
+    #    # Pathname
+    #    pathname = Pathname.new("path")
+    #    Sys::Filesystem.stat(pathname)
+    #    # File
+    #    file = File.open("file", "r")
+    #    Sys::Filesystem.stat(file)
+    #    # Dir
+    #    dir = Dir.open("/")
+    #    Sys::Filesystem.stat(dir)
+    #
     def self.stat(path)
+      path = case path
+             when Pathname, File, Dir
+               path.to_path
+             else
+               path
+             end
+
       fs = Statvfs.new
 
       if statvfs(path, fs) < 0

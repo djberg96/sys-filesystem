@@ -259,10 +259,27 @@ module Sys
     #
     # Examples:
     #
+    #    # path
     #    Sys::Filesystem.stat("C:\\")
     #    Sys::Filesystem.stat("C:\\Documents and Settings\\some_user")
+    #    # Pathname
+    #    pathname = Pathname.new("C:\\")
+    #    Sys::Filesystem.stat(pathname)
+    #    # File
+    #    file = File.open("C:\\file", "r")
+    #    Sys::Filesystem.stat(file)
+    #    # Dir
+    #    dir = Dir.open("C:\\")
+    #    Sys::Filesystem.stat(dir)
     #
     def self.stat(path)
+      path = case path
+             when Pathname, File, Dir
+               path.to_path
+             else
+               path
+             end
+
       bytes_avail = FFI::MemoryPointer.new(:ulong_long)
       bytes_free  = FFI::MemoryPointer.new(:ulong_long)
       total_bytes = FFI::MemoryPointer.new(:ulong_long)
