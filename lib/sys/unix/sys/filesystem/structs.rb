@@ -123,6 +123,21 @@ module Sys
             :f_fstr, [:char, 32],
             :f_filler, [:ulong, 16]
           )
+        elsif RbConfig::CONFIG['host'] =~ /i686/i
+          layout(
+            :f_bsize, :ulong,
+            :f_frsize, :ulong,
+            :f_blocks, :uint,
+            :f_bfree, :uint,
+            :f_bavail, :uint,
+            :f_files, :uint,
+            :f_ffree, :uint,
+            :f_favail, :uint,
+            :f_fsid, :ulong,
+            :f_flag, :ulong,
+            :f_namemax, :ulong,
+            :f_spare, [:int, 6]
+          )
         else
           layout(
             :f_bsize, :ulong,
