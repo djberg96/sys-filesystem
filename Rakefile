@@ -1,26 +1,8 @@
 require 'rake'
 require 'rake/clean'
-require 'rake/testtask'
+require 'rspec/core/rake_task'
 
-CLEAN.include('**/*.gem', '**/*.rbc', '**/*.rbx')
-
-desc "Run the test suite"
-Rake::TestTask.new("test") do |t|
-  if File::ALT_SEPARATOR
-    t.libs << 'lib/windows'
-  else
-    t.libs << 'lib/unix'
-  end
-
-  t.warning = true
-  t.verbose = true
-  t.test_files = FileList['test/test_sys_filesystem.rb']
-end
-
-desc "Run the example program"
-task :example do |t|
-  sh "ruby -Ilib -Ilib/unix -Ilib/windows examples/example_stat.rb"
-end
+CLEAN.include('**/*.gem', '**/*.rbc', '**/*.rbx', '**/*.lock')
 
 namespace :gem do
   desc "Build the sys-filesystem gem"
@@ -28,7 +10,7 @@ namespace :gem do
     require 'rubygems/package'
     spec = eval(IO.read('sys-filesystem.gemspec'))
     spec.signing_key = File.join(Dir.home, '.ssh', 'gem-private_key.pem')
-    Gem::Package.build(spec, true)
+    Gem::Package.build(spec)
   end
 
   desc "Install the sys-filesystem gem"
@@ -38,4 +20,12 @@ namespace :gem do
   end
 end
 
-task :default => :test
+desc "Run the example program"
+task :example do |t|
+  sh "ruby -Ilib -Ilib/unix -Ilib/windows examples/example_stat.rb"
+end
+
+desc "Run the test suite"
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec

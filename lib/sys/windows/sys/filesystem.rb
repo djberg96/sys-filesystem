@@ -259,26 +259,24 @@ module Sys
     #
     # Examples:
     #
-    #    # path
+    #    # Regular directory
     #    Sys::Filesystem.stat("C:\\")
     #    Sys::Filesystem.stat("C:\\Documents and Settings\\some_user")
+    #
     #    # Pathname
     #    pathname = Pathname.new("C:\\")
     #    Sys::Filesystem.stat(pathname)
-    #    # File
-    #    file = File.open("C:\\file", "r")
-    #    Sys::Filesystem.stat(file)
+    #
     #    # Dir
     #    dir = Dir.open("C:\\")
     #    Sys::Filesystem.stat(dir)
     #
+    # Note that on Windows you cannot stat a regular file because
+    # Windows won't like it. It must be a directory in some form.
+    #
     def self.stat(path)
-      path = case path
-             when Pathname, File, Dir
-               path.to_path
-             else
-               path
-             end
+      path = path.path if path.respond_to?(:path) # Dir
+      path = path.to_s if path.respond_to?(:to_s) # Pathname
 
       bytes_avail = FFI::MemoryPointer.new(:ulong_long)
       bytes_free  = FFI::MemoryPointer.new(:ulong_long)
@@ -287,7 +285,7 @@ module Sys
       mpoint = mount_point(path).to_s
       mpoint << '/' unless mpoint.end_with?('/')
 
-      wpath  = path.to_s.wincode
+      wpath = path.to_s.wincode
 
       # We need this call for the 64 bit support
       unless GetDiskFreeSpaceExW(wpath, bytes_avail, total_bytes, bytes_free)

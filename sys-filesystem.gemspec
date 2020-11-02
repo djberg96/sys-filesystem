@@ -2,22 +2,22 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'sys-filesystem'
-  spec.version    = '1.3.4'
+  spec.version    = '1.4.0'
   spec.author     = 'Daniel J. Berger'
   spec.email      = 'djberg96@gmail.com'
   spec.homepage   = 'https://github.com/djberg96/sys-filesystem'
   spec.summary    = 'A Ruby interface for getting file system information.'
   spec.license    = 'Apache-2.0'
-  spec.test_files = Dir['test/*.rb']
+  spec.test_files = Dir['spec/*_spec.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
   spec.cert_chain = Dir['certs/*']
    
   spec.extra_rdoc_files = Dir['*.rdoc']
 
-  spec.add_dependency('ffi')
+  spec.add_dependency('ffi', '~> 1.1')
+  spec.add_development_dependency('mkmf-lite', '~> 0.4')
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('test-unit', '~> 3.3')
-  spec.add_development_dependency('mkmf-lite', '~> 0.3')
+  spec.add_development_dependency('rspec', '~> 3.9')
 
   spec.metadata = {
     'homepage_uri'      => 'https://github.com/djberg96/sys-filesystem',
