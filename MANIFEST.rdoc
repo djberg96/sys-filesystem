@@ -1,4 +1,5 @@
 * CHANGES.rdoc
+* Gemfile
 * LICENSE
 * MANIFEST.rdoc
 * Rakefile
