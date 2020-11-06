@@ -12,8 +12,6 @@ Gem::Specification.new do |spec|
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
   spec.cert_chain = Dir['certs/*']
    
-  spec.extra_rdoc_files = Dir['*.rdoc']
-
   spec.add_dependency('ffi', '~> 1.1')
   spec.add_development_dependency('mkmf-lite', '~> 0.4')
   spec.add_development_dependency('rake')
