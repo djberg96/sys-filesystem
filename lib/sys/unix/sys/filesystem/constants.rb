@@ -1,8 +1,6 @@
 module Sys
   class Filesystem
     module Constants
-      private
-
       MNT_RDONLY      = 0x00000001 # read only filesystem
       MNT_SYNCHRONOUS = 0x00000002 # file system written synchronously
       MNT_NOEXEC      = 0x00000004 # can't exec from filesystem

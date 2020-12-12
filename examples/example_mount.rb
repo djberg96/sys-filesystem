@@ -7,11 +7,12 @@
 require 'optparse'
 
 options = {:mount_options => []}
+
 OptionParser.new do |opts|
   opts.banner = "Usage: #$0 [-o options] [-t external_type] special node"
 
-  opts.on("-o=OPTIONS",       "Set one or many mount options (comma delimited)") do |opts|
-    options[:mount_options] += opts.split(',')
+  opts.on("-o=OPTIONS",       "Set one or many mount options (comma delimited)") do |cli_opts|
+    options[:mount_options] += cli_opts.split(',')
   end
 
   opts.on("-r",               "Set readonly flag") do

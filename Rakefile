@@ -6,7 +6,7 @@ CLEAN.include('**/*.gem', '**/*.rbc', '**/*.rbx', '**/*.lock')
 
 namespace :gem do
   desc "Build the sys-filesystem gem"
-  task :create => [:clean] do |t|
+  task :create => [:clean] do
     require 'rubygems/package'
     spec = eval(IO.read('sys-filesystem.gemspec'))
     spec.signing_key = File.join(Dir.home, '.ssh', 'gem-private_key.pem')
@@ -21,7 +21,7 @@ namespace :gem do
 end
 
 desc "Run the example program"
-task :example do |t|
+task :example do
   sh "ruby -Ilib -Ilib/unix -Ilib/windows examples/example_stat.rb"
 end
 

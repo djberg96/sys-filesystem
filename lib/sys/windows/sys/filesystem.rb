@@ -397,8 +397,6 @@ module Sys
       self
     end
 
-    private
-
     # This method is used to get the boot time of the system, which is used
     # for the mount_time attribute within the File.mounts method.
     #
@@ -411,13 +409,13 @@ module Sys
         raise Error, e
       else
         query = 'select LastBootupTime from Win32_OperatingSystem'
-        results = wmi.ExecQuery(query)
-        results.each{ |ole|
-          time_array = Time.parse(ole.LastBootupTime.split('.').first)
-          return Time.mktime(*time_array)
-        }
+        ole = wmi.ExecQuery(query).ItemIndex(0)
+        time_array = Time.parse(ole.LastBootupTime.split('.').first)
+        Time.mktime(*time_array)
       end
     end
+
+    private_class_method :get_boot_time
 
     # Private method that converts filesystem flags into a comma separated
     # list of strings. The presentation is meant as a rough analogue to the
@@ -439,8 +437,9 @@ module Sys
        str << " compressed" if VOLUME_IS_COMPRESSED & flags > 0
 
        str.tr!(' ', ',')
-       str = str[1..-1] # Ignore the first comma
-       str
+       str[1..-1] # Ignore the first comma
     end
+
+    private_class_method :get_options
   end
 end

@@ -11,8 +11,6 @@ module Sys
     include Sys::Filesystem::Structs
     extend Sys::Filesystem::Functions
 
-    private
-
     # Readable versions of constant names
     OPT_NAMES = {
       MNT_RDONLY           => 'read-only',
@@ -37,6 +35,8 @@ module Sys
       MNT_NOATIME          => 'noatime'
     }.freeze
 
+    private_constant :OPT_NAMES
+
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')
       MOUNT_FILE = '/etc/mtab'
@@ -48,7 +48,7 @@ module Sys
       MOUNT_FILE = 'getmntinfo'
     end
 
-    public
+    private_constant :MOUNT_FILE
 
     # The error raised if any of the Filesystem methods fail.
     class Error < StandardError; end
@@ -278,7 +278,7 @@ module Sys
 
         ptr = buf.get_pointer(0)
 
-        num.times{ |i|
+        num.times do
           mnt = Statfs.new(ptr)
           obj = Sys::Filesystem::Mount.new
           obj.name = mnt[:f_mntfromname].to_s
@@ -308,7 +308,7 @@ module Sys
           end
 
           ptr += Statfs.size
-        }
+        end
       else
         begin
           if respond_to?(:setmntent, true)
