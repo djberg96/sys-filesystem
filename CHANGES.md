@@ -1,3 +1,9 @@
+## 1.4.1 - 30-Dec-2020
+* Fix an FFI function declaration bug for Big Sur and later on Mac. Thanks go
+  to Roman Gaufman for the spot and Martins Polakovs for testing.
+* Fixed the changelog metadata URI.
+* Added a .gitignore file.
+
 ## 1.4.0 - 6-Sep-2020
 * The Sys::Filesystem.stat method now accepts a Pathname and Dir object as
   an argument. On most platforms it will also accept a File object. Thanks

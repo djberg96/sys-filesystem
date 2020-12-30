@@ -8,7 +8,7 @@ A cross platform Ruby interface for getting file system information.
 
 ## Synopsis
 
-```
+```ruby
 require 'sys/filesystem'
 include Sys
    
