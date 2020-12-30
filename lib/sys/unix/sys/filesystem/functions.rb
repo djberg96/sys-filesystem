@@ -41,7 +41,11 @@ module Sys
         end
       rescue FFI::NotFoundError
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
-          attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
+          begin
+            attach_function(:getmntinfo, :getmntinfo64, [:pointer, :int], :int)
+          rescue FFI::NotFoundError
+            attach_function(:getmntinfo, [:pointer, :int], :int) # Big Sur and later
+          end
         else
           attach_function(:getmntinfo, [:pointer, :int], :int)
         end
