@@ -359,8 +359,11 @@ RSpec.describe Sys::Filesystem, :unix => true do
   end
 
   context "FFI" do
-    require 'mkmf-lite'
-    include Mkmf::Lite
+    before(:context) do
+      require 'mkmf-lite'
+    end
+
+    let(:dummy) { Class.new { extend Mkmf::Lite } }
 
     example "ffi functions are private" do
       expect(Sys::Filesystem.methods.include?('statvfs')).to be false
@@ -369,21 +372,21 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example "statfs struct is expected size" do
       header = bsd || darwin ? 'sys/mount.h' : 'sys/statfs.h'
-      expect(Sys::Filesystem::Structs::Statfs.size).to eq(check_sizeof('struct statfs', header))
+      expect(Sys::Filesystem::Structs::Statfs.size).to eq(dummy.check_sizeof('struct statfs', header))
     end
 
     example "statvfs struct is expected size" do
-      expect(Sys::Filesystem::Structs::Statvfs.size).to eq(check_sizeof('struct statvfs', 'sys/statvfs.h'))
+      expect(Sys::Filesystem::Structs::Statvfs.size).to eq(dummy.check_sizeof('struct statvfs', 'sys/statvfs.h'))
     end
 
     example "mnttab struct is expected size" do
       skip "mnttab test skipped except on Solaris" unless solaris
-      expect(Sys::Filesystem::Structs::Mnttab.size).to eq(check_sizeof('struct mnttab', 'sys/mnttab.h'))
+      expect(Sys::Filesystem::Structs::Mnttab.size).to eq(dummy.check_sizeof('struct mnttab', 'sys/mnttab.h'))
     end
 
     example "mntent struct is expected size" do
       skip "mnttab test skipped except on Linux" unless linux
-      expect(Sys::Filesystem::Structs::Mntent.size).to eq(check_sizeof('struct mntent', 'mntent.h'))
+      expect(Sys::Filesystem::Structs::Mntent.size).to eq(dummy.check_sizeof('struct mntent', 'mntent.h'))
     end
   end
 end
