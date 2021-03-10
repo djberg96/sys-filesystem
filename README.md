@@ -1,3 +1,5 @@
+[![Ruby](https://github.com/djberg96/sys-filesystem/actions/workflows/ruby.yml/badge.svg)](https://github.com/djberg96/sys-filesystem/actions/workflows/ruby.yml)
+
 ## Description
 
 A cross platform Ruby interface for getting file system information.
