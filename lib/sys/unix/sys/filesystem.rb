@@ -288,7 +288,7 @@ module Sys
           string = ''
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
-          OPT_NAMES.each{ |key,val|
+          OPT_NAMES.each do |key,val|
             if flags & key > 0
               if string.empty?
                 string << val
@@ -297,7 +297,7 @@ module Sys
               end
             end
             flags &= ~key
-          }
+          end
 
           obj.options = string
 
@@ -385,7 +385,7 @@ module Sys
       dev = File.stat(file).dev
       val = file
 
-      self.mounts.each{ |mnt|
+      self.mounts.each do |mnt|
         mp = mnt.mount_point
         begin
           if File.stat(mp).dev == dev
@@ -395,7 +395,7 @@ module Sys
         rescue Errno::EACCES
           next
         end
-      }
+      end
 
       val
     end

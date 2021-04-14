@@ -181,7 +181,7 @@ module Sys
 
       boot_time = get_boot_time
 
-      drives.each{ |drive|
+      drives.each do |drive|
         mount  = Mount.new
         volume = FFI::MemoryPointer.new(:char, MAXPATH)
         fsname = FFI::MemoryPointer.new(:char, MAXPATH)
@@ -231,7 +231,7 @@ module Sys
         else
           mounts << mount
         end
-      }
+      end
 
       mounts # Nil if the block form was used.
     end
