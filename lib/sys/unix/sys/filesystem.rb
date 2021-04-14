@@ -285,7 +285,7 @@ module Sys
           obj.mount_point = mnt[:f_mntonname].to_s
           obj.mount_type = mnt[:f_fstypename].to_s
 
-          string = ""
+          string = ''
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
           OPT_NAMES.each{ |key,val|
