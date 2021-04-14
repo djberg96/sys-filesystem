@@ -288,7 +288,7 @@ module Sys
           string = ''
           flags = mnt[:f_flags] & MNT_VISFLAGMASK
 
-          OPT_NAMES.each do |key,val|
+          OPT_NAMES.each do |key, val|
             if flags & key > 0
               if string.empty?
                 string << val

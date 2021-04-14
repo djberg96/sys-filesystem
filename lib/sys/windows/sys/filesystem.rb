@@ -206,7 +206,7 @@ module Sys
 
         # Skip unmounted floppies or cd-roms, or inaccessible drives
         unless bool
-          if [5,21].include?(FFI.errno) # ERROR_NOT_READY or ERROR_ACCESS_DENIED
+          if [5, 21].include?(FFI.errno) # ERROR_NOT_READY or ERROR_ACCESS_DENIED
             next
           else
             raise SystemCallError.new('GetVolumeInformation', FFI.errno)
@@ -218,7 +218,7 @@ module Sys
 
         name = 0.chr * MAXPATH
 
-        if QueryDosDeviceA(drive[0,2], name, name.size) == 0
+        if QueryDosDeviceA(drive[0, 2], name, name.size) == 0
           raise SystemCallError.new('QueryDosDevice', FFI.errno)
         end
 
