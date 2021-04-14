@@ -13,26 +13,26 @@ module Sys
 
     # Readable versions of constant names
     OPT_NAMES = {
-      MNT_RDONLY           => 'read-only',
-      MNT_SYNCHRONOUS      => 'synchronous',
-      MNT_NOEXEC           => 'noexec',
-      MNT_NOSUID           => 'nosuid',
-      MNT_NODEV            => 'nodev',
-      MNT_UNION            => 'union',
-      MNT_ASYNC            => 'asynchronous',
-      MNT_CPROTECT         => 'content-protection',
-      MNT_EXPORTED         => 'exported',
-      MNT_QUARANTINE       => 'quarantined',
-      MNT_LOCAL            => 'local',
-      MNT_QUOTA            => 'quotas',
-      MNT_ROOTFS           => 'rootfs',
-      MNT_DONTBROWSE       => 'nobrowse',
+      MNT_RDONLY => 'read-only',
+      MNT_SYNCHRONOUS => 'synchronous',
+      MNT_NOEXEC => 'noexec',
+      MNT_NOSUID => 'nosuid',
+      MNT_NODEV => 'nodev',
+      MNT_UNION => 'union',
+      MNT_ASYNC => 'asynchronous',
+      MNT_CPROTECT => 'content-protection',
+      MNT_EXPORTED => 'exported',
+      MNT_QUARANTINE => 'quarantined',
+      MNT_LOCAL => 'local',
+      MNT_QUOTA => 'quotas',
+      MNT_ROOTFS => 'rootfs',
+      MNT_DONTBROWSE => 'nobrowse',
       MNT_IGNORE_OWNERSHIP => 'noowners',
-      MNT_AUTOMOUNTED      => 'automounted',
-      MNT_JOURNALED        => 'journaled',
-      MNT_NOUSERXATTR      => 'nouserxattr',
-      MNT_DEFWRITE         => 'defwrite',
-      MNT_NOATIME          => 'noatime'
+      MNT_AUTOMOUNTED => 'automounted',
+      MNT_JOURNALED => 'journaled',
+      MNT_NOUSERXATTR => 'nouserxattr',
+      MNT_DEFWRITE => 'defwrite',
+      MNT_NOATIME => 'noatime'
     }.freeze
 
     private_constant :OPT_NAMES
