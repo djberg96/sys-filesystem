@@ -385,7 +385,7 @@ module Sys
       dev = File.stat(file).dev
       val = file
 
-      self.mounts.each do |mnt|
+      mounts.each do |mnt|
         mp = mnt.mount_point
         begin
           if File.stat(mp).dev == dev
