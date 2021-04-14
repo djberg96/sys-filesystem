@@ -20,12 +20,12 @@ module Sys
       attach_pfunc :GetLogicalDriveStringsA, %i[ulong pointer], :ulong
 
       attach_pfunc :GetVolumeInformationA,
-        %i[buffer_in pointer ulong pointer pointer pointer pointer ulong],
-        :bool
+                   %i[buffer_in pointer ulong pointer pointer pointer pointer ulong],
+                   :bool
 
       attach_pfunc :GetVolumeInformationW,
-        %i[buffer_in pointer ulong pointer pointer pointer pointer ulong],
-        :bool
+                   %i[buffer_in pointer ulong pointer pointer pointer pointer ulong],
+                   :bool
 
       attach_pfunc :GetVolumeNameForVolumeMountPointW, %i[buffer_in buffer_in ulong], :bool
       attach_pfunc :QueryDosDeviceA, %i[buffer_in buffer_out ulong], :ulong
