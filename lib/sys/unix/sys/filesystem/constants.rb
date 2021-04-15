@@ -31,7 +31,7 @@ module Sys
         MNT_LOCAL  | MNT_QUOTA |
         MNT_ROOTFS | MNT_DOVOLFS | MNT_DONTBROWSE |
         MNT_IGNORE_OWNERSHIP | MNT_AUTOMOUNTED | MNT_JOURNALED |
-        MNT_NOUSERXATTR | MNT_DEFWRITE  | MNT_MULTILABEL |
+        MNT_NOUSERXATTR | MNT_DEFWRITE | MNT_MULTILABEL |
         MNT_NOATIME | MNT_CPROTECT
       )
 
@@ -56,7 +56,7 @@ module Sys
       MS_SHARED = 1 << 20
       MS_RELATIME = 1 << 21
       MS_KERNMOUNT = 1 << 22
-      MS_I_VERSION =  1 << 23
+      MS_I_VERSION = 1 << 23
       MS_STRICTATIME = 1 << 24
       MS_ACTIVE = 1 << 30
       MS_NOUSER = 1 << 31

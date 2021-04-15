@@ -181,7 +181,7 @@ module Sys
 
       boot_time = get_boot_time
 
-      drives.each{ |drive|
+      drives.each do |drive|
         mount  = Mount.new
         volume = FFI::MemoryPointer.new(:char, MAXPATH)
         fsname = FFI::MemoryPointer.new(:char, MAXPATH)
@@ -206,7 +206,7 @@ module Sys
 
         # Skip unmounted floppies or cd-roms, or inaccessible drives
         unless bool
-          if [5,21].include?(FFI.errno) # ERROR_NOT_READY or ERROR_ACCESS_DENIED
+          if [5, 21].include?(FFI.errno) # ERROR_NOT_READY or ERROR_ACCESS_DENIED
             next
           else
             raise SystemCallError.new('GetVolumeInformation', FFI.errno)
@@ -218,7 +218,7 @@ module Sys
 
         name = 0.chr * MAXPATH
 
-        if QueryDosDeviceA(drive[0,2], name, name.size) == 0
+        if QueryDosDeviceA(drive[0, 2], name, name.size) == 0
           raise SystemCallError.new('QueryDosDevice', FFI.errno)
         end
 
@@ -231,7 +231,7 @@ module Sys
         else
           mounts << mount
         end
-      }
+      end
 
       mounts # Nil if the block form was used.
     end
@@ -422,22 +422,22 @@ module Sys
     # way options are presented for Unix filesystems.
     #
     def self.get_options(flags)
-       str = ""
-       str << " casepres" if CASE_PRESERVED_NAMES & flags > 0
-       str << " casesens" if CASE_SENSITIVE_SEARCH & flags > 0
-       str << " compression" if FILE_COMPRESSION & flags > 0
-       str << " namedstreams" if NAMED_STREAMS & flags > 0
-       str << " pacls" if PERSISTENT_ACLS & flags > 0
-       str << " ro" if READ_ONLY_VOLUME & flags > 0
-       str << " encryption" if SUPPORTS_ENCRYPTION & flags > 0
-       str << " objids" if SUPPORTS_OBJECT_IDS & flags > 0
-       str << " rpoints" if SUPPORTS_REPARSE_POINTS & flags > 0
-       str << " sparse" if SUPPORTS_SPARSE_FILES & flags > 0
-       str << " unicode" if UNICODE_ON_DISK & flags > 0
-       str << " compressed" if VOLUME_IS_COMPRESSED & flags > 0
+      str = ''
+      str << ' casepres' if CASE_PRESERVED_NAMES & flags > 0
+      str << ' casesens' if CASE_SENSITIVE_SEARCH & flags > 0
+      str << ' compression' if FILE_COMPRESSION & flags > 0
+      str << ' namedstreams' if NAMED_STREAMS & flags > 0
+      str << ' pacls' if PERSISTENT_ACLS & flags > 0
+      str << ' ro' if READ_ONLY_VOLUME & flags > 0
+      str << ' encryption' if SUPPORTS_ENCRYPTION & flags > 0
+      str << ' objids' if SUPPORTS_OBJECT_IDS & flags > 0
+      str << ' rpoints' if SUPPORTS_REPARSE_POINTS & flags > 0
+      str << ' sparse' if SUPPORTS_SPARSE_FILES & flags > 0
+      str << ' unicode' if UNICODE_ON_DISK & flags > 0
+      str << ' compressed' if VOLUME_IS_COMPRESSED & flags > 0
 
-       str.tr!(' ', ',')
-       str[1..-1] # Ignore the first comma
+      str.tr!(' ', ',')
+      str[1..-1] # Ignore the first comma
     end
 
     private_class_method :get_options
