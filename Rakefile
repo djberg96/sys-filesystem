@@ -8,7 +8,7 @@ namespace :gem do
   desc "Build the sys-filesystem gem"
   task :create => [:clean] do
     require 'rubygems/package'
-    spec = eval(IO.read('sys-filesystem.gemspec'))
+    spec = Gem::Specification.load('sys-filesystem.gemspec')
     spec.signing_key = File.join(Dir.home, '.ssh', 'gem-private_key.pem')
     Gem::Package.build(spec)
   end
