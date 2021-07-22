@@ -1,3 +1,6 @@
+## 1.4.2 - 22-Jul-2021
+* Fixed support for 32-bit Linux. Thanks go to ciprianbadescu for the spot.
+
 ## 1.4.1 - 30-Dec-2020
 * Fix an FFI function declaration bug for Big Sur and later on Mac. Thanks go
   to Roman Gaufman for the spot and Martins Polakovs for testing.

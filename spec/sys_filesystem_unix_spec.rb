@@ -21,7 +21,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
   end
 
   example "version number is set to the expected value" do
-    expect(Sys::Filesystem::VERSION).to eq('1.4.1')
+    expect(Sys::Filesystem::VERSION).to eq('1.4.2')
     expect(Sys::Filesystem::VERSION).to be_frozen
   end
 
