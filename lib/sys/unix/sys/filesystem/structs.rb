@@ -40,20 +40,37 @@ module Sys
             :f_mntonname, [:char, MNAMELEN]
           )
         elsif RbConfig::CONFIG['host_os'] =~ /linux/i
-          layout(
-            :f_type, :ulong,
-            :f_bsize, :ulong,
-            :f_blocks, :uint64,
-            :f_bfree, :uint64,
-            :f_bavail, :uint64,
-            :f_files, :uint64,
-            :f_ffree, :uint64,
-            :f_fsid, [:int, 2],
-            :f_namelen, :ulong,
-            :f_frsize, :ulong,
-            :f_flags, :ulong,
-            :f_spare, [:ulong, 4]
-          )
+          if RbConfig::CONFIG['host_os'] =~ /64/
+            layout(
+              :f_type, :ulong,
+              :f_bsize, :ulong,
+              :f_blocks, :uint64,
+              :f_bfree, :uint64,
+              :f_bavail, :uint64,
+              :f_files, :uint64,
+              :f_ffree, :uint64,
+              :f_fsid, [:int, 2],
+              :f_namelen, :ulong,
+              :f_frsize, :ulong,
+              :f_flags, :ulong,
+              :f_spare, [:ulong, 4]
+            )
+          else
+            layout(
+              :f_type, :ulong,
+              :f_bsize, :ulong,
+              :f_blocks, :uint32,
+              :f_bfree, :uint32,
+              :f_bavail, :uint32,
+              :f_files, :uint32,
+              :f_ffree, :uint32,
+              :f_fsid, [:int, 2],
+              :f_namelen, :ulong,
+              :f_frsize, :ulong,
+              :f_flags, :ulong,
+              :f_spare, [:ulong, 4]
+            )
+          end
         else
           layout(
             :f_bsize, :uint32,
@@ -134,6 +151,7 @@ module Sys
             :f_ffree, :uint,
             :f_favail, :uint,
             :f_fsid, :ulong,
+            :f_unused, :int,
             :f_flag, :ulong,
             :f_namemax, :ulong,
             :f_spare, [:int, 6]

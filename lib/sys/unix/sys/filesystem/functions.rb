@@ -7,7 +7,7 @@ module Sys
 
       ffi_lib FFI::Library::LIBC
 
-      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris|linux/i
+      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris|_64.*linux/i
         attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
       else
         attach_function(:statvfs, %i[string pointer], :int)
