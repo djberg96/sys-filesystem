@@ -8,6 +8,9 @@ A cross platform Ruby interface for getting file system information.
 
 `gem install sys-filesystem`
 
+## Adding the trusted cert
+`gem cert --add <(curl -Ls https://raw.githubusercontent.com/djberg96/sys-filesystem/main/certs/djberg96_pub.pem)`
+
 ## Synopsis
 
 ```ruby
