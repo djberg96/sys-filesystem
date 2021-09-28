@@ -18,6 +18,8 @@ module Sys
     # Error typically raised if any of the Sys::Filesystem methods fail.
     class Error < StandardError; end
 
+    private_class_method :new
+
     class Mount
       # The name of the volume. This is the device mapping.
       attr_reader :name
