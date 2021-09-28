@@ -11,6 +11,8 @@ module Sys
     include Sys::Filesystem::Structs
     extend Sys::Filesystem::Functions
 
+    private_class_method :new
+
     # Readable versions of constant names
     OPT_NAMES = {
       MNT_RDONLY => 'read-only',

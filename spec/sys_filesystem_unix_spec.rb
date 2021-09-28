@@ -25,6 +25,10 @@ RSpec.describe Sys::Filesystem, :unix => true do
     expect(Sys::Filesystem::VERSION).to be_frozen
   end
 
+  example "you cannot instantiate an instance" do
+    expect{ described_class.new }.to raise_error(NoMethodError)
+  end
+
   example "stat path works as expected" do
     expect(@stat).to respond_to(:path)
     expect(@stat.path).to eq(root)
