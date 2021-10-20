@@ -1,9 +1,9 @@
-* CHANGES.rdoc
+* CHANGES.md
 * Gemfile
 * LICENSE
-* MANIFEST.rdoc
+* MANIFEST.md
 * Rakefile
-* README.rdoc
+* README.md
 * sys-fileystem.gemspec
 * certs/djberg96_pub.pem
 * examples/example_stat.rb
@@ -17,6 +17,6 @@
 * lib/sys/windows/sys/filesystem/constants.rb
 * lib/sys/windows/sys/filesystem/functions.rb
 * lib/sys/windows/sys/filesystem/helper.rb
-* test/test_sys_filesystem.rb
-* test/test_sys_filesystem_unix
-* test/test_sys_filesystem_windows
+* spec/spec_helper.rb
+* spec/sys_filesystem_unix_spec.rb
+* spec/sys_filesystem_windows_spec.rb

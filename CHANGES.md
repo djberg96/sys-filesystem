@@ -4,6 +4,7 @@
   as well. Thanks go to Scott Bradnick for the spot. 
 * The constructor is now explicitly private. This class was never meant to
   actually be instantiated.
+* Updated the MANIFEST.md file.
 
 ## 1.4.2 - 22-Jul-2021
 * Fixed support for 32-bit Linux. Thanks go to ciprianbadescu for the spot.
