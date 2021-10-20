@@ -1,3 +1,10 @@
+## 1.4.3 - 20-Oct-2021
+* Another fix for 32-bit vs 64-bit Linux since it was realized we cannot always
+  rely on the host architecture information. Handling for JRuby was improved
+  as well. Thanks go to Scott Bradnick for the spot. 
+* The constructor is now explicitly private. This class was never meant to
+  actually be instantiated.
+
 ## 1.4.2 - 22-Jul-2021
 * Fixed support for 32-bit Linux. Thanks go to ciprianbadescu for the spot.
 
