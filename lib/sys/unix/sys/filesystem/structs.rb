@@ -6,6 +6,17 @@ module Sys
     module Structs
       class Statfs < FFI::Struct
 
+        def self.linux64?
+          if RUBY_PLATFORM == 'java'
+            ENV_JAVA['sun.arch.data.model'].to_i == 64
+          else
+            RbConfig::CONFIG['host_os'] =~ /linux/i &&
+              (RbConfig::CONFIG['arch'] =~ /64/ || RbConfig::CONFIG['DEFS'] =~ /64/)
+          end
+        end
+
+        private_class_method :linux64?
+
         # FreeBSD 12.0 MNAMELEN from 88 => 1024.
         MNAMELEN =
           if RbConfig::CONFIG['host_os'] =~ /freebsd(.*)/i
@@ -40,7 +51,7 @@ module Sys
             :f_mntonname, [:char, MNAMELEN]
           )
         elsif RbConfig::CONFIG['host_os'] =~ /linux/i
-          if RbConfig::CONFIG['arch'] =~ /64/
+          if linux64?
             layout(
               :f_type, :ulong,
               :f_bsize, :ulong,
