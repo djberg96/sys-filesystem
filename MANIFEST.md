@@ -6,6 +6,7 @@
 * README.md
 * sys-fileystem.gemspec
 * certs/djberg96_pub.pem
+* examples/example_mount.rb
 * examples/example_stat.rb
 * lib/sys-filesystem.rb
 * lib/sys/filesystem.rb
