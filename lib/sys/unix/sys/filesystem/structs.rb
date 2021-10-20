@@ -40,7 +40,7 @@ module Sys
             :f_mntonname, [:char, MNAMELEN]
           )
         elsif RbConfig::CONFIG['host_os'] =~ /linux/i
-          if RbConfig::CONFIG['arch'] =~ /64/
+          if 1.size == 8
             layout(
               :f_type, :ulong,
               :f_bsize, :ulong,
