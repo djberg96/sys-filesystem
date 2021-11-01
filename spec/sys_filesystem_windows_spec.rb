@@ -182,20 +182,20 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
 
     example "stat with Dir argument works as expected" do
-      expect( @stat_dir.class).to eq(@stat.class)
-      expect( @stat_dir.path).to eq(@stat.path)
-      expect( @stat_dir.block_size).to eq(@stat.block_size)
-      expect( @stat_dir.fragment_size).to eq(@stat.fragment_size)
-      expect( @stat_dir.blocks).to eq(@stat.blocks)
-      expect( @stat_dir.blocks_free).to eq(@stat.blocks_free)
-      expect( @stat_dir.blocks_available).to eq(@stat.blocks_available)
-      expect( @stat_dir.files).to eq(@stat.files)
-      expect( @stat_dir.files_free).to eq(@stat.files_free)
-      expect( @stat_dir.files_available).to eq(@stat.files_available)
-      expect( @stat_dir.filesystem_id).to eq(@stat.filesystem_id)
-      expect( @stat_dir.flags).to eq(@stat.flags)
-      expect( @stat_dir.name_max).to eq(@stat.name_max)
-      expect( @stat_dir.base_type).to eq(@stat.base_type)
+      expect(@stat_dir.class).to eq(@stat.class)
+      expect(@stat_dir.path).to eq(@stat.path)
+      expect(@stat_dir.block_size).to eq(@stat.block_size)
+      expect(@stat_dir.fragment_size).to eq(@stat.fragment_size)
+      expect(@stat_dir.blocks).to eq(@stat.blocks)
+      expect(@stat_dir.blocks_free).to eq(@stat.blocks_free)
+      expect(@stat_dir.blocks_available).to eq(@stat.blocks_available)
+      expect(@stat_dir.files).to eq(@stat.files)
+      expect(@stat_dir.files_free).to eq(@stat.files_free)
+      expect(@stat_dir.files_available).to eq(@stat.files_available)
+      expect(@stat_dir.filesystem_id).to eq(@stat.filesystem_id)
+      expect(@stat_dir.flags).to eq(@stat.flags)
+      expect(@stat_dir.name_max).to eq(@stat.name_max)
+      expect(@stat_dir.base_type).to eq(@stat.base_type)
     end
   end
 
