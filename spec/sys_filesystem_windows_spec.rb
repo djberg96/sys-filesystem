@@ -270,7 +270,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
     example "mounts singleton method basic functionality" do
       expect(described_class).to respond_to(:mounts)
       expect{ described_class.mounts }.not_to raise_error
-      expect{ described_class.mounts{}.not_to raise_error }
+      expect{ described_class.mounts{} }.not_to raise_error
     end
 
     example "mounts singleton method returns the expected value" do
