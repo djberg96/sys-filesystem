@@ -12,7 +12,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
   let(:root) { 'C:/' }
 
   before do
-    @stat  = Sys::Filesystem.stat(root)
+    @stat  = described_class.stat(root)
     @size  = 58720256
   end
 
@@ -36,17 +36,17 @@ RSpec.describe Sys::Filesystem, :windows => true do
   end
 
   example "stat works with or without trailing slash on standard paths" do
-    expect(Sys::Filesystem.stat("C:/").path).to eq("C:/")
-    expect(Sys::Filesystem.stat("C:/Users").path).to eq("C:/Users")
-    expect(Sys::Filesystem.stat("C:/Users/").path).to eq("C:/Users/")
-    expect(Sys::Filesystem.stat("C:/Users/").path).to eq("C:/Users/")
+    expect(described_class.stat("C:/").path).to eq("C:/")
+    expect(described_class.stat("C:/Users").path).to eq("C:/Users")
+    expect(described_class.stat("C:/Users/").path).to eq("C:/Users/")
+    expect(described_class.stat("C:/Users/").path).to eq("C:/Users/")
   end
 
   example "stat works with or without trailing slash on UNC paths" do
-    expect(Sys::Filesystem.stat("//127.0.0.1/C$").path).to eq("//127.0.0.1/C$")
-    expect(Sys::Filesystem.stat("//127.0.0.1/C$/").path).to eq("//127.0.0.1/C$/")
-    expect(Sys::Filesystem.stat("\\\\127.0.0.1\\C$").path).to eq("\\\\127.0.0.1\\C$")
-    expect(Sys::Filesystem.stat("\\\\127.0.0.1\\C$\\").path).to eq("\\\\127.0.0.1\\C$\\")
+    expect(described_class.stat("//127.0.0.1/C$").path).to eq("//127.0.0.1/C$")
+    expect(described_class.stat("//127.0.0.1/C$/").path).to eq("//127.0.0.1/C$/")
+    expect(described_class.stat("\\\\127.0.0.1\\C$").path).to eq("\\\\127.0.0.1\\C$")
+    expect(described_class.stat("\\\\127.0.0.1\\C$\\").path).to eq("\\\\127.0.0.1\\C$\\")
   end
 
   example "stat fragment_size works as expected" do
@@ -155,7 +155,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context "Filesystem.stat(Pathname)" do
     before do
-      @stat_pathname = Sys::Filesystem.stat(Pathname.new(root))
+      @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
     example "stat with Pathname argument works as expected" do
@@ -178,7 +178,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context "Filesystem.stat(Dir)" do
     before do
-      @stat_dir = Dir.open(root){ |dir| Sys::Filesystem.stat(dir) }
+      @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
     example "stat with Dir argument works as expected" do
@@ -201,20 +201,20 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context "mount_point" do
     example "mount_point singleton method basic functionality" do
-      expect(Sys::Filesystem).to respond_to(:mount_point)
-      expect{ Sys::Filesystem.mount_point(Dir.pwd) }.not_to raise_error
-      expect(Sys::Filesystem.mount_point(Dir.pwd)).to be_kind_of(String)
+      expect(described_class).to respond_to(:mount_point)
+      expect{ described_class.mount_point(Dir.pwd) }.not_to raise_error
+      expect(described_class.mount_point(Dir.pwd)).to be_kind_of(String)
     end
 
     example "mount_point singleton method returns expected value" do
-      expect(Sys::Filesystem.mount_point("C:\\Users\\foo")).to eq("C:\\")
-      expect(Sys::Filesystem.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
+      expect(described_class.mount_point("C:\\Users\\foo")).to eq("C:\\")
+      expect(described_class.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
     end
 
     example "mount_point works with Pathname object" do
-      expect{ Sys::Filesystem.mount_point(Pathname.new("C:/Users/foo")) }.not_to raise_error
-      expect(Sys::Filesystem.mount_point("C:\\Users\\foo")).to eq("C:\\")
-      expect(Sys::Filesystem.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
+      expect{ described_class.mount_point(Pathname.new("C:/Users/foo")) }.not_to raise_error
+      expect(described_class.mount_point("C:\\Users\\foo")).to eq("C:\\")
+      expect(described_class.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
     end
   end
 
@@ -236,51 +236,51 @@ RSpec.describe Sys::Filesystem, :windows => true do
   end
 
   example "stat singleton method defaults to root path if proviced" do
-    expect{ Sys::Filesystem.stat("C://Program Files") }.not_to raise_error
+    expect{ described_class.stat("C://Program Files") }.not_to raise_error
   end
 
   example "stat singleton method accepts a Pathname object" do
-    expect{ Sys::Filesystem.stat(Pathname.new("C://Program Files")) }.not_to raise_error
+    expect{ described_class.stat(Pathname.new("C://Program Files")) }.not_to raise_error
   end
 
   example "stat singleton method requires a single argument" do
-    expect{ Sys::Filesystem.stat }.to raise_error(ArgumentError)
-    expect{ Sys::Filesystem.stat(Dir.pwd, Dir.pwd) }.to raise_error(ArgumentError)
+    expect{ described_class.stat }.to raise_error(ArgumentError)
+    expect{ described_class.stat(Dir.pwd, Dir.pwd) }.to raise_error(ArgumentError)
   end
 
   example "stat singleton method raises an error if path is not found" do
-    expect{ Sys::Filesystem.stat("C://Bogus//Dir") }.to raise_error(Errno::ESRCH)
+    expect{ described_class.stat("C://Bogus//Dir") }.to raise_error(Errno::ESRCH)
   end
 
   context "Filesystem::Mount" do
-    let(:mount){ Sys::Filesystem.mounts[0] }
+    let(:mount){ described_class.mounts[0] }
 
     before do
       @array = []
     end
 
     example "mount singleton method exists" do
-      expect(Sys::Filesystem).to respond_to(:mount)
+      expect(described_class).to respond_to(:mount)
     end
 
     example "umount singleton method exists" do
-      expect(Sys::Filesystem).to respond_to(:umount)
+      expect(described_class).to respond_to(:umount)
     end
 
     example "mounts singleton method basic functionality" do
-      expect(Sys::Filesystem).to respond_to(:mounts)
-      expect{ Sys::Filesystem.mounts }.not_to raise_error
-      expect{ Sys::Filesystem.mounts{}.not_to raise_error }
+      expect(described_class).to respond_to(:mounts)
+      expect{ described_class.mounts }.not_to raise_error
+      expect{ described_class.mounts{}.not_to raise_error }
     end
 
     example "mounts singleton method returns the expected value" do
-      expect(Sys::Filesystem.mounts).to be_kind_of(Array)
-      expect(Sys::Filesystem.mounts[0]).to be_kind_of(Sys::Filesystem::Mount)
+      expect(described_class.mounts).to be_kind_of(Array)
+      expect(described_class.mounts[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
     example "mounts singleton method works as expected when a block is provided" do
-      expect(Sys::Filesystem.mounts{}).to be_nil
-      expect{ Sys::Filesystem.mounts{ |mt| @array << mt } }.not_to raise_error
+      expect(described_class.mounts{}).to be_nil
+      expect{ described_class.mounts{ |mt| @array << mt } }.not_to raise_error
       expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
@@ -320,7 +320,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
 
     example "mounts singleton method does not accept any arguments" do
-      expect{ Sys::Filesystem.mounts("C:\\") }.to raise_error(ArgumentError)
+      expect{ described_class.mounts("C:\\") }.to raise_error(ArgumentError)
     end
   end
 
@@ -341,8 +341,8 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context "FFI" do
     example "internal ffi functions are not public" do
-      expect(Sys::Filesystem.methods.include?(:GetVolumeInformationA)).to eq(false)
-      expect(Sys::Filesystem.instance_methods.include?(:GetVolumeInformationA)).to eq(false)
+      expect(described_class.methods.include?(:GetVolumeInformationA)).to eq(false)
+      expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to eq(false)
     end
   end
 end

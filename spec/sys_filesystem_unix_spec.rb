@@ -16,7 +16,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
   let(:root)    { '/' }
 
   before do
-    @stat  = Sys::Filesystem.stat(root)
+    @stat  = described_class.stat(root)
     @size  = 58720256
   end
 
@@ -154,19 +154,19 @@ RSpec.describe Sys::Filesystem, :unix => true do
   end
 
   example "stat singleton method requires an argument" do
-    expect{ Sys::Filesystem.stat }.to raise_error(ArgumentError)
+    expect{ described_class.stat }.to raise_error(ArgumentError)
   end
 
   example "stat case_insensitive method works as expected" do
     expected = darwin ? true : false
     expect(@stat.case_insensitive?).to eq(expected)
-    expect(Sys::Filesystem.stat(Dir.home).case_insensitive?).to eq(expected)
+    expect(described_class.stat(Dir.home).case_insensitive?).to eq(expected)
   end
 
   example "stat case_sensitive method works as expected" do
     expected = darwin ? false : true
     expect(@stat.case_sensitive?).to eq(expected)
-    expect(Sys::Filesystem.stat(Dir.home).case_sensitive?).to eq(expected)
+    expect(described_class.stat(Dir.home).case_sensitive?).to eq(expected)
   end
 
   example "numeric helper methods are defined" do
@@ -190,7 +190,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   context "Filesystem.stat(Pathname)" do
     before do
-      @stat_pathname = Sys::Filesystem.stat(Pathname.new(root))
+      @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
     example "stat with Pathname argument works as expected" do
@@ -213,7 +213,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   context "Filesystem.stat(File)" do
     before do
-      @stat_file = File.open(root){ |file| Sys::Filesystem.stat(file) }
+      @stat_file = File.open(root){ |file| described_class.stat(file) }
     end
 
     example "stat with File argument works as expected" do
@@ -236,7 +236,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   context "Filesystem.stat(Dir)" do
     before do
-      @stat_dir = Dir.open(root){ |dir| Sys::Filesystem.stat(dir) }
+      @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
     example "stat with Dir argument works as expected" do
@@ -258,24 +258,24 @@ RSpec.describe Sys::Filesystem, :unix => true do
   end
 
   context "Filesystem::Mount" do
-    let(:mount){ Sys::Filesystem.mounts[0] }
+    let(:mount){ described_class.mounts[0] }
 
     before do
       @array = []
     end
 
     example "mounts singleton method works as expected without a block" do
-      expect{ @array = Sys::Filesystem.mounts }.not_to raise_error
+      expect{ @array = described_class.mounts }.not_to raise_error
       expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
     example "mounts singleton method works as expected with a block" do
-      expect{ Sys::Filesystem.mounts{ |m| @array << m } }.not_to raise_error
+      expect{ described_class.mounts{ |m| @array << m } }.not_to raise_error
       expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
     example "calling the mounts singleton method a large number of times does not cause issues" do
-      expect{ 1000.times{ @array = Sys::Filesystem.mounts } }.not_to raise_error
+      expect{ 1000.times{ @array = described_class.mounts } }.not_to raise_error
     end
 
     example "mount name method works as expected" do
@@ -348,17 +348,17 @@ RSpec.describe Sys::Filesystem, :unix => true do
     end
 
     example "mount_point singleton method works as expected" do
-      expect(Sys::Filesystem).to respond_to(:mount_point)
-      expect{ Sys::Filesystem.mount_point(Dir.pwd) }.not_to raise_error
-      expect(Sys::Filesystem.mount_point(Dir.pwd)).to be_kind_of(String)
+      expect(described_class).to respond_to(:mount_point)
+      expect{ described_class.mount_point(Dir.pwd) }.not_to raise_error
+      expect(described_class.mount_point(Dir.pwd)).to be_kind_of(String)
     end
 
     example "mount singleton method is defined" do
-      expect(Sys::Filesystem).to respond_to(:mount)
+      expect(described_class).to respond_to(:mount)
     end
 
     example "umount singleton method is defined" do
-      expect(Sys::Filesystem).to respond_to(:umount)
+      expect(described_class).to respond_to(:umount)
     end
   end
 
@@ -370,8 +370,8 @@ RSpec.describe Sys::Filesystem, :unix => true do
     let(:dummy) { Class.new { extend Mkmf::Lite } }
 
     example "ffi functions are private" do
-      expect(Sys::Filesystem.methods.include?('statvfs')).to be false
-      expect(Sys::Filesystem.methods.include?('strerror')).to be false
+      expect(described_class.methods.include?('statvfs')).to be false
+      expect(described_class.methods.include?('strerror')).to be false
     end
 
     example "statfs struct is expected size" do
