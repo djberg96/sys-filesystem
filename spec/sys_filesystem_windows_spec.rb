@@ -16,149 +16,149 @@ RSpec.describe Sys::Filesystem, :windows => true do
     @size  = 58720256
   end
 
-  example "version number is set to the expected value" do
+  example 'version number is set to the expected value' do
     expect(Sys::Filesystem::VERSION).to eq('1.4.3')
     expect(Sys::Filesystem::VERSION).to be_frozen
   end
 
-  example "you cannot instantiate an instance" do
+  example 'you cannot instantiate an instance' do
     expect{ described_class.new }.to raise_error(NoMethodError)
   end
 
-  example "stat path works as expected" do
+  example 'stat path works as expected' do
     expect(@stat).to respond_to(:path)
     expect(@stat.path).to eq(root)
   end
 
-  example "stat block_size works as expected" do
+  example 'stat block_size works as expected' do
     expect(@stat).to respond_to(:block_size)
     expect(@stat.block_size).to be_kind_of(Numeric)
   end
 
-  example "stat works with or without trailing slash on standard paths" do
-    expect(described_class.stat("C:/").path).to eq("C:/")
-    expect(described_class.stat("C:/Users").path).to eq("C:/Users")
-    expect(described_class.stat("C:/Users/").path).to eq("C:/Users/")
-    expect(described_class.stat("C:/Users/").path).to eq("C:/Users/")
+  example 'stat works with or without trailing slash on standard paths' do
+    expect(described_class.stat('C:/').path).to eq('C:/')
+    expect(described_class.stat('C:/Users').path).to eq('C:/Users')
+    expect(described_class.stat('C:/Users/').path).to eq('C:/Users/')
+    expect(described_class.stat('C:/Users/').path).to eq('C:/Users/')
   end
 
-  example "stat works with or without trailing slash on UNC paths" do
-    expect(described_class.stat("//127.0.0.1/C$").path).to eq("//127.0.0.1/C$")
-    expect(described_class.stat("//127.0.0.1/C$/").path).to eq("//127.0.0.1/C$/")
-    expect(described_class.stat("\\\\127.0.0.1\\C$").path).to eq("\\\\127.0.0.1\\C$")
-    expect(described_class.stat("\\\\127.0.0.1\\C$\\").path).to eq("\\\\127.0.0.1\\C$\\")
+  example 'stat works with or without trailing slash on UNC paths' do
+    expect(described_class.stat('//127.0.0.1/C$').path).to eq('//127.0.0.1/C$')
+    expect(described_class.stat('//127.0.0.1/C$/').path).to eq('//127.0.0.1/C$/')
+    expect(described_class.stat('\\\\127.0.0.1\\C$').path).to eq('\\\\127.0.0.1\\C$')
+    expect(described_class.stat('\\\\127.0.0.1\\C$\\').path).to eq('\\\\127.0.0.1\\C$\\')
   end
 
-  example "stat fragment_size works as expected" do
+  example 'stat fragment_size works as expected' do
     expect(@stat).to respond_to(:fragment_size)
     expect(@stat.fragment_size).to be_nil
   end
 
-  example "stat blocks works as expected" do
+  example 'stat blocks works as expected' do
     expect(@stat).to respond_to(:blocks)
     expect(@stat.blocks).to be_kind_of(Numeric)
   end
 
-  example "stat blocks_free works as expected" do
+  example 'stat blocks_free works as expected' do
     expect(@stat).to respond_to(:blocks_free)
     expect(@stat.blocks_free).to be_kind_of(Numeric)
   end
 
-  example "stat blocks_available works as expected" do
+  example 'stat blocks_available works as expected' do
     expect(@stat).to respond_to(:blocks_available)
     expect(@stat.blocks_available).to be_kind_of(Numeric)
   end
 
-  example "block stats return expected relative values" do
+  example 'block stats return expected relative values' do
     expect(@stat.blocks >= @stat.blocks_free).to be true
     expect(@stat.blocks_free >= @stat.blocks_available).to be true
   end
 
-  example "stat files works as expected" do
+  example 'stat files works as expected' do
     expect(@stat).to respond_to(:files)
     expect(@stat.files).to be_nil
   end
 
-  example "stat inodes is an alias for files" do
+  example 'stat inodes is an alias for files' do
     expect(@stat.method(:inodes)).to eq(@stat.method(:files))
   end
 
-  example "stat files_free works as expected" do
+  example 'stat files_free works as expected' do
     expect(@stat).to respond_to(:files_free)
     expect(@stat.files_free).to be_nil
   end
 
-  example "stat inodes_free is an alias for files_free" do
+  example 'stat inodes_free is an alias for files_free' do
     expect(@stat).to respond_to(:inodes_free)
   end
 
-  example "stat files available works as expected" do
+  example 'stat files available works as expected' do
     expect(@stat).to respond_to(:files_available)
     expect(@stat.files_available).to be_nil
   end
 
-  example "stat inodes_available is an alias for files_available" do
+  example 'stat inodes_available is an alias for files_available' do
     expect(@stat.method(:inodes_available)).to eq(@stat.method(:files_available))
   end
 
-  example "stat filesystem_id works as expected" do
+  example 'stat filesystem_id works as expected' do
     expect(@stat).to respond_to(:filesystem_id)
     expect(@stat.filesystem_id).to be_kind_of(Integer)
   end
 
-  example "stat flags works as expected" do
+  example 'stat flags works as expected' do
     expect(@stat).to respond_to(:flags)
     expect(@stat.flags).to be_kind_of(Numeric)
   end
 
-  example "stat name_max works as expected" do
+  example 'stat name_max works as expected' do
     expect(@stat).to respond_to(:name_max)
     expect(@stat.name_max).to be_kind_of(Numeric)
   end
 
-  example "stat base_type works as expected" do
+  example 'stat base_type works as expected' do
     expect(@stat).to respond_to(:base_type)
     expect(@stat.base_type).to be_kind_of(String)
   end
 
-  example "stat bytes_total basic functionality" do
+  example 'stat bytes_total basic functionality' do
     expect(@stat).to respond_to(:bytes_total)
     expect(@stat.bytes_total).to be_kind_of(Numeric)
   end
 
-  example "stat bytes_free basic functionality" do
+  example 'stat bytes_free basic functionality' do
     expect(@stat).to respond_to(:bytes_free)
     expect(@stat.bytes_free).to be_kind_of(Numeric)
     expect(@stat.blocks_free * @stat.block_size).to eq(@stat.bytes_free)
   end
 
-  example "stat bytes_available basic functionality" do
+  example 'stat bytes_available basic functionality' do
     expect(@stat).to respond_to(:bytes_available)
     expect(@stat.bytes_available).to be_kind_of(Numeric)
     expect(@stat.blocks_available * @stat.block_size).to eq(@stat.bytes_available)
   end
 
-  example "stat bytes_used basic functionality" do
+  example 'stat bytes_used basic functionality' do
     expect(@stat).to respond_to(:bytes_used)
     expect(@stat.bytes_used).to be_kind_of(Numeric)
   end
 
-  example "stat percent_used basic functionality" do
+  example 'stat percent_used basic functionality' do
     expect(@stat).to respond_to(:percent_used)
     expect(@stat.percent_used).to be_kind_of(Float)
   end
 
-  example "case_insensitive returns expected result" do
+  example 'case_insensitive returns expected result' do
     expect(@stat).to respond_to(:case_insensitive?)
     expect(@stat.case_insensitive?).to eq(true)
   end
 
-  context "Filesystem.stat(Pathname)" do
+  context 'Filesystem.stat(Pathname)' do
     before do
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
-    example "stat with Pathname argument works as expected" do
+    example 'stat with Pathname argument works as expected' do
       expect(@stat_pathname.class).to eq(@stat.class)
       expect(@stat_pathname.path).to eq(@stat.path)
       expect(@stat_pathname.block_size).to eq(@stat.block_size)
@@ -176,12 +176,12 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
   end
 
-  context "Filesystem.stat(Dir)" do
+  context 'Filesystem.stat(Dir)' do
     before do
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
-    example "stat with Dir argument works as expected" do
+    example 'stat with Dir argument works as expected' do
       expect(@stat_dir.class).to eq(@stat.class)
       expect(@stat_dir.path).to eq(@stat.path)
       expect(@stat_dir.block_size).to eq(@stat.block_size)
@@ -199,26 +199,26 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
   end
 
-  context "mount_point" do
-    example "mount_point singleton method basic functionality" do
+  context 'mount_point' do
+    example 'mount_point singleton method basic functionality' do
       expect(described_class).to respond_to(:mount_point)
       expect{ described_class.mount_point(Dir.pwd) }.not_to raise_error
       expect(described_class.mount_point(Dir.pwd)).to be_kind_of(String)
     end
 
-    example "mount_point singleton method returns expected value" do
-      expect(described_class.mount_point("C:\\Users\\foo")).to eq("C:\\")
-      expect(described_class.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
+    example 'mount_point singleton method returns expected value' do
+      expect(described_class.mount_point('C:\\Users\\foo')).to eq('C:\\')
+      expect(described_class.mount_point('//foo/bar/baz')).to eq('\\\\foo\\bar')
     end
 
-    example "mount_point works with Pathname object" do
-      expect{ described_class.mount_point(Pathname.new("C:/Users/foo")) }.not_to raise_error
-      expect(described_class.mount_point("C:\\Users\\foo")).to eq("C:\\")
-      expect(described_class.mount_point("//foo/bar/baz")).to eq("\\\\foo\\bar")
+    example 'mount_point works with Pathname object' do
+      expect{ described_class.mount_point(Pathname.new('C:/Users/foo')) }.not_to raise_error
+      expect(described_class.mount_point('C:\\Users\\foo')).to eq('C:\\')
+      expect(described_class.mount_point('//foo/bar/baz')).to eq('\\\\foo\\bar')
     end
   end
 
-  example "filesystem constants are defined" do
+  example 'filesystem constants are defined' do
     expect(Sys::Filesystem::CASE_SENSITIVE_SEARCH).not_to be_nil
     expect(Sys::Filesystem::CASE_PRESERVED_NAMES).not_to be_nil
     expect(Sys::Filesystem::UNICODE_ON_DISK).not_to be_nil
@@ -235,112 +235,112 @@ RSpec.describe Sys::Filesystem, :windows => true do
     expect(Sys::Filesystem::READ_ONLY_VOLUME).not_to be_nil
   end
 
-  example "stat singleton method defaults to root path if proviced" do
-    expect{ described_class.stat("C://Program Files") }.not_to raise_error
+  example 'stat singleton method defaults to root path if proviced' do
+    expect{ described_class.stat('C://Program Files') }.not_to raise_error
   end
 
-  example "stat singleton method accepts a Pathname object" do
-    expect{ described_class.stat(Pathname.new("C://Program Files")) }.not_to raise_error
+  example 'stat singleton method accepts a Pathname object' do
+    expect{ described_class.stat(Pathname.new('C://Program Files')) }.not_to raise_error
   end
 
-  example "stat singleton method requires a single argument" do
+  example 'stat singleton method requires a single argument' do
     expect{ described_class.stat }.to raise_error(ArgumentError)
     expect{ described_class.stat(Dir.pwd, Dir.pwd) }.to raise_error(ArgumentError)
   end
 
-  example "stat singleton method raises an error if path is not found" do
-    expect{ described_class.stat("C://Bogus//Dir") }.to raise_error(Errno::ESRCH)
+  example 'stat singleton method raises an error if path is not found' do
+    expect{ described_class.stat('C://Bogus//Dir') }.to raise_error(Errno::ESRCH)
   end
 
-  context "Filesystem::Mount" do
+  context 'Filesystem::Mount' do
     let(:mount){ described_class.mounts[0] }
 
     before do
       @array = []
     end
 
-    example "mount singleton method exists" do
+    example 'mount singleton method exists' do
       expect(described_class).to respond_to(:mount)
     end
 
-    example "umount singleton method exists" do
+    example 'umount singleton method exists' do
       expect(described_class).to respond_to(:umount)
     end
 
-    example "mounts singleton method basic functionality" do
+    example 'mounts singleton method basic functionality' do
       expect(described_class).to respond_to(:mounts)
       expect{ described_class.mounts }.not_to raise_error
       expect{ described_class.mounts{} }.not_to raise_error
     end
 
-    example "mounts singleton method returns the expected value" do
+    example 'mounts singleton method returns the expected value' do
       expect(described_class.mounts).to be_kind_of(Array)
       expect(described_class.mounts[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
-    example "mounts singleton method works as expected when a block is provided" do
+    example 'mounts singleton method works as expected when a block is provided' do
       expect(described_class.mounts{}).to be_nil
       expect{ described_class.mounts{ |mt| @array << mt } }.not_to raise_error
       expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
     end
 
-    example "mount name works as expected" do
+    example 'mount name works as expected' do
       expect(mount).to respond_to(:name)
       expect(mount.name).to be_kind_of(String)
     end
 
-    example "mount_time works as expected" do
+    example 'mount_time works as expected' do
       expect(mount).to respond_to(:mount_time)
       expect(mount.mount_time).to be_kind_of(Time)
     end
 
-    example "mount type works as expected" do
+    example 'mount type works as expected' do
       expect(mount).to respond_to(:mount_type)
       expect(mount.mount_type).to be_kind_of(String)
     end
 
-    example "mount point works as expected" do
+    example 'mount point works as expected' do
       expect(mount).to respond_to(:mount_point)
       expect(mount.mount_point).to be_kind_of(String)
     end
 
-    example "mount options works as expected" do
+    example 'mount options works as expected' do
       expect(mount).to respond_to(:options)
       expect(mount.options).to be_kind_of(String)
     end
 
-    example "mount pass_number works as expected" do
+    example 'mount pass_number works as expected' do
       expect(mount).to respond_to(:pass_number)
       expect(mount.pass_number).to be_nil
     end
 
-    example "mount frequency works as expected" do
+    example 'mount frequency works as expected' do
       expect(mount).to respond_to(:frequency)
       expect(mount.frequency).to be_nil
     end
 
-    example "mounts singleton method does not accept any arguments" do
-      expect{ described_class.mounts("C:\\") }.to raise_error(ArgumentError)
+    example 'mounts singleton method does not accept any arguments' do
+      expect{ described_class.mounts('C:\\') }.to raise_error(ArgumentError)
     end
   end
 
-  example "custom Numeric#to_kb method works as expected" do
+  example 'custom Numeric#to_kb method works as expected' do
     expect(@size).to respond_to(:to_kb)
     expect(@size.to_kb).to eq(57344)
   end
 
-  example "custom Numeric#to_mb method works as expected" do
+  example 'custom Numeric#to_mb method works as expected' do
     expect(@size).to respond_to(:to_mb)
     expect(@size.to_mb).to eq(56)
   end
 
-  example "custom Numeric#to_gb method works as expected" do
+  example 'custom Numeric#to_gb method works as expected' do
     expect(@size).to respond_to(:to_gb)
     expect(@size.to_gb).to eq(0)
   end
 
-  context "FFI" do
-    example "internal ffi functions are not public" do
+  context 'FFI' do
+    example 'internal ffi functions are not public' do
       expect(described_class.methods.include?(:GetVolumeInformationA)).to eq(false)
       expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to eq(false)
     end

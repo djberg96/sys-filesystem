@@ -1,0 +1,48 @@
+require: rubocop-rspec
+
+RSpec/MultipleExpectations:
+  Max: 4
+RSpec/ContextWording:
+  Enabled: false
+RSpec/FilePath:
+  SpecSuffixOnly: true
+RSpec/InstanceVariable:
+  Enabled: false
+
+AllCops:
+  NewCops: enable
+Lint/AssignmentInCondition:
+  Enabled: false
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/ConditionalAssignment:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+Layout/CaseIndentation:
+  IndentOneStep: true
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/BlockLength:
+  IgnoredMethods: ['describe', 'context']
+Metrics/ClassLength:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Naming/FileName:
+  Exclude:
+    - 'lib/sys-filesystem.rb'
