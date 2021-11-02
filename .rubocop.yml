@@ -45,6 +45,8 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
+Naming/AccessorMethodName:
+  Enabled: false
 Naming/FileName:
   Exclude:
     - 'lib/sys-filesystem.rb'
