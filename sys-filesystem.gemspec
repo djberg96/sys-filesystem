@@ -17,6 +17,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec', '~> 3.9')
 
+  if RUBY_PLATFORM == 'java' && Gem.win_platform?
+    spec.add_dependency('jruby-win32ole')
+  end
+
   spec.metadata = {
     'homepage_uri'      => 'https://github.com/djberg96/sys-filesystem',
     'bug_tracker_uri'   => 'https://github.com/djberg96/sys-filesystem/issues',
