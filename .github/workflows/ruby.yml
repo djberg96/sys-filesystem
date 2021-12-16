@@ -18,8 +18,11 @@ jobs:
   test:
     strategy:
       matrix:
-        ruby-version: ['2.6', '2.7']
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        ruby-version: ['2.6', '2.7', truffleruby-head]
+        platform: [ubuntu-latest, macos-latest, windows-lates]
+        exclude:
+          - ruby-version: truffleruby-head
+            platform: windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
