@@ -9,7 +9,8 @@ module Sys
 
       def self.linux64?
         if RUBY_PLATFORM == 'java'
-          ENV_JAVA['sun.arch.data.model'].to_i == 64
+          RbConfig::CONFIG['host_os'] =~ /linux/i &&
+            ENV_JAVA['sun.arch.data.model'].to_i == 64
         else
           RbConfig::CONFIG['host_os'] =~ /linux/i &&
             (RbConfig::CONFIG['arch'] =~ /64/ || RbConfig::CONFIG['DEFS'] =~ /64/)
