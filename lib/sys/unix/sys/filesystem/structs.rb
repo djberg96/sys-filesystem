@@ -20,7 +20,7 @@ module Sys
         # FreeBSD 12.0 MNAMELEN from 88 => 1024.
         MNAMELEN =
           if RbConfig::CONFIG['host_os'] =~ /freebsd(.*)/i
-            $1.to_f < 12.0 ? 88 : 1024
+            Regexp.last_match(1).to_f < 12.0 ? 88 : 1024
           else
             88
           end
