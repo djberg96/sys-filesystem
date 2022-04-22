@@ -11,6 +11,11 @@ RSpec/InstanceVariable:
 
 AllCops:
   NewCops: enable
+  Exclude:
+    - sys-filesystem.gemspec
+    - Rakefile
+    - Gemfile
+    - examples/*.rb
 Lint/AssignmentInCondition:
   Enabled: false
 Style/MethodCallWithoutArgsParentheses:

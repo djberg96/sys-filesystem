@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/clean'
 require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 
 CLEAN.include('**/*.gem', '**/*.rbc', '**/*.rbx', '**/*.lock')
 
@@ -24,6 +25,8 @@ desc "Run the example program"
 task :example do
   sh "ruby -Ilib -Ilib/unix -Ilib/windows examples/example_stat.rb"
 end
+
+RuboCop::RakeTask.new
 
 desc "Run the test suite"
 RSpec::Core::RakeTask.new(:spec)
