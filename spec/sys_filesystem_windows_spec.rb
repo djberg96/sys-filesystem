@@ -141,7 +141,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   example 'case_insensitive returns expected result' do
     expect(@stat).to respond_to(:case_insensitive?)
-    expect(@stat.case_insensitive?).to eq(true)
+    expect(@stat.case_insensitive?).to be(true)
   end
 
   context 'Filesystem.stat(Pathname)' do
@@ -332,8 +332,8 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context 'FFI' do
     example 'internal ffi functions are not public' do
-      expect(described_class.methods.include?(:GetVolumeInformationA)).to eq(false)
-      expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to eq(false)
+      expect(described_class.methods.include?(:GetVolumeInformationA)).to be(false)
+      expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to be(false)
     end
   end
 end
