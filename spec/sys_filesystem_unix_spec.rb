@@ -388,7 +388,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'a failed statvfs call behaves as expected' do
       allow(described_class).to receive(:statvfs).and_return(-1)
-      msg = "statvfs() function failed: No such file or directory"
+      msg = 'statvfs() function failed: No such file or directory'
       expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
     end
   end
