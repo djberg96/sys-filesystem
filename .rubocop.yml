@@ -32,6 +32,8 @@ Style/GuardClause:
   Enabled: false
 Style/HashSyntax:
   Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Layout/CaseIndentation:

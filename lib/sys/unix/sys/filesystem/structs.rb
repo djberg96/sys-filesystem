@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 require 'ffi'
 require 'rbconfig'
 
 module Sys
   class Filesystem
     module Structs
+      # The Statfs struct is a subclass of FFI::Struct that corresponds to a struct statfs.
       class Statfs < FFI::Struct
-
+        # Private method that will determine the layout of the struct on Linux.
         def self.linux64?
           if RUBY_PLATFORM == 'java'
             ENV_JAVA['sun.arch.data.model'].to_i == 64
