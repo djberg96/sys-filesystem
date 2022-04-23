@@ -28,6 +28,16 @@ end
 
 RuboCop::RakeTask.new
 
+namespace :rubocop do
+  RuboCop::RakeTask.new(:unix) do |task|
+    task.patterns = ['lib/sys/unix/sys/**/*.rb', 'spec/*unix*']
+  end
+
+  RuboCop::RakeTask.new(:windows) do |task|
+    task.patterns = ['lib/sys/windows/sys/**/*.rb', 'spec/*windows*']
+  end
+end
+
 desc "Run the test suite"
 RSpec::Core::RakeTask.new(:spec)
 
