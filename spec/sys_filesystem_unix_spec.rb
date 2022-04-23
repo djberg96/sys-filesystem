@@ -383,5 +383,11 @@ RSpec.describe Sys::Filesystem, :unix => true do
       skip 'mnttab test skipped except on Linux' unless linux
       expect(Sys::Filesystem::Structs::Mntent.size).to eq(dummy.check_sizeof('struct mntent', 'mntent.h'))
     end
+
+    example 'a failed statvfs call behaves as expected' do
+      allow(described_class).to receive(:statvfs).and_return(-1)
+      msg = "statvfs() function failed: No such file or directory"
+      expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
+    end
   end
 end
