@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ####################################################################
 # sys_filesystem_unix_spec.rb
 #
