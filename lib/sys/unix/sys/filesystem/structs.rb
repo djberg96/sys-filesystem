@@ -28,82 +28,83 @@ module Sys
             88
           end
 
-        if RbConfig::CONFIG['host_os'] =~ /bsd/i
-          layout(
-            :f_version, :uint32,
-            :f_type, :uint32,
-            :f_flags, :uint64,
-            :f_bsize, :uint64,
-            :f_iosize, :int64,
-            :f_blocks, :uint64,
-            :f_bfree, :uint64,
-            :f_bavail, :int64,
-            :f_files, :uint64,
-            :f_ffree, :uint64,
-            :f_syncwrites, :uint64,
-            :f_asyncwrites, :uint64,
-            :f_syncreads, :uint64,
-            :f_asyncreads, :uint64,
-            :f_spare, [:uint64, 10],
-            :f_namemax, :uint32,
-            :f_owner, :int32,
-            :f_fsid,  [:int32, 2],
-            :f_charspare, [:char, 80],
-            :f_fstypename, [:char, 16],
-            :f_mntfromname, [:char, MNAMELEN],
-            :f_mntonname, [:char, MNAMELEN]
-          )
-        elsif RbConfig::CONFIG['host_os'] =~ /linux/i
-          if linux64?
+        case RbConfig::CONFIG['host_os']
+          when /bsd/i
             layout(
-              :f_type, :ulong,
-              :f_bsize, :ulong,
+              :f_version, :uint32,
+              :f_type, :uint32,
+              :f_flags, :uint64,
+              :f_bsize, :uint64,
+              :f_iosize, :int64,
+              :f_blocks, :uint64,
+              :f_bfree, :uint64,
+              :f_bavail, :int64,
+              :f_files, :uint64,
+              :f_ffree, :uint64,
+              :f_syncwrites, :uint64,
+              :f_asyncwrites, :uint64,
+              :f_syncreads, :uint64,
+              :f_asyncreads, :uint64,
+              :f_spare, [:uint64, 10],
+              :f_namemax, :uint32,
+              :f_owner, :int32,
+              :f_fsid,  [:int32, 2],
+              :f_charspare, [:char, 80],
+              :f_fstypename, [:char, 16],
+              :f_mntfromname, [:char, MNAMELEN],
+              :f_mntonname, [:char, MNAMELEN]
+            )
+          when /linux/i
+            if linux64?
+              layout(
+                :f_type, :ulong,
+                :f_bsize, :ulong,
+                :f_blocks, :uint64,
+                :f_bfree, :uint64,
+                :f_bavail, :uint64,
+                :f_files, :uint64,
+                :f_ffree, :uint64,
+                :f_fsid, [:int, 2],
+                :f_namelen, :ulong,
+                :f_frsize, :ulong,
+                :f_flags, :ulong,
+                :f_spare, [:ulong, 4]
+              )
+            else
+              layout(
+                :f_type, :ulong,
+                :f_bsize, :ulong,
+                :f_blocks, :uint32,
+                :f_bfree, :uint32,
+                :f_bavail, :uint32,
+                :f_files, :uint32,
+                :f_ffree, :uint32,
+                :f_fsid, [:int, 2],
+                :f_namelen, :ulong,
+                :f_frsize, :ulong,
+                :f_flags, :ulong,
+                :f_spare, [:ulong, 4]
+              )
+            end
+          else
+            layout(
+              :f_bsize, :uint32,
+              :f_iosize, :int32,
               :f_blocks, :uint64,
               :f_bfree, :uint64,
               :f_bavail, :uint64,
               :f_files, :uint64,
               :f_ffree, :uint64,
-              :f_fsid, [:int, 2],
-              :f_namelen, :ulong,
-              :f_frsize, :ulong,
-              :f_flags, :ulong,
-              :f_spare, [:ulong, 4]
+              :f_fsid, [:int32, 2],
+              :f_owner, :int32,
+              :f_type, :uint32,
+              :f_flags, :uint32,
+              :f_fssubtype, :uint32,
+              :f_fstypename, [:char, 16],
+              :f_mntonname, [:char, 1024],
+              :f_mntfromname, [:char, 1024],
+              :f_reserved, [:uint32, 8]
             )
-          else
-            layout(
-              :f_type, :ulong,
-              :f_bsize, :ulong,
-              :f_blocks, :uint32,
-              :f_bfree, :uint32,
-              :f_bavail, :uint32,
-              :f_files, :uint32,
-              :f_ffree, :uint32,
-              :f_fsid, [:int, 2],
-              :f_namelen, :ulong,
-              :f_frsize, :ulong,
-              :f_flags, :ulong,
-              :f_spare, [:ulong, 4]
-            )
-          end
-        else
-          layout(
-            :f_bsize, :uint32,
-            :f_iosize, :int32,
-            :f_blocks, :uint64,
-            :f_bfree, :uint64,
-            :f_bavail, :uint64,
-            :f_files, :uint64,
-            :f_ffree, :uint64,
-            :f_fsid, [:int32, 2],
-            :f_owner, :int32,
-            :f_type, :uint32,
-            :f_flags, :uint32,
-            :f_fssubtype, :uint32,
-            :f_fstypename, [:char, 16],
-            :f_mntonname, [:char, 1024],
-            :f_mntfromname, [:char, 1024],
-            :f_reserved, [:uint32, 8]
-          )
         end
       end
 
