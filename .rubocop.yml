@@ -18,6 +18,9 @@ AllCops:
     - examples/*.rb
 Lint/AssignmentInCondition:
   Enabled: false
+Lint/EmptyBlock:
+  Exclude:
+    - spec/*.rb
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/NumericLiterals:
