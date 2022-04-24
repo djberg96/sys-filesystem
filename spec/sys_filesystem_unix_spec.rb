@@ -248,20 +248,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_file = File.open(root){ |file| described_class.stat(file) }
     end
 
-    example 'stat with File argument works as expected' do
+    example 'class returns expected value with file argument' do
       expect(@stat_file.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with file argument' do
       expect(@stat_file.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with file argument' do
       expect(@stat_file.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with file argument' do
       expect(@stat_file.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with file argument' do
       expect(@stat_file.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with file argument' do
       expect(@stat_file.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with file argument' do
       expect(@stat_file.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with file argument' do
       expect(@stat_file.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with file argument' do
       expect(@stat_file.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with file argument' do
       expect(@stat_file.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with file argument' do
       expect(@stat_file.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with file argument' do
       expect(@stat_file.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with file argument' do
       expect(@stat_file.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with file argument' do
       expect(@stat_file.base_type).to eq(@stat.base_type)
     end
   end
