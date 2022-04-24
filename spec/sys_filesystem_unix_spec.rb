@@ -186,20 +186,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
-    example 'stat with Pathname argument works as expected' do
+    example 'class returns expected value with pathname argument' do
       expect(@stat_pathname.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with pathname argument' do
       expect(@stat_pathname.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with pathname argument' do
       expect(@stat_pathname.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with pathname argument' do
       expect(@stat_pathname.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with pathname argument' do
       expect(@stat_pathname.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with pathname argument' do
       expect(@stat_pathname.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with pathname argument' do
       expect(@stat_pathname.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with pathname argument' do
       expect(@stat_pathname.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with pathname argument' do
       expect(@stat_pathname.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with pathname argument' do
       expect(@stat_pathname.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with pathname argument' do
       expect(@stat_pathname.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with pathname argument' do
       expect(@stat_pathname.base_type).to eq(@stat.base_type)
     end
   end
