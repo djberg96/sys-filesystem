@@ -43,13 +43,13 @@ module Sys
 
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')
-      MOUNT_FILE = '/etc/mtab'.freeze
+      MOUNT_FILE = '/etc/mtab'
     elsif File.exist?('/etc/mnttab')
-      MOUNT_FILE = '/etc/mnttab'.freeze
+      MOUNT_FILE = '/etc/mnttab'
     elsif File.exist?('/proc/mounts')
-      MOUNT_FILE = '/proc/mounts'.freeze
+      MOUNT_FILE = '/proc/mounts'
     else
-      MOUNT_FILE = 'getmntinfo'.freeze
+      MOUNT_FILE = 'getmntinfo'
     end
 
     private_constant :MOUNT_FILE
