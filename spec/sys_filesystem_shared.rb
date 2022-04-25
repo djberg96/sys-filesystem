@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sys-filesystem'
 
 RSpec.shared_examples Sys::Filesystem do

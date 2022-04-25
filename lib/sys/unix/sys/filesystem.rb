@@ -224,7 +224,7 @@ module Sys
       fs = Statvfs.new
 
       if statvfs(path, fs) < 0
-        raise Error, 'statvfs() function failed: ' + strerror(FFI.errno)
+        raise Error, "statvfs() function failed: #{strerror(FFI.errno)}"
       end
 
       obj = Sys::Filesystem::Stat.new
@@ -275,7 +275,7 @@ module Sys
         num = getmntinfo(buf, 2)
 
         if num == 0
-          raise Error, 'getmntinfo() function failed: ' + strerror(FFI.errno)
+          raise Error, "getmntinfo() function failed: #{strerror(FFI.errno)}"
         end
 
         ptr = buf.get_pointer(0)
@@ -419,7 +419,7 @@ module Sys
     #
     def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
       if mount_c(source, target, fstype, flags, data) != 0
-        raise Error, 'mount() function failed: ' + strerror(FFI.errno)
+        raise Error, "mount() function failed: #{strerror(FFI.errno)}"
       end
 
       self

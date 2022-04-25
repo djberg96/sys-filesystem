@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require 'ffi'
 
 module Sys
   class Filesystem
+    # A scoped module for internal FFI functions to be used by the main code.
     module Functions
       extend FFI::Library
 
@@ -17,11 +20,13 @@ module Sys
         end
       end
 
+      def self.solaris?
+        RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
+      end
+
       private_class_method :linux64?
 
-      if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-        attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
-      elsif linux64?
+      if linux64? || solaris?
         attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
       else
         attach_function(:statvfs, %i[string pointer], :int)

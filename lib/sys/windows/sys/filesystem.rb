@@ -9,7 +9,6 @@ require 'time'
 
 # The Sys module serves as a namespace only.
 module Sys
-
   # The Filesystem class encapsulates information about your filesystem.
   class Filesystem
     include Sys::Filesystem::Constants
@@ -20,6 +19,7 @@ module Sys
 
     private_class_method :new
 
+    # Mount objects are returned by the Sys::Filesystem.mounts method.
     class Mount
       # The name of the volume. This is the device mapping.
       attr_reader :name
@@ -50,6 +50,7 @@ module Sys
       alias freq frequency
     end
 
+    # Stat objects are returned by the Sys::Filesystem.stat method.
     class Stat
       # The path of the file system.
       attr_reader :path
@@ -160,6 +161,8 @@ module Sys
     #--
     # I couldn't really find a good reason to use the wide functions for this
     # method. If you have one, patches welcome.
+    #--
+    # rubocop:disable Metrics/BlockLength
     #
     def self.mounts
       # First call, get needed buffer size
@@ -196,14 +199,14 @@ module Sys
         filesystem_flags     = FFI::MemoryPointer.new(:ulong)
 
         bool = GetVolumeInformationA(
-           drive,
-           volume,
-           volume.size,
-           volume_serial_number,
-           max_component_length,
-           filesystem_flags,
-           fsname,
-           fsname.size
+          drive,
+          volume,
+          volume.size,
+          volume_serial_number,
+          max_component_length,
+          filesystem_flags,
+          fsname,
+          fsname.size
         )
 
         # Skip unmounted floppies or cd-roms, or inaccessible drives
@@ -237,6 +240,7 @@ module Sys
 
       mounts # Nil if the block form was used.
     end
+    # rubocop:enable Metrics/BlockLength
 
     # Returns the mount point for the given +file+. For MS Windows this
     # means the root of the path.
@@ -250,8 +254,6 @@ module Sys
 
       if PathStripToRootW(wfile)
         wfile.read_string(wfile.size).split("\000\000").first.tr(0.chr, '')
-      else
-        nil
       end
     end
 

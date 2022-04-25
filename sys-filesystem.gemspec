@@ -16,6 +16,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('mkmf-lite', '~> 0.5') unless Gem.win_platform?
   spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec', '~> 3.9')
+  spec.add_development_dependency('rubocop')
+  spec.add_development_dependency('rubocop-rspec')
 
   if RUBY_PLATFORM == 'java' && Gem.win_platform?
     spec.add_dependency('jruby-win32ole')

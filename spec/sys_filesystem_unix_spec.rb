@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ####################################################################
 # sys_filesystem_unix_spec.rb
 #
@@ -184,20 +186,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
-    example 'stat with Pathname argument works as expected' do
+    example 'class returns expected value with pathname argument' do
       expect(@stat_pathname.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with pathname argument' do
       expect(@stat_pathname.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with pathname argument' do
       expect(@stat_pathname.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with pathname argument' do
       expect(@stat_pathname.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with pathname argument' do
       expect(@stat_pathname.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with pathname argument' do
       expect(@stat_pathname.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with pathname argument' do
       expect(@stat_pathname.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with pathname argument' do
       expect(@stat_pathname.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with pathname argument' do
       expect(@stat_pathname.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with pathname argument' do
       expect(@stat_pathname.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with pathname argument' do
       expect(@stat_pathname.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with pathname argument' do
       expect(@stat_pathname.base_type).to eq(@stat.base_type)
     end
   end
@@ -207,20 +248,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_file = File.open(root){ |file| described_class.stat(file) }
     end
 
-    example 'stat with File argument works as expected' do
+    example 'class returns expected value with file argument' do
       expect(@stat_file.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with file argument' do
       expect(@stat_file.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with file argument' do
       expect(@stat_file.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with file argument' do
       expect(@stat_file.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with file argument' do
       expect(@stat_file.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with file argument' do
       expect(@stat_file.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with file argument' do
       expect(@stat_file.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with file argument' do
       expect(@stat_file.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with file argument' do
       expect(@stat_file.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with file argument' do
       expect(@stat_file.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with file argument' do
       expect(@stat_file.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with file argument' do
       expect(@stat_file.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with file argument' do
       expect(@stat_file.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with file argument' do
       expect(@stat_file.base_type).to eq(@stat.base_type)
     end
   end
@@ -230,20 +310,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
-    example 'stat with Dir argument works as expected' do
+    example 'class returns expected value with Dir argument' do
       expect(@stat_dir.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with Dir argument' do
       expect(@stat_dir.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with Dir argument' do
       expect(@stat_dir.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with Dir argument' do
       expect(@stat_dir.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with Dir argument' do
       expect(@stat_dir.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with Dir argument' do
       expect(@stat_dir.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with Dir argument' do
       expect(@stat_dir.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with Dir argument' do
       expect(@stat_dir.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with Dir argument' do
       expect(@stat_dir.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with Dir argument' do
       expect(@stat_dir.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with Dir argument' do
       expect(@stat_dir.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with Dir argument' do
       expect(@stat_dir.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with Dir argument' do
       expect(@stat_dir.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with Dir argument' do
       expect(@stat_dir.base_type).to eq(@stat.base_type)
     end
   end
@@ -305,13 +424,9 @@ RSpec.describe Sys::Filesystem, :unix => true do
     end
 
     example 'mount time works as expected' do
+      expected_class = solaris ? Time : NilClass
       expect(mount).to respond_to(:mount_time)
-
-      if solaris
-        expect(mount.mount_time).to be_kind_of(Time)
-      else
-        expect(mount.mount_time).to be_nil
-      end
+      expect(mount.mount_time).to be_kind_of(expected_class)
     end
 
     example 'mount dump_frequency works as expected' do
@@ -382,6 +497,16 @@ RSpec.describe Sys::Filesystem, :unix => true do
     example 'mntent struct is expected size' do
       skip 'mnttab test skipped except on Linux' unless linux
       expect(Sys::Filesystem::Structs::Mntent.size).to eq(dummy.check_sizeof('struct mntent', 'mntent.h'))
+    end
+
+    example 'a failed statvfs call behaves as expected' do
+      allow(described_class).to receive(:statvfs).and_return(-1)
+      if ENV['CI']
+        msg = 'statvfs() function failed: Inappropriate ioctl for device'
+      else
+        msg = 'statvfs() function failed: No such file or directory'
+      end
+      expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
     end
   end
 end

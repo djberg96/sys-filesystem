@@ -1,9 +1,4 @@
-module Sys
-  class Filesystem
-    # The version of the sys-filesystem library
-    VERSION = '1.4.3'.freeze
-  end
-end
+# frozen_string_literal: true
 
 require 'rbconfig'
 
@@ -13,10 +8,18 @@ else
   require_relative 'unix/sys/filesystem'
 end
 
-# Methods universal to all platforms
+# Methods and properties universal to all platforms
 
+# The Sys module serves as a namespace only.
 module Sys
+  # The Filesystem class serves as an abstract base class. Its methods
+  # return objects of other types. Do not instantiate.
   class Filesystem
+    # The version of the sys-filesystem library
+    VERSION = '1.4.3'
+
+    # Stat objects are returned by the Sys::Filesystem.stat method. Here
+    # we're adding universal methods.
     class Stat
       # Returns true if the filesystem is case sensitive for the current path.
       # Typically this will be any path on MS Windows or Macs using HFS.
@@ -26,14 +29,12 @@ module Sys
       # general rule, I do not recommend using this method for a root path.
       #
       def case_insensitive?
-        if path !~ /\w+/
-          if RbConfig::CONFIG['host_os'] =~ /darwin|mac|windows|mswin|mingw/i
-            true # Assumes HFS
-          else
-            false
-          end
-        else
+        if path =~ /\w+/
           File.identical?(path, path.swapcase)
+        elsif RbConfig::CONFIG['host_os'] =~ /darwin|mac|windows|mswin|mingw/i
+          true # Assumes HFS/APFS on Mac
+        else
+          false
         end
       end
 
@@ -46,8 +47,8 @@ module Sys
   end
 end
 
-# Some convenient methods for converting bytes to kb, mb, and gb.
-#
+# Reopen the Numeric class and add some convenient methods
+# for converting bytes to kb, mb, and gb.
 class Numeric
   # call-seq:
   #  <tt>num</tt>.to_kb

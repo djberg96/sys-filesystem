@@ -2,6 +2,7 @@ require 'ffi'
 
 module Sys
   class Filesystem
+    # Wrapper module for Windows related FFI functions.
     module Functions
       extend FFI::Library
       ffi_lib :kernel32

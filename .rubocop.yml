@@ -8,10 +8,24 @@ RSpec/FilePath:
   SpecSuffixOnly: true
 RSpec/InstanceVariable:
   Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+RSpec/BeforeAfterAll:
+  Enabled: false
 
 AllCops:
   NewCops: enable
+  Exclude:
+    - sys-filesystem.gemspec
+    - Rakefile
+    - Gemfile
+    - examples/*.rb
 Lint/AssignmentInCondition:
+  Enabled: false
+Lint/EmptyBlock:
+  Exclude:
+    - spec/*.rb
+Style/FrozenStringLiteralComment:
   Enabled: false
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
@@ -27,6 +41,8 @@ Style/GuardClause:
   Enabled: false
 Style/HashSyntax:
   Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Layout/CaseIndentation:
@@ -37,6 +53,8 @@ Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
   IgnoredMethods: ['describe', 'context']
+Metrics/BlockNesting:
+  Max: 4
 Metrics/ClassLength:
   Enabled: false
 Metrics/MethodLength:

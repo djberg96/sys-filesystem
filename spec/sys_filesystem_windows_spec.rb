@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ####################################################################
 # sys_filesystem_windows_spec.rb
 #
@@ -141,7 +143,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   example 'case_insensitive returns expected result' do
     expect(@stat).to respond_to(:case_insensitive?)
-    expect(@stat.case_insensitive?).to eq(true)
+    expect(@stat.case_insensitive?).to be(true)
   end
 
   context 'Filesystem.stat(Pathname)' do
@@ -149,20 +151,59 @@ RSpec.describe Sys::Filesystem, :windows => true do
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
-    example 'stat with Pathname argument works as expected' do
+    example 'class returns expected value with pathname argument' do
       expect(@stat_pathname.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with pathname argument' do
       expect(@stat_pathname.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with pathname argument' do
       expect(@stat_pathname.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with pathname argument' do
       expect(@stat_pathname.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with pathname argument' do
       expect(@stat_pathname.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with pathname argument' do
       expect(@stat_pathname.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with pathname argument' do
       expect(@stat_pathname.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with pathname argument' do
       expect(@stat_pathname.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with pathname argument' do
       expect(@stat_pathname.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with pathname argument' do
       expect(@stat_pathname.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with pathname argument' do
       expect(@stat_pathname.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with pathname argument' do
       expect(@stat_pathname.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with pathname argument' do
       expect(@stat_pathname.base_type).to eq(@stat.base_type)
     end
   end
@@ -172,20 +213,59 @@ RSpec.describe Sys::Filesystem, :windows => true do
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
-    example 'stat with Dir argument works as expected' do
+    example 'stat class with Dir argument works as expected' do
       expect(@stat_dir.class).to eq(@stat.class)
+    end
+
+    example 'stat path with Dir argument works as expected' do
       expect(@stat_dir.path).to eq(@stat.path)
+    end
+
+    example 'stat block_size with Dir argument works as expected' do
       expect(@stat_dir.block_size).to eq(@stat.block_size)
+    end
+
+    example 'stat fragment_size with Dir argument works as expected' do
       expect(@stat_dir.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'stat blocks with Dir argument works as expected' do
       expect(@stat_dir.blocks).to eq(@stat.blocks)
+    end
+
+    example 'stat blocks_free with Dir argument works as expected' do
       expect(@stat_dir.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'stat blocks_available with Dir argument works as expected' do
       expect(@stat_dir.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'stat files with Dir argument works as expected' do
       expect(@stat_dir.files).to eq(@stat.files)
+    end
+
+    example 'stat files_free with Dir argument works as expected' do
       expect(@stat_dir.files_free).to eq(@stat.files_free)
+    end
+
+    example 'stat files_available with Dir argument works as expected' do
       expect(@stat_dir.files_available).to eq(@stat.files_available)
+    end
+
+    example 'stat filesystem_id with Dir argument works as expected' do
       expect(@stat_dir.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'stat flags with Dir argument works as expected' do
       expect(@stat_dir.flags).to eq(@stat.flags)
+    end
+
+    example 'stat name_max with Dir argument works as expected' do
       expect(@stat_dir.name_max).to eq(@stat.name_max)
+    end
+
+    example 'stat base_type with Dir argument works as expected' do
       expect(@stat_dir.base_type).to eq(@stat.base_type)
     end
   end
@@ -209,21 +289,62 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
   end
 
-  example 'filesystem constants are defined' do
-    expect(Sys::Filesystem::CASE_SENSITIVE_SEARCH).not_to be_nil
-    expect(Sys::Filesystem::CASE_PRESERVED_NAMES).not_to be_nil
-    expect(Sys::Filesystem::UNICODE_ON_DISK).not_to be_nil
-    expect(Sys::Filesystem::PERSISTENT_ACLS).not_to be_nil
-    expect(Sys::Filesystem::FILE_COMPRESSION).not_to be_nil
-    expect(Sys::Filesystem::VOLUME_QUOTAS).not_to be_nil
-    expect(Sys::Filesystem::SUPPORTS_SPARSE_FILES).not_to be_nil
-    expect(Sys::Filesystem::SUPPORTS_REPARSE_POINTS).not_to be_nil
-    expect(Sys::Filesystem::SUPPORTS_REMOTE_STORAGE).not_to be_nil
-    expect(Sys::Filesystem::VOLUME_IS_COMPRESSED).not_to be_nil
-    expect(Sys::Filesystem::SUPPORTS_OBJECT_IDS).not_to be_nil
-    expect(Sys::Filesystem::SUPPORTS_ENCRYPTION).not_to be_nil
-    expect(Sys::Filesystem::NAMED_STREAMS).not_to be_nil
-    expect(Sys::Filesystem::READ_ONLY_VOLUME).not_to be_nil
+  context 'filesystem constants are defined' do
+    example 'CASE_SENSITIVE_SEARCH' do
+      expect(Sys::Filesystem::CASE_SENSITIVE_SEARCH).not_to be_nil
+    end
+
+    example 'CASE_PRESERVED_NAMES' do
+      expect(Sys::Filesystem::CASE_PRESERVED_NAMES).not_to be_nil
+    end
+
+    example 'UNICODE_ON_DISK' do
+      expect(Sys::Filesystem::UNICODE_ON_DISK).not_to be_nil
+    end
+
+    example 'PERSISTENT_ACLS' do
+      expect(Sys::Filesystem::PERSISTENT_ACLS).not_to be_nil
+    end
+
+    example 'FILE_COMPRESSION' do
+      expect(Sys::Filesystem::FILE_COMPRESSION).not_to be_nil
+    end
+
+    example 'VOLUME_QUOTAS' do
+      expect(Sys::Filesystem::VOLUME_QUOTAS).not_to be_nil
+    end
+
+    example 'SUPPORTS_SPARSE_FILES' do
+      expect(Sys::Filesystem::SUPPORTS_SPARSE_FILES).not_to be_nil
+    end
+
+    example 'SUPPORTS_REPARSE_POINTS' do
+      expect(Sys::Filesystem::SUPPORTS_REPARSE_POINTS).not_to be_nil
+    end
+
+    example 'SUPPORTS_REMOTE_STORAGE' do
+      expect(Sys::Filesystem::SUPPORTS_REMOTE_STORAGE).not_to be_nil
+    end
+
+    example 'VOLUME_IS_COMPRESSED' do
+      expect(Sys::Filesystem::VOLUME_IS_COMPRESSED).not_to be_nil
+    end
+
+    example 'SUPPORTS_OBJECT_IDS' do
+      expect(Sys::Filesystem::SUPPORTS_OBJECT_IDS).not_to be_nil
+    end
+
+    example 'SUPPORTS_ENCRYPTION' do
+      expect(Sys::Filesystem::SUPPORTS_ENCRYPTION).not_to be_nil
+    end
+
+    example 'NAMED_STREAMS' do
+      expect(Sys::Filesystem::NAMED_STREAMS).not_to be_nil
+    end
+
+    example 'READ_ONLY_VOLUME' do
+      expect(Sys::Filesystem::READ_ONLY_VOLUME).not_to be_nil
+    end
   end
 
   example 'stat singleton method defaults to root path if proviced' do
@@ -332,8 +453,8 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   context 'FFI' do
     example 'internal ffi functions are not public' do
-      expect(described_class.methods.include?(:GetVolumeInformationA)).to eq(false)
-      expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to eq(false)
+      expect(described_class.methods.include?(:GetVolumeInformationA)).to be(false)
+      expect(described_class.instance_methods.include?(:GetVolumeInformationA)).to be(false)
     end
   end
 end
