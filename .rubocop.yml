@@ -10,6 +10,8 @@ RSpec/InstanceVariable:
   Enabled: false
 RSpec/MultipleMemoizedHelpers:
   Max: 10
+RSpec/BeforeAfterAll:
+  Enabled: false
 
 AllCops:
   NewCops: enable
