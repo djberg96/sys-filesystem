@@ -424,13 +424,9 @@ RSpec.describe Sys::Filesystem, :unix => true do
     end
 
     example 'mount time works as expected' do
+      expected_class = solaris ? Time : NilClass
       expect(mount).to respond_to(:mount_time)
-
-      if solaris
-        expect(mount.mount_time).to be_kind_of(Time)
-      else
-        expect(mount.mount_time).to be_nil
-      end
+      expect(mount.mount_time).to be_kind_of(expected_class)
     end
 
     example 'mount dump_frequency works as expected' do
