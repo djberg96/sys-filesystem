@@ -21,6 +21,8 @@ Lint/AssignmentInCondition:
 Lint/EmptyBlock:
   Exclude:
     - spec/*.rb
+Style/FrozenStringLiteralComment:
+  Enabled: false
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/NumericLiterals:
