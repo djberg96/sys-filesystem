@@ -310,20 +310,59 @@ RSpec.describe Sys::Filesystem, :unix => true do
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
-    example 'stat with Dir argument works as expected' do
+    example 'class returns expected value with Dir argument' do
       expect(@stat_dir.class).to eq(@stat.class)
+    end
+
+    example 'path returns expected value with Dir argument' do
       expect(@stat_dir.path).to eq(@stat.path)
+    end
+
+    example 'block_size returns expected value with Dir argument' do
       expect(@stat_dir.block_size).to eq(@stat.block_size)
+    end
+
+    example 'fragment_size returns expected value with Dir argument' do
       expect(@stat_dir.fragment_size).to eq(@stat.fragment_size)
+    end
+
+    example 'blocks returns expected value with Dir argument' do
       expect(@stat_dir.blocks).to eq(@stat.blocks)
+    end
+
+    example 'blocks_free returns expected value with Dir argument' do
       expect(@stat_dir.blocks_free).to eq(@stat.blocks_free)
+    end
+
+    example 'blocks_available returns expected value with Dir argument' do
       expect(@stat_dir.blocks_available).to eq(@stat.blocks_available)
+    end
+
+    example 'files returns expected value with Dir argument' do
       expect(@stat_dir.files).to eq(@stat.files)
+    end
+
+    example 'files_free returns expected value with Dir argument' do
       expect(@stat_dir.files_free).to eq(@stat.files_free)
+    end
+
+    example 'files_available returns expected value with Dir argument' do
       expect(@stat_dir.files_available).to eq(@stat.files_available)
+    end
+
+    example 'filesystem_id returns expected value with Dir argument' do
       expect(@stat_dir.filesystem_id).to eq(@stat.filesystem_id)
+    end
+
+    example 'flags returns expected value with Dir argument' do
       expect(@stat_dir.flags).to eq(@stat.flags)
+    end
+
+    example 'name_max returns expected value with Dir argument' do
       expect(@stat_dir.name_max).to eq(@stat.name_max)
+    end
+
+    example 'base_type returns expected value with Dir argument' do
       expect(@stat_dir.base_type).to eq(@stat.base_type)
     end
   end
