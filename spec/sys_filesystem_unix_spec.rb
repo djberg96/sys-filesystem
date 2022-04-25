@@ -501,7 +501,11 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'a failed statvfs call behaves as expected' do
       allow(described_class).to receive(:statvfs).and_return(-1)
-      msg = 'statvfs() function failed: No such file or directory'
+      if ENV['CI']
+        msg = 'statvfs() function failed: Inappropriate ioctl for device'
+      else
+        msg = 'statvfs() function failed: No such file or directory'
+      end
       expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
     end
   end
