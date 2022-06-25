@@ -24,12 +24,13 @@ Gem::Specification.new do |spec|
   end
 
   spec.metadata = {
-    'homepage_uri'      => 'https://github.com/djberg96/sys-filesystem',
-    'bug_tracker_uri'   => 'https://github.com/djberg96/sys-filesystem/issues',
-    'changelog_uri'     => 'https://github.com/djberg96/sys-filesystem/blob/main/CHANGES.md',
-    'documentation_uri' => 'https://github.com/djberg96/sys-filesystem/wiki',
-    'source_code_uri'   => 'https://github.com/djberg96/sys-filesystem',
-    'wiki_uri'          => 'https://github.com/djberg96/sys-filesystem/wiki'
+    'homepage_uri'          => 'https://github.com/djberg96/sys-filesystem',
+    'bug_tracker_uri'       => 'https://github.com/djberg96/sys-filesystem/issues',
+    'changelog_uri'         => 'https://github.com/djberg96/sys-filesystem/blob/main/CHANGES.md',
+    'documentation_uri'     => 'https://github.com/djberg96/sys-filesystem/wiki',
+    'source_code_uri'       => 'https://github.com/djberg96/sys-filesystem',
+    'wiki_uri'              => 'https://github.com/djberg96/sys-filesystem/wiki',
+    'rubygems_mfa_required' => 'true'
   }
 
   spec.description = <<-EOF
