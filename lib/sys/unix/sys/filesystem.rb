@@ -221,33 +221,39 @@ module Sys
       path = path.path if path.respond_to?(:path) # File, Dir
       path = path.to_s if path.respond_to?(:to_s) # Pathname
 
-      fs = Statvfs.new
+      vfs = Statvfs.new
 
-      if statvfs(path, fs) < 0
+      if statvfs(path, vfs) < 0
         raise Error, "statvfs() function failed: #{strerror(FFI.errno)}"
       end
 
       obj = Sys::Filesystem::Stat.new
       obj.path = path
-      obj.block_size = fs[:f_bsize]
-      obj.fragment_size = fs[:f_frsize]
-      obj.blocks = fs[:f_blocks]
-      obj.blocks_free = fs[:f_bfree]
-      obj.blocks_available = fs[:f_bavail]
-      obj.files = fs[:f_files]
-      obj.files_free = fs[:f_ffree]
-      obj.files_available = fs[:f_favail]
-      obj.filesystem_id = fs[:f_fsid]
-      obj.flags = fs[:f_flag]
-      obj.name_max = fs[:f_namemax]
+      obj.block_size = vfs[:f_bsize]
+      obj.fragment_size = vfs[:f_frsize]
+      obj.blocks = vfs[:f_blocks]
+      obj.blocks_free = vfs[:f_bfree]
+      obj.blocks_available = vfs[:f_bavail]
+      obj.files = vfs[:f_files]
+      obj.files_free = vfs[:f_ffree]
+      obj.files_available = vfs[:f_favail]
+      obj.filesystem_id = vfs[:f_fsid]
+      obj.flags = vfs[:f_flag]
+      obj.name_max = vfs[:f_namemax]
 
       # OSX does things a little differently
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
         obj.block_size /= 256
       end
 
-      if fs.members.include?(:f_basetype)
-        obj.base_type = fs[:f_basetype].to_s
+      if vfs.members.include?(:f_basetype)
+        obj.base_type = vfs[:f_basetype].to_s
+      else
+        fs = Statfs.new
+        if statfs(path, fs) < 0
+          raise Error, "statfs() function failed: #{strerror(FFI.errno)}"
+        end
+        obj.base_type = fs[:f_type]
       end
 
       obj.freeze
