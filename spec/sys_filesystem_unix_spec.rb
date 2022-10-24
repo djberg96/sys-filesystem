@@ -103,10 +103,8 @@ RSpec.describe Sys::Filesystem, :unix => true do
   end
 
   example 'stat base_type works as expected' do
-    skip 'base_type test skipped except on Solaris' unless solaris
-
     expect(@stat).to respond_to(:base_type)
-    expect(@stat.base_type).to be_kind_of(String)
+    expect(@stat.base_type).to be_kind_of(String).or be_kind_of(Numeric)
   end
 
   example 'stat constants are defined' do
