@@ -28,8 +28,10 @@ module Sys
 
       if linux64? || solaris?
         attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
+        attach_function(:statfs, :statfs64, %i[string pointer], :int)
       else
         attach_function(:statvfs, %i[string pointer], :int)
+        attach_function(:statfs, %i[string pointer], :int)
       end
 
       attach_function(:strerror, [:int], :string)
