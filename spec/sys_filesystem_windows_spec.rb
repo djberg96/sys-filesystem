@@ -25,7 +25,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   example 'stat block_size works as expected' do
     expect(@stat).to respond_to(:block_size)
-    expect(@stat.block_size).to be_kind_of(Numeric)
+    expect(@stat.block_size).to be_a(Numeric)
   end
 
   example 'stat works with or without trailing slash on standard paths' do
@@ -49,17 +49,17 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   example 'stat blocks works as expected' do
     expect(@stat).to respond_to(:blocks)
-    expect(@stat.blocks).to be_kind_of(Numeric)
+    expect(@stat.blocks).to be_a(Numeric)
   end
 
   example 'stat blocks_free works as expected' do
     expect(@stat).to respond_to(:blocks_free)
-    expect(@stat.blocks_free).to be_kind_of(Numeric)
+    expect(@stat.blocks_free).to be_a(Numeric)
   end
 
   example 'stat blocks_available works as expected' do
     expect(@stat).to respond_to(:blocks_available)
-    expect(@stat.blocks_available).to be_kind_of(Numeric)
+    expect(@stat.blocks_available).to be_a(Numeric)
   end
 
   example 'block stats return expected relative values' do
@@ -96,49 +96,49 @@ RSpec.describe Sys::Filesystem, :windows => true do
 
   example 'stat filesystem_id works as expected' do
     expect(@stat).to respond_to(:filesystem_id)
-    expect(@stat.filesystem_id).to be_kind_of(Integer)
+    expect(@stat.filesystem_id).to be_a(Integer)
   end
 
   example 'stat flags works as expected' do
     expect(@stat).to respond_to(:flags)
-    expect(@stat.flags).to be_kind_of(Numeric)
+    expect(@stat.flags).to be_a(Numeric)
   end
 
   example 'stat name_max works as expected' do
     expect(@stat).to respond_to(:name_max)
-    expect(@stat.name_max).to be_kind_of(Numeric)
+    expect(@stat.name_max).to be_a(Numeric)
   end
 
   example 'stat base_type works as expected' do
     expect(@stat).to respond_to(:base_type)
-    expect(@stat.base_type).to be_kind_of(String)
+    expect(@stat.base_type).to be_a(String)
   end
 
   example 'stat bytes_total basic functionality' do
     expect(@stat).to respond_to(:bytes_total)
-    expect(@stat.bytes_total).to be_kind_of(Numeric)
+    expect(@stat.bytes_total).to be_a(Numeric)
   end
 
   example 'stat bytes_free basic functionality' do
     expect(@stat).to respond_to(:bytes_free)
-    expect(@stat.bytes_free).to be_kind_of(Numeric)
+    expect(@stat.bytes_free).to be_a(Numeric)
     expect(@stat.blocks_free * @stat.block_size).to eq(@stat.bytes_free)
   end
 
   example 'stat bytes_available basic functionality' do
     expect(@stat).to respond_to(:bytes_available)
-    expect(@stat.bytes_available).to be_kind_of(Numeric)
+    expect(@stat.bytes_available).to be_a(Numeric)
     expect(@stat.blocks_available * @stat.block_size).to eq(@stat.bytes_available)
   end
 
   example 'stat bytes_used basic functionality' do
     expect(@stat).to respond_to(:bytes_used)
-    expect(@stat.bytes_used).to be_kind_of(Numeric)
+    expect(@stat.bytes_used).to be_a(Numeric)
   end
 
   example 'stat percent_used basic functionality' do
     expect(@stat).to respond_to(:percent_used)
-    expect(@stat.percent_used).to be_kind_of(Float)
+    expect(@stat.percent_used).to be_a(Float)
   end
 
   example 'case_insensitive returns expected result' do
@@ -274,7 +274,7 @@ RSpec.describe Sys::Filesystem, :windows => true do
     example 'mount_point singleton method basic functionality' do
       expect(described_class).to respond_to(:mount_point)
       expect{ described_class.mount_point(Dir.pwd) }.not_to raise_error
-      expect(described_class.mount_point(Dir.pwd)).to be_kind_of(String)
+      expect(described_class.mount_point(Dir.pwd)).to be_a(String)
     end
 
     example 'mount_point singleton method returns expected value' do
@@ -386,39 +386,39 @@ RSpec.describe Sys::Filesystem, :windows => true do
     end
 
     example 'mounts singleton method returns the expected value' do
-      expect(described_class.mounts).to be_kind_of(Array)
-      expect(described_class.mounts[0]).to be_kind_of(Sys::Filesystem::Mount)
+      expect(described_class.mounts).to be_a(Array)
+      expect(described_class.mounts[0]).to be_a(Sys::Filesystem::Mount)
     end
 
     example 'mounts singleton method works as expected when a block is provided' do
       expect(described_class.mounts{}).to be_nil
       expect{ described_class.mounts{ |mt| @array << mt } }.not_to raise_error
-      expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
+      expect(@array[0]).to be_a(Sys::Filesystem::Mount)
     end
 
     example 'mount name works as expected' do
       expect(mount).to respond_to(:name)
-      expect(mount.name).to be_kind_of(String)
+      expect(mount.name).to be_a(String)
     end
 
     example 'mount_time works as expected' do
       expect(mount).to respond_to(:mount_time)
-      expect(mount.mount_time).to be_kind_of(Time)
+      expect(mount.mount_time).to be_a(Time)
     end
 
     example 'mount type works as expected' do
       expect(mount).to respond_to(:mount_type)
-      expect(mount.mount_type).to be_kind_of(String)
+      expect(mount.mount_type).to be_a(String)
     end
 
     example 'mount point works as expected' do
       expect(mount).to respond_to(:mount_point)
-      expect(mount.mount_point).to be_kind_of(String)
+      expect(mount.mount_point).to be_a(String)
     end
 
     example 'mount options works as expected' do
       expect(mount).to respond_to(:options)
-      expect(mount.options).to be_kind_of(String)
+      expect(mount.options).to be_a(String)
     end
 
     example 'mount pass_number works as expected' do

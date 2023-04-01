@@ -29,12 +29,12 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat block_size works as expected' do
     expect(@stat).to respond_to(:block_size)
-    expect(@stat.block_size).to be_kind_of(Numeric)
+    expect(@stat.block_size).to be_a(Numeric)
   end
 
   example 'stat fragment_size works as expected' do
     expect(@stat).to respond_to(:fragment_size)
-    expect(@stat.fragment_size).to be_kind_of(Numeric)
+    expect(@stat.fragment_size).to be_a(Numeric)
   end
 
   example 'stat fragment_size is a plausible value' do
@@ -44,22 +44,22 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat blocks works as expected' do
     expect(@stat).to respond_to(:blocks)
-    expect(@stat.blocks).to be_kind_of(Numeric)
+    expect(@stat.blocks).to be_a(Numeric)
   end
 
   example 'stat blocks_free works as expected' do
     expect(@stat).to respond_to(:blocks_free)
-    expect(@stat.blocks_free).to be_kind_of(Numeric)
+    expect(@stat.blocks_free).to be_a(Numeric)
   end
 
   example 'stat blocks_available works as expected' do
     expect(@stat).to respond_to(:blocks_available)
-    expect(@stat.blocks_available).to be_kind_of(Numeric)
+    expect(@stat.blocks_available).to be_a(Numeric)
   end
 
   example 'stat files works as expected' do
     expect(@stat).to respond_to(:files)
-    expect(@stat.files).to be_kind_of(Numeric)
+    expect(@stat.files).to be_a(Numeric)
   end
 
   example 'stat inodes is an alias for files' do
@@ -69,7 +69,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat files tree works as expected' do
     expect(@stat).to respond_to(:files_free)
-    expect(@stat.files_free).to be_kind_of(Numeric)
+    expect(@stat.files_free).to be_a(Numeric)
   end
 
   example 'stat inodes_free is an alias for files_free' do
@@ -79,7 +79,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat files_available works as expected' do
     expect(@stat).to respond_to(:files_available)
-    expect(@stat.files_available).to be_kind_of(Numeric)
+    expect(@stat.files_available).to be_a(Numeric)
   end
 
   example 'stat inodes_available is an alias for files_available' do
@@ -89,24 +89,24 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat filesystem_id works as expected' do
     expect(@stat).to respond_to(:filesystem_id)
-    expect(@stat.filesystem_id).to be_kind_of(Integer)
+    expect(@stat.filesystem_id).to be_a(Integer)
   end
 
   example 'stat flags works as expected' do
     expect(@stat).to respond_to(:flags)
-    expect(@stat.flags).to be_kind_of(Numeric)
+    expect(@stat.flags).to be_a(Numeric)
   end
 
   example 'stat name_max works as expected' do
     expect(@stat).to respond_to(:name_max)
-    expect(@stat.name_max).to be_kind_of(Numeric)
+    expect(@stat.name_max).to be_a(Numeric)
   end
 
   example 'stat base_type works as expected' do
     skip 'base_type test skipped except on Solaris' unless solaris
 
     expect(@stat).to respond_to(:base_type)
-    expect(@stat.base_type).to be_kind_of(String)
+    expect(@stat.base_type).to be_a(String)
   end
 
   example 'stat constants are defined' do
@@ -121,29 +121,29 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat bytes_total works as expected' do
     expect(@stat).to respond_to(:bytes_total)
-    expect(@stat.bytes_total).to be_kind_of(Numeric)
+    expect(@stat.bytes_total).to be_a(Numeric)
   end
 
   example 'stat bytes_free works as expected' do
     expect(@stat).to respond_to(:bytes_free)
-    expect(@stat.bytes_free).to be_kind_of(Numeric)
+    expect(@stat.bytes_free).to be_a(Numeric)
     expect(@stat.blocks_free * @stat.fragment_size).to eq(@stat.bytes_free)
   end
 
   example 'stat bytes_available works as expected' do
     expect(@stat).to respond_to(:bytes_available)
-    expect(@stat.bytes_available).to be_kind_of(Numeric)
+    expect(@stat.bytes_available).to be_a(Numeric)
     expect(@stat.blocks_available * @stat.fragment_size).to eq(@stat.bytes_available)
   end
 
   example 'stat bytes works as expected' do
     expect(@stat).to respond_to(:bytes_used)
-    expect(@stat.bytes_used).to be_kind_of(Numeric)
+    expect(@stat.bytes_used).to be_a(Numeric)
   end
 
   example 'stat percent_used works as expected' do
     expect(@stat).to respond_to(:percent_used)
-    expect(@stat.percent_used).to be_kind_of(Float)
+    expect(@stat.percent_used).to be_a(Float)
   end
 
   example 'stat singleton method requires an argument' do
@@ -376,12 +376,12 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'mounts singleton method works as expected without a block' do
       expect{ @array = described_class.mounts }.not_to raise_error
-      expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
+      expect(@array[0]).to be_a(Sys::Filesystem::Mount)
     end
 
     example 'mounts singleton method works as expected with a block' do
       expect{ described_class.mounts{ |m| @array << m } }.not_to raise_error
-      expect(@array[0]).to be_kind_of(Sys::Filesystem::Mount)
+      expect(@array[0]).to be_a(Sys::Filesystem::Mount)
     end
 
     example 'calling the mounts singleton method a large number of times does not cause issues' do
@@ -390,7 +390,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'mount name method works as expected' do
       expect(mount).to respond_to(:name)
-      expect(mount.name).to be_kind_of(String)
+      expect(mount.name).to be_a(String)
     end
 
     example 'mount fsname is an alias for name' do
@@ -400,7 +400,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'mount point method works as expected' do
       expect(mount).to respond_to(:mount_point)
-      expect(mount.mount_point).to be_kind_of(String)
+      expect(mount.mount_point).to be_a(String)
     end
 
     example 'mount dir is an alias for mount_point' do
@@ -410,12 +410,12 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'mount mount_type works as expected' do
       expect(mount).to respond_to(:mount_type)
-      expect(mount.mount_type).to be_kind_of(String)
+      expect(mount.mount_type).to be_a(String)
     end
 
     example 'mount options works as expected' do
       expect(mount).to respond_to(:options)
-      expect(mount.options).to be_kind_of(String)
+      expect(mount.options).to be_a(String)
     end
 
     example 'mount opts is an alias for options' do
@@ -426,14 +426,14 @@ RSpec.describe Sys::Filesystem, :unix => true do
     example 'mount time works as expected' do
       expected_class = solaris ? Time : NilClass
       expect(mount).to respond_to(:mount_time)
-      expect(mount.mount_time).to be_kind_of(expected_class)
+      expect(mount.mount_time).to be_a(expected_class)
     end
 
     example 'mount dump_frequency works as expected' do
       msg = 'dump_frequency test skipped on this platform'
       skip msg if solaris || bsd || darwin
       expect(mount).to respond_to(:dump_frequency)
-      expect(mount.dump_frequency).to be_kind_of(Numeric)
+      expect(mount.dump_frequency).to be_a(Numeric)
     end
 
     example 'mount freq is an alias for dump_frequency' do
@@ -445,7 +445,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
       msg = 'pass_number test skipped on this platform'
       skip msg if solaris || bsd || darwin
       expect(mount).to respond_to(:pass_number)
-      expect(mount.pass_number).to be_kind_of(Numeric)
+      expect(mount.pass_number).to be_a(Numeric)
     end
 
     example 'mount passno is an alias for pass_number' do
@@ -456,7 +456,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
     example 'mount_point singleton method works as expected' do
       expect(described_class).to respond_to(:mount_point)
       expect{ described_class.mount_point(Dir.pwd) }.not_to raise_error
-      expect(described_class.mount_point(Dir.pwd)).to be_kind_of(String)
+      expect(described_class.mount_point(Dir.pwd)).to be_a(String)
     end
 
     example 'mount singleton method is defined' do
