@@ -30,7 +30,8 @@ Gem::Specification.new do |spec|
     'documentation_uri'     => 'https://github.com/djberg96/sys-filesystem/wiki',
     'source_code_uri'       => 'https://github.com/djberg96/sys-filesystem',
     'wiki_uri'              => 'https://github.com/djberg96/sys-filesystem/wiki',
-    'rubygems_mfa_required' => 'true'
+    'rubygems_mfa_required' => 'true',
+    'github_repo'           => 'https://github.com/djberg96/sys-filesystem' 
   }
 
   spec.description = <<-EOF
