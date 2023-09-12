@@ -1,3 +1,7 @@
+## 1.4.4 - 12-Sep-2023
+* Yet another fix for 32-bit vs 64-bit linux, specifically for the Statvfs
+  struct. Thanks go to Josh Cooper for the spot and the patch.
+
 ## 1.4.3 - 20-Oct-2021
 * Another fix for 32-bit vs 64-bit Linux since it was realized we cannot always
   rely on the host architecture information. Handling for JRuby was improved
