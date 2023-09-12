@@ -110,6 +110,16 @@ module Sys
 
       # The Statvfs struct represents struct statvfs from sys/statvfs.h.
       class Statvfs < FFI::Struct
+        # Private method that will determine the layout of the struct on Linux.
+        def self.linux64?
+          if RUBY_PLATFORM == 'java'
+            ENV_JAVA['sun.arch.data.model'].to_i == 64
+          else
+            RbConfig::CONFIG['host_os'] =~ /linux/i &&
+              (RbConfig::CONFIG['arch'] =~ /64/ || RbConfig::CONFIG['DEFS'] =~ /64/)
+          end
+        end
+
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
           layout(
             :f_bsize, :ulong,
@@ -155,7 +165,7 @@ module Sys
             :f_fstr, [:char, 32],
             :f_filler, [:ulong, 16]
           )
-        elsif RbConfig::CONFIG['host'] =~ /i686/i
+        elsif !linux64?
           layout(
             :f_bsize, :ulong,
             :f_frsize, :ulong,
