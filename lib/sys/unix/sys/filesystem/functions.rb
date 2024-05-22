@@ -27,7 +27,11 @@ module Sys
       private_class_method :linux64?
 
       if linux64? || solaris?
-        attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
+        begin
+          attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
+        rescue FFI::NotFoundError # Not every Linux distro has an alias
+          attach_function(:statvfs, %i[string pointer], :int)
+        end
       else
         attach_function(:statvfs, %i[string pointer], :int)
       end

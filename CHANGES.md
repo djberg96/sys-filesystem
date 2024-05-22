@@ -1,3 +1,7 @@
+## 1.4.5 - 22-May-2024
+* Handle the possibility that a statvs64 alias may not exist on some Linux
+  platforms. Thanks go to Antoine Martin for the report.
+
 ## 1.4.4 - 12-Sep-2023
 * Yet another fix for 32-bit vs 64-bit linux, specifically for the Statvfs
   struct. Thanks go to Josh Cooper for the spot and the patch.
