@@ -503,5 +503,10 @@ RSpec.describe Sys::Filesystem, :unix => true do
       msg = 'statvfs() function failed: No such file or directory'
       expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
     end
+
+    example 'statvfs alias is used for statvfs64' do
+      expect(Sys::Filesystem::Functions.attached_functions[:statvfs]).to be_a(FFI::Function)
+      expect(Sys::Filesystem::Functions.attached_functions[:statvfs64]).to be_nil
+    end
   end
 end
