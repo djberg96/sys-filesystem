@@ -12,7 +12,7 @@ require 'pathname'
 
 RSpec.describe Sys::Filesystem, :unix => true do
   let(:linux)   { RbConfig::CONFIG['host_os'] =~ /linux/i }
-  let(:bsd)     { RbConfig::CONFIG['host_os'] =~ /bsd/i }
+  let(:bsd)     { RbConfig::CONFIG['host_os'] =~ /bsd|dragonfly/i }
   let(:darwin)  { RbConfig::CONFIG['host_os'] =~ /mac|darwin/i }
   let(:root)    { '/' }
 

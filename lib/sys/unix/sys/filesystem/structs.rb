@@ -86,6 +86,31 @@ module Sys
                 :f_spare, [:ulong, 4]
               )
             end
+          when /dragonfly/i
+            layout(
+              :f_spare2, :long,
+              :f_bsize, :long,
+              :f_iosize, :long,
+              :f_blocks, :long,
+              :f_bfree, :long,
+              :f_bavail, :long,
+              :f_files, :long,
+              :f_ffree, :long,
+              :f_fsid, [:int32_t, 2],
+              :f_owner, :uid_t,
+              :f_type, :int,
+              :f_flags, :int,
+              :f_syncwrites, :long,
+              :f_asyncwrites, :long,
+              :f_fstypename, [:char, 16],
+              :f_mntonname, [:char, 80],
+              :f_syncreads, :long,
+              :f_asyncreads, :long,
+              :f_spares1, :short,
+              :f_mntfromname, [:char, 80],
+              :f_spares2, :short,
+              :f_spare, [:long,2]
+            )
           else
             layout(
               :f_bsize, :uint32,
