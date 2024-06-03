@@ -105,6 +105,27 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
+      # The filesystem ID
+      attr_accessor :filesystem_id
+
+      # The filesystem type
+      attr_accessor :filesystem_type
+
+      # The user that mounted the filesystem
+      attr_accessor :owner
+
+      # Count of sync reads since mount
+      attr_accessor :sync_reads
+
+      # Count of sync writes since mount
+      attr_accessor :sync_writes
+
+      # Count of async reads since mount
+      attr_accessor :async_reads
+
+      # Count of async writes since mount
+      attr_accessor :async_writes
+
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
@@ -248,6 +269,16 @@ module Sys
 
       if fs.members.include?(:f_basetype)
         obj.base_type = fs[:f_basetype].to_s
+      end
+
+      # DragonFlyBSD has additional struct members
+      if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
+        obj.owner = fs[:f_owner]
+        obj.filesystem_type = fs[:f_type]
+        obj.sync_reads= fs[:f_syncreads]
+        obj.async_reads= fs[:f_asyncreads]
+        obj.sync_writes = fs[:f_syncwrites]
+        obj.async_writes = fs[:f_asyncwrites]
       end
 
       obj.freeze
