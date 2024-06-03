@@ -6,6 +6,20 @@ require 'rbconfig'
 module Sys
   class Filesystem
     module Structs
+      # Used by DragonFlyBSD
+      class UUID < FFI::Struct
+        UUID_NODE_LEN = 6
+
+        layout(
+          :time_low, :uint32,
+          :time_mid, :uint16,
+          :time_hi_and_version, :uint16,
+          :clock_seq_hi_and_reserved, :uint8,
+          :clock_seq_low, :uint8,
+          :node, [:uint8, UUID_NODE_LEN]
+        )
+      end
+
       # The Statfs struct is a subclass of FFI::Struct that corresponds to a struct statfs.
       class Statfs < FFI::Struct
         # Private method that will determine the layout of the struct on Linux.
@@ -172,6 +186,28 @@ module Sys
             :f_frsize, :ulong,
             :f_fsid, :ulong,
             :f_namemax, :ulong
+          )
+        elsif RbConfig::CONFIG['host'] =~ /dragonfly/i
+          layout(
+            :f_bsize, :ulong,
+            :f_frsize, :ulong,
+            :f_blocks, :uint64,
+            :f_bfree, :uint64,
+            :f_bavail, :uint64,
+            :f_files, :uint64,
+            :f_ffree, :uint64,
+            :f_favail, :uint64,
+            :f_fsid, :ulong,
+            :f_flag, :ulong,
+            :f_namemax, :ulong,
+            :f_owner, :uid_t,
+            :f_type, :uint,
+            :f_syncreads, :uint64,
+            :f_syncwrites, :uint64,
+            :f_asyncreads, :uint64,
+            :f_asyncwrites, :uint64,
+            :f_fsid_uuid, UUID,
+            :f_uid_uuid, UUID
           )
         elsif !linux64?
           layout(
