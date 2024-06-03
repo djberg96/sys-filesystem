@@ -38,7 +38,8 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat fragment_size is a plausible value' do
     expect(@stat.fragment_size).to be >= 512
-    expect(@stat.fragment_size).to be <= 16384
+    expect(@stat.fragment_size).to be <= 2**16
+    expect(@stat.fragment_size).to be >= @stat.block_size
   end
 
   example 'stat blocks works as expected' do
@@ -99,6 +100,38 @@ RSpec.describe Sys::Filesystem, :unix => true do
   example 'stat name_max works as expected' do
     expect(@stat).to respond_to(:name_max)
     expect(@stat.name_max).to be_a(Numeric)
+  end
+
+  context 'dragonfly', :dragonfly do
+    example 'owner works as expected' do
+      expect(@stat).to respond_to(:owner)
+      expect(@stat.owner).to be_a(Numeric)
+    end
+
+    example 'filesystem_type works as expected' do
+      expect(@stat).to respond_to(:filesystem_type)
+      expect(@stat.filesystem_type).to be_a(Numeric)
+    end
+
+    example 'sync_reads works as expected' do
+      expect(@stat).to respond_to(:sync_reads)
+      expect(@stat.sync_reads).to be_a(Numeric)
+    end
+
+    example 'async_reads works as expected' do
+      expect(@stat).to respond_to(:async_reads)
+      expect(@stat.async_reads).to be_a(Numeric)
+    end
+
+    example 'sync_writes works as expected' do
+      expect(@stat).to respond_to(:sync_writes)
+      expect(@stat.sync_writes).to be_a(Numeric)
+    end
+
+    example 'async_writes works as expected' do
+      expect(@stat).to respond_to(:async_writes)
+      expect(@stat.async_writes).to be_a(Numeric)
+    end
   end
 
   example 'stat constants are defined' do
