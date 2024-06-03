@@ -40,10 +40,12 @@ module Sys
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
       begin
-        attach_function(:umount_c, :umount, [:string], :int)
+        attach_function(:umount_c, :umount2, %i[string int], :int)
       rescue FFI::NotFoundError
-        if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd/i
+        if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
           attach_function(:umount_c, :unmount, [:string], :int)
+        else
+          attach_function(:umount_c, :umount, [:string], :int)
         end
       end
 
@@ -59,8 +61,7 @@ module Sys
           attach_function(:getmntent, [:pointer], :pointer)
           attach_function(:setmntent, %i[string string], :pointer)
           attach_function(:endmntent, [:pointer], :int)
-          attach_function(:umount2, %i[string int], :int)
-          private_class_method :getmntent, :setmntent, :endmntent, :umount2
+          private_class_method :getmntent, :setmntent, :endmntent
         end
       rescue FFI::NotFoundError
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
