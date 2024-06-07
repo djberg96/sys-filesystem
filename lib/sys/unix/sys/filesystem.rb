@@ -325,41 +325,23 @@ module Sys
             raise SystemCallError.new(method_name, FFI.errno)
           end
 
-          if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-            mt = Mnttab.new
-            while getmntent(fp, mt) == 0
-              obj = Sys::Filesystem::Mount.new
-              obj.name = mt[:mnt_special].to_s
-              obj.mount_point = mt[:mnt_mountp].to_s
-              obj.mount_type = mt[:mnt_fstype].to_s
-              obj.options = mt[:mnt_mntopts].to_s
-              obj.mount_time = Time.at(Integer(mt[:mnt_time]))
+          while ptr = getmntent(fp)
+            break if ptr.null?
+            mt = Mntent.new(ptr)
 
-              if block_given?
-                yield obj.freeze
-              else
-                array << obj.freeze
-              end
-            end
-          else
-            while ptr = getmntent(fp)
-              break if ptr.null?
-              mt = Mntent.new(ptr)
+            obj = Sys::Filesystem::Mount.new
+            obj.name = mt[:mnt_fsname]
+            obj.mount_point = mt[:mnt_dir]
+            obj.mount_type = mt[:mnt_type]
+            obj.options = mt[:mnt_opts]
+            obj.mount_time = nil
+            obj.dump_frequency = mt[:mnt_freq]
+            obj.pass_number = mt[:mnt_passno]
 
-              obj = Sys::Filesystem::Mount.new
-              obj.name = mt[:mnt_fsname]
-              obj.mount_point = mt[:mnt_dir]
-              obj.mount_type = mt[:mnt_type]
-              obj.options = mt[:mnt_opts]
-              obj.mount_time = nil
-              obj.dump_frequency = mt[:mnt_freq]
-              obj.pass_number = mt[:mnt_passno]
-
-              if block_given?
-                yield obj.freeze
-              else
-                array << obj.freeze
-              end
+            if block_given?
+              yield obj.freeze
+            else
+              array << obj.freeze
             end
           end
         ensure

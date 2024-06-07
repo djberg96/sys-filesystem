@@ -148,23 +148,6 @@ module Sys
             :f_fsid, :ulong,
             :f_namemax, :ulong
           )
-        elsif RbConfig::CONFIG['host'] =~ /sunos|solaris/i
-          layout(
-            :f_bsize, :ulong,
-            :f_frsize, :ulong,
-            :f_blocks, :uint64_t,
-            :f_bfree, :uint64_t,
-            :f_bavail, :uint64_t,
-            :f_files, :uint64_t,
-            :f_ffree, :uint64_t,
-            :f_favail, :uint64_t,
-            :f_fsid, :ulong,
-            :f_basetype, [:char, 16],
-            :f_flag, :ulong,
-            :f_namemax, :ulong,
-            :f_fstr, [:char, 32],
-            :f_filler, [:ulong, 16]
-          )
         elsif !linux64?
           layout(
             :f_bsize, :ulong,

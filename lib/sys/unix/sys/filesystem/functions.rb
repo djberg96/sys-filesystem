@@ -20,13 +20,9 @@ module Sys
         end
       end
 
-      def self.solaris?
-        RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-      end
-
       private_class_method :linux64?
 
-      if linux64? || solaris?
+      if linux64?
         begin
           attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
         rescue FFI::NotFoundError # Not every Linux distro has an alias
@@ -52,17 +48,10 @@ module Sys
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
 
       begin
-        if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-          attach_function(:fopen, %i[string string], :pointer)
-          attach_function(:fclose, [:pointer], :int)
-          attach_function(:getmntent, %i[pointer pointer], :int)
-          private_class_method :fopen, :fclose, :getmntent
-        else
-          attach_function(:getmntent, [:pointer], :pointer)
-          attach_function(:setmntent, %i[string string], :pointer)
-          attach_function(:endmntent, [:pointer], :int)
-          private_class_method :getmntent, :setmntent, :endmntent
-        end
+        attach_function(:getmntent, [:pointer], :pointer)
+        attach_function(:setmntent, %i[string string], :pointer)
+        attach_function(:endmntent, [:pointer], :int)
+        private_class_method :getmntent, :setmntent, :endmntent
       rescue FFI::NotFoundError
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
           begin
