@@ -182,17 +182,6 @@ module Sys
         end
       end
 
-      # The Mnttab struct represents struct mnnttab from sys/mnttab.h on Solaris.
-      class Mnttab < FFI::Struct
-        layout(
-          :mnt_special, :string,
-          :mnt_mountp, :string,
-          :mnt_fstype, :string,
-          :mnt_mntopts, :string,
-          :mnt_time, :string
-        )
-      end
-
       # The Mntent struct represents struct mntent from sys/mount.h on Unix.
       class Mntent < FFI::Struct
         layout(
