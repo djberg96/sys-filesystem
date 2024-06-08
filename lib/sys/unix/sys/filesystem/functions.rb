@@ -35,14 +35,10 @@ module Sys
       attach_function(:strerror, [:int], :string)
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
-      begin
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
+        attach_function(:umount_c, :unmount, [:string], :int)
+      else
         attach_function(:umount_c, :umount2, %i[string int], :int)
-      rescue FFI::NotFoundError
-        if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
-          attach_function(:umount_c, :unmount, [:string], :int)
-        else
-          attach_function(:umount_c, :umount, [:string], :int)
-        end
       end
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
