@@ -36,7 +36,7 @@ module Sys
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
-        attach_function(:umount_c, :unmount, [:string], :int)
+        attach_function(:umount_c, :unmount, %i[string int], :int)
       else
         attach_function(:umount_c, :umount2, %i[string int], :int)
       end
