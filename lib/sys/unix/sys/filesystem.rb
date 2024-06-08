@@ -408,22 +408,24 @@ module Sys
     end
 
     # Removes the attachment of the (topmost) filesystem mounted on target.
-    # Additional flags may be provided for operating systems that support
-    # the umount2 function. Otherwise this argument is ignored.
+    # You may also specify bitwise OR'd +flags+ to control the precise behavior.
+    # The possible flags on Linux are:
     #
-    # Typically requires admin privileges.
+    # * MNT_FORCE  - Abort pending requests, may cause data loss.
+    # * MNT_DETACH - Lazy umount, waits until the mount point is no longer busy.
+    # * MNT_EXPIRE - Mark mount point as expired, but don't actually remove it until
+    #                a second call MNT_EXPIRE call is made.
     #
-    def self.umount(target, flags = nil)
-      if flags && respond_to?(:umount2)
-        function = 'umount2'
-        rv = umount2_c(target, flags)
-      else
-        function = 'umount'
-        rv = umount_c(target)
-      end
-
-      if rv != 0
-        raise Error, "#{function} function failed: " + strerror(FFI.errno)
+    # * UMOUNT_NOFOLLOW - Don't dereference the target if it's a symbolic link.
+    #
+    # Note that BSD platforms may support different flags. Please see the man
+    # pages for details.
+    #
+    # Typically this method requires admin privileges.
+    #
+    def self.umount(target, flags = 0)
+      if umount_c(target, flags) != 0
+        raise Error, "umount function failed: #{strerror(FFI.errno)}"
       end
 
       self
