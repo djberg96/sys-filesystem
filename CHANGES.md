@@ -1,4 +1,4 @@
-## 1.5.0 - ???
+## 1.5.0 - 8-Jun-2024
 * Add support for DragonFlyBSD.
 * Remove Solaris support. It's dead, Jim.
 * Now assumes umount2 function is present on Linux systems, and some
