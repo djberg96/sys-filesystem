@@ -39,7 +39,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
   example 'stat fragment_size is a plausible value' do
     expect(@stat.fragment_size).to be >= 512
     expect(@stat.fragment_size).to be <= 2**16
-    expect(@stat.fragment_size).to be >= @stat.block_size
+    expect(@stat.fragment_size).to be <= @stat.block_size
   end
 
   example 'stat blocks works as expected' do
