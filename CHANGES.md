@@ -1,3 +1,9 @@
+## 1.5.0 - 8-Jun-2024
+* Add support for DragonFlyBSD.
+* Remove Solaris support. It's dead, Jim.
+* Now assumes umount2 function is present on Linux systems, and some
+  corresponding refactoring of the umount method.
+
 ## 1.4.5 - 22-May-2024
 * Handle the possibility that a statvs64 alias may not exist on some Linux
   platforms. Thanks go to Antoine Martin for the report.

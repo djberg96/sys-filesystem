@@ -20,13 +20,9 @@ module Sys
         end
       end
 
-      def self.solaris?
-        RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-      end
-
       private_class_method :linux64?
 
-      if linux64? || solaris?
+      if linux64?
         begin
           attach_function(:statvfs, :statvfs64, %i[string pointer], :int)
         rescue FFI::NotFoundError # Not every Linux distro has an alias
@@ -39,29 +35,19 @@ module Sys
       attach_function(:strerror, [:int], :string)
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
-      begin
-        attach_function(:umount_c, :umount, [:string], :int)
-      rescue FFI::NotFoundError
-        if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd/i
-          attach_function(:umount_c, :unmount, [:string], :int)
-        end
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
+        attach_function(:umount_c, :unmount, %i[string int], :int)
+      else
+        attach_function(:umount_c, :umount2, %i[string int], :int)
       end
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
 
       begin
-        if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-          attach_function(:fopen, %i[string string], :pointer)
-          attach_function(:fclose, [:pointer], :int)
-          attach_function(:getmntent, %i[pointer pointer], :int)
-          private_class_method :fopen, :fclose, :getmntent
-        else
-          attach_function(:getmntent, [:pointer], :pointer)
-          attach_function(:setmntent, %i[string string], :pointer)
-          attach_function(:endmntent, [:pointer], :int)
-          attach_function(:umount2, %i[string int], :int)
-          private_class_method :getmntent, :setmntent, :endmntent, :umount2
-        end
+        attach_function(:getmntent, [:pointer], :pointer)
+        attach_function(:setmntent, %i[string string], :pointer)
+        attach_function(:endmntent, [:pointer], :int)
+        private_class_method :getmntent, :setmntent, :endmntent
       rescue FFI::NotFoundError
         if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach/i
           begin

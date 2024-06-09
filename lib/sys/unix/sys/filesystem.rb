@@ -105,6 +105,27 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
+      # The filesystem ID
+      attr_accessor :filesystem_id
+
+      # The filesystem type
+      attr_accessor :filesystem_type
+
+      # The user that mounted the filesystem
+      attr_accessor :owner
+
+      # Count of sync reads since mount
+      attr_accessor :sync_reads
+
+      # Count of sync writes since mount
+      attr_accessor :sync_writes
+
+      # Count of async reads since mount
+      attr_accessor :async_reads
+
+      # Count of async writes since mount
+      attr_accessor :async_writes
+
       alias inodes files
       alias inodes_free files_free
       alias inodes_available files_available
@@ -250,6 +271,16 @@ module Sys
         obj.base_type = fs[:f_basetype].to_s
       end
 
+      # DragonFlyBSD has additional struct members
+      if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
+        obj.owner = fs[:f_owner]
+        obj.filesystem_type = fs[:f_type]
+        obj.sync_reads= fs[:f_syncreads]
+        obj.async_reads= fs[:f_asyncreads]
+        obj.sync_writes = fs[:f_syncwrites]
+        obj.async_writes = fs[:f_asyncwrites]
+      end
+
       obj.freeze
     end
 
@@ -325,41 +356,23 @@ module Sys
             raise SystemCallError.new(method_name, FFI.errno)
           end
 
-          if RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i
-            mt = Mnttab.new
-            while getmntent(fp, mt) == 0
-              obj = Sys::Filesystem::Mount.new
-              obj.name = mt[:mnt_special].to_s
-              obj.mount_point = mt[:mnt_mountp].to_s
-              obj.mount_type = mt[:mnt_fstype].to_s
-              obj.options = mt[:mnt_mntopts].to_s
-              obj.mount_time = Time.at(Integer(mt[:mnt_time]))
+          while ptr = getmntent(fp)
+            break if ptr.null?
+            mt = Mntent.new(ptr)
 
-              if block_given?
-                yield obj.freeze
-              else
-                array << obj.freeze
-              end
-            end
-          else
-            while ptr = getmntent(fp)
-              break if ptr.null?
-              mt = Mntent.new(ptr)
+            obj = Sys::Filesystem::Mount.new
+            obj.name = mt[:mnt_fsname]
+            obj.mount_point = mt[:mnt_dir]
+            obj.mount_type = mt[:mnt_type]
+            obj.options = mt[:mnt_opts]
+            obj.mount_time = nil
+            obj.dump_frequency = mt[:mnt_freq]
+            obj.pass_number = mt[:mnt_passno]
 
-              obj = Sys::Filesystem::Mount.new
-              obj.name = mt[:mnt_fsname]
-              obj.mount_point = mt[:mnt_dir]
-              obj.mount_type = mt[:mnt_type]
-              obj.options = mt[:mnt_opts]
-              obj.mount_time = nil
-              obj.dump_frequency = mt[:mnt_freq]
-              obj.pass_number = mt[:mnt_passno]
-
-              if block_given?
-                yield obj.freeze
-              else
-                array << obj.freeze
-              end
+            if block_given?
+              yield obj.freeze
+            else
+              array << obj.freeze
             end
           end
         ensure
@@ -426,22 +439,24 @@ module Sys
     end
 
     # Removes the attachment of the (topmost) filesystem mounted on target.
-    # Additional flags may be provided for operating systems that support
-    # the umount2 function. Otherwise this argument is ignored.
+    # You may also specify bitwise OR'd +flags+ to control the precise behavior.
+    # The possible flags on Linux are:
     #
-    # Typically requires admin privileges.
+    # * MNT_FORCE  - Abort pending requests, may cause data loss.
+    # * MNT_DETACH - Lazy umount, waits until the mount point is no longer busy.
+    # * MNT_EXPIRE - Mark mount point as expired, but don't actually remove it until
+    #                a second call MNT_EXPIRE call is made.
     #
-    def self.umount(target, flags = nil)
-      if flags && respond_to?(:umount2)
-        function = 'umount2'
-        rv = umount2_c(target, flags)
-      else
-        function = 'umount'
-        rv = umount_c(target)
-      end
-
-      if rv != 0
-        raise Error, "#{function} function failed: " + strerror(FFI.errno)
+    # * UMOUNT_NOFOLLOW - Don't dereference the target if it's a symbolic link.
+    #
+    # Note that BSD platforms may support different flags. Please see the man
+    # pages for details.
+    #
+    # Typically this method requires admin privileges.
+    #
+    def self.umount(target, flags = 0)
+      if umount_c(target, flags) != 0
+        raise Error, "umount function failed: #{strerror(FFI.errno)}"
       end
 
       self

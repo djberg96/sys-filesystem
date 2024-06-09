@@ -11,9 +11,8 @@ require 'sys-filesystem'
 require 'pathname'
 
 RSpec.describe Sys::Filesystem, :unix => true do
-  let(:solaris) { RbConfig::CONFIG['host_os'] =~ /sunos|solaris/i }
   let(:linux)   { RbConfig::CONFIG['host_os'] =~ /linux/i }
-  let(:bsd)     { RbConfig::CONFIG['host_os'] =~ /bsd/i }
+  let(:bsd)     { RbConfig::CONFIG['host_os'] =~ /bsd|dragonfly/i }
   let(:darwin)  { RbConfig::CONFIG['host_os'] =~ /mac|darwin/i }
   let(:root)    { '/' }
 
@@ -39,7 +38,8 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
   example 'stat fragment_size is a plausible value' do
     expect(@stat.fragment_size).to be >= 512
-    expect(@stat.fragment_size).to be <= 16384
+    expect(@stat.fragment_size).to be <= 2**16
+    expect(@stat.fragment_size).to be <= @stat.block_size
   end
 
   example 'stat blocks works as expected' do
@@ -102,21 +102,41 @@ RSpec.describe Sys::Filesystem, :unix => true do
     expect(@stat.name_max).to be_a(Numeric)
   end
 
-  example 'stat base_type works as expected' do
-    skip 'base_type test skipped except on Solaris' unless solaris
+  context 'dragonfly', :dragonfly do
+    example 'owner works as expected' do
+      expect(@stat).to respond_to(:owner)
+      expect(@stat.owner).to be_a(Numeric)
+    end
 
-    expect(@stat).to respond_to(:base_type)
-    expect(@stat.base_type).to be_a(String)
+    example 'filesystem_type works as expected' do
+      expect(@stat).to respond_to(:filesystem_type)
+      expect(@stat.filesystem_type).to be_a(Numeric)
+    end
+
+    example 'sync_reads works as expected' do
+      expect(@stat).to respond_to(:sync_reads)
+      expect(@stat.sync_reads).to be_a(Numeric)
+    end
+
+    example 'async_reads works as expected' do
+      expect(@stat).to respond_to(:async_reads)
+      expect(@stat.async_reads).to be_a(Numeric)
+    end
+
+    example 'sync_writes works as expected' do
+      expect(@stat).to respond_to(:sync_writes)
+      expect(@stat.sync_writes).to be_a(Numeric)
+    end
+
+    example 'async_writes works as expected' do
+      expect(@stat).to respond_to(:async_writes)
+      expect(@stat.async_writes).to be_a(Numeric)
+    end
   end
 
   example 'stat constants are defined' do
     expect(Sys::Filesystem::Stat::RDONLY).not_to be_nil
     expect(Sys::Filesystem::Stat::NOSUID).not_to be_nil
-  end
-
-  example 'stat constants for solaris are defined' do
-    skip 'NOTRUNC test skipped except on Solaris' unless solaris
-    expect(Sys::Filesystem::Stat::NOTRUNC).not_to be_nil
   end
 
   example 'stat bytes_total works as expected' do
@@ -423,15 +443,15 @@ RSpec.describe Sys::Filesystem, :unix => true do
       expect(mount.method(:opts)).to eq(mount.method(:options))
     end
 
+    # This method may be removed
     example 'mount time works as expected' do
-      expected_class = solaris ? Time : NilClass
       expect(mount).to respond_to(:mount_time)
-      expect(mount.mount_time).to be_a(expected_class)
+      expect(mount.mount_time).to be_nil
     end
 
     example 'mount dump_frequency works as expected' do
       msg = 'dump_frequency test skipped on this platform'
-      skip msg if solaris || bsd || darwin
+      skip msg if bsd || darwin
       expect(mount).to respond_to(:dump_frequency)
       expect(mount.dump_frequency).to be_a(Numeric)
     end
@@ -443,7 +463,7 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'mount pass_number works as expected' do
       msg = 'pass_number test skipped on this platform'
-      skip msg if solaris || bsd || darwin
+      skip msg if bsd || darwin
       expect(mount).to respond_to(:pass_number)
       expect(mount.pass_number).to be_a(Numeric)
     end
@@ -487,11 +507,6 @@ RSpec.describe Sys::Filesystem, :unix => true do
 
     example 'statvfs struct is expected size' do
       expect(Sys::Filesystem::Structs::Statvfs.size).to eq(dummy.check_sizeof('struct statvfs', 'sys/statvfs.h'))
-    end
-
-    example 'mnttab struct is expected size' do
-      skip 'mnttab test skipped except on Solaris' unless solaris
-      expect(Sys::Filesystem::Structs::Mnttab.size).to eq(dummy.check_sizeof('struct mnttab', 'sys/mnttab.h'))
     end
 
     example 'mntent struct is expected size' do
