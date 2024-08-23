@@ -10,7 +10,7 @@ require 'spec_helper'
 require 'sys/filesystem'
 require 'pathname'
 
-RSpec.describe Sys::Filesystem, :windows => true do
+RSpec.describe Sys::Filesystem, :windows do
   let(:root) { 'C:/' }
 
   before do
