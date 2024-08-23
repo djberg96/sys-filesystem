@@ -123,7 +123,7 @@ module Sys
               :f_spares1, :short,
               :f_mntfromname, [:char, 80],
               :f_spares2, :short,
-              :f_spare, [:long,2]
+              :f_spare, [:long, 2]
             )
           else
             layout(
