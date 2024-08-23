@@ -107,9 +107,6 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
-      # The filesystem ID
-      attr_accessor :filesystem_id
-
       # The filesystem type
       attr_accessor :filesystem_type
 
