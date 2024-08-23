@@ -10,7 +10,7 @@ require 'spec_helper'
 require 'sys-filesystem'
 require 'pathname'
 
-RSpec.describe Sys::Filesystem, :unix => true do
+RSpec.describe Sys::Filesystem, :unix do
   let(:linux)   { RbConfig::CONFIG['host_os'] =~ /linux/i }
   let(:bsd)     { RbConfig::CONFIG['host_os'] =~ /bsd|dragonfly/i }
   let(:darwin)  { RbConfig::CONFIG['host_os'] =~ /mac|darwin/i }

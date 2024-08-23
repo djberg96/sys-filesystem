@@ -105,9 +105,6 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
-      # The filesystem ID
-      attr_accessor :filesystem_id
-
       # The filesystem type
       attr_accessor :filesystem_type
 
@@ -275,8 +272,8 @@ module Sys
       if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
         obj.owner = fs[:f_owner]
         obj.filesystem_type = fs[:f_type]
-        obj.sync_reads= fs[:f_syncreads]
-        obj.async_reads= fs[:f_asyncreads]
+        obj.sync_reads = fs[:f_syncreads]
+        obj.async_reads = fs[:f_asyncreads]
         obj.sync_writes = fs[:f_syncwrites]
         obj.async_writes = fs[:f_asyncwrites]
       end
