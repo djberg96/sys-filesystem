@@ -277,8 +277,8 @@ module Sys
       if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
         obj.owner = fs[:f_owner]
         obj.filesystem_type = fs[:f_type]
-        obj.sync_reads= fs[:f_syncreads]
-        obj.async_reads= fs[:f_asyncreads]
+        obj.sync_reads = fs[:f_syncreads]
+        obj.async_reads = fs[:f_asyncreads]
         obj.sync_writes = fs[:f_syncwrites]
         obj.async_writes = fs[:f_asyncwrites]
       end

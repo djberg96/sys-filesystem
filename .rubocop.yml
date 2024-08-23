@@ -4,8 +4,8 @@ RSpec/MultipleExpectations:
   Max: 4
 RSpec/ContextWording:
   Enabled: false
-RSpec/FilePath:
-  SpecSuffixOnly: true
+RSpec/SpecFilePathFormat:
+  Enabled: false
 RSpec/InstanceVariable:
   Enabled: false
 RSpec/MultipleMemoizedHelpers:
@@ -52,7 +52,7 @@ Layout/SpaceBeforeBlockBraces:
 Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
-  IgnoredMethods: ['describe', 'context']
+  AllowedMethods: ['describe', 'context']
 Metrics/BlockNesting:
   Max: 4
 Metrics/ClassLength:
