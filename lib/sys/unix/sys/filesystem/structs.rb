@@ -223,7 +223,8 @@ module Sys
             :f_unused, :int,
             :f_flag, :ulong,
             :f_namemax, :ulong,
-            :f_spare, [:int, 6]
+            :f_type, :uint,
+            :f_spare, [:int, 5]
           )
         else
           layout(
@@ -238,7 +239,8 @@ module Sys
             :f_fsid, :ulong,
             :f_flag, :ulong,
             :f_namemax, :ulong,
-            :f_spare, [:int, 6]
+            :f_type, :uint,
+            :f_spare, [:int, 5]
           )
         end
       end
