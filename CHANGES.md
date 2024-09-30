@@ -1,3 +1,7 @@
+## 1.5.2 - 30-Sep-2024
+* Forgot to switch mkmf-lite from a dev dependency to a runtime dependency.
+  Thanks go to Thomas Langé for the spot and patch.
+
 ## 1.5.1 - 29-Sep-2024
 * Add the f_type struct member to the Statvfs struct for Linux. This was added
   at some point in the Linux lifecycle, though may still be blank depending on

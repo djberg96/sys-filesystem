@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'sys-filesystem'
-  spec.version    = '1.5.1'
+  spec.version    = '1.5.2'
   spec.author     = 'Daniel J. Berger'
   spec.email      = 'djberg96@gmail.com'
   spec.homepage   = 'https://github.com/djberg96/sys-filesystem'

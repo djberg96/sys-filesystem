@@ -4,7 +4,7 @@ require 'sys-filesystem'
 
 RSpec.shared_examples Sys::Filesystem do
   example 'version number is set to the expected value' do
-    expect(Sys::Filesystem::VERSION).to eq('1.5.1')
+    expect(Sys::Filesystem::VERSION).to eq('1.5.2')
     expect(Sys::Filesystem::VERSION).to be_frozen
   end
 
