@@ -16,7 +16,7 @@ module Sys
   # return objects of other types. Do not instantiate.
   class Filesystem
     # The version of the sys-filesystem library
-    VERSION = '1.5.0'
+    VERSION = '1.5.1'
 
     # Stat objects are returned by the Sys::Filesystem.stat method. Here
     # we're adding universal methods.

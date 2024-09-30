@@ -1,3 +1,11 @@
+## 1.5.1 - 29-Sep-2024
+* Add the f_type struct member to the Statvfs struct for Linux. This was added
+  at some point in the Linux lifecycle, though may still be blank depending on
+  your platform. Thanks go to Tasos Sahanidis for the patch.
+* Added padding on 32-bit Statvfs struct with 64-bit offsets for Linux. Thanks
+  go Tasos Sahanidis again for this update.
+* Bumped mkmf-lite dependency since the changes were needed to support the above.
+
 ## 1.5.0 - 8-Jun-2024
 * Add support for DragonFlyBSD.
 * Remove Solaris support. It's dead, Jim.
