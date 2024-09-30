@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.cert_chain = Dir['certs/*']
    
   spec.add_dependency('ffi', '~> 1.1')
-  spec.add_development_dependency('mkmf-lite', '~> 0.7') unless Gem.win_platform?
+  spec.add_dependency('mkmf-lite', '~> 0.7') unless Gem.win_platform?
   spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec', '~> 3.9')
   spec.add_development_dependency('rubocop')
