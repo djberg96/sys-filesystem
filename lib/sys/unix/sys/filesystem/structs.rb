@@ -227,9 +227,7 @@ module Sys
             :f_spare, [:int, 5]
           )
         else
-          require 'mkmf-lite'
-          extend Mkmf::Lite
-          layout_array = [
+          layout(
             :f_bsize, :ulong,
             :f_frsize, :ulong,
             :f_blocks, :uint64,
@@ -243,16 +241,7 @@ module Sys
             :f_namemax, :ulong,
             :f_type, :uint,
             :f_spare, [:int, 5]
-          ]
-
-          # Check if we need to add __f_unused
-          f_unused_bytes = 2 * check_sizeof('int') - check_sizeof('long')
-          if f_unused_bytes > 0
-            # For Big Endian, this should be inserted at -9
-            layout_array.insert(-7, :__f_unused, [:char, f_unused_bytes])
-          end
-
-          layout(*layout_array)
+          )
         end
       end
 
