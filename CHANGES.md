@@ -1,3 +1,10 @@
+## 1.5.3 - 3-Oct-2024
+* Decided to unroll the changes in 1.5.2 because doing runtime compiler
+  checks was making more people unhappy than happy, and I already had
+  some misgivings about it.
+* Updated the README.md to note the issues with running 32-bit Ruby with
+  64-bit offsets. At the moment I think this mainly only affects arch Linux.
+
 ## 1.5.2 - 30-Sep-2024
 * Forgot to switch mkmf-lite from a dev dependency to a runtime dependency.
   Thanks go to Thomas Langé for the spot and patch.

@@ -55,16 +55,19 @@ with JRuby, too.
 Run 'rake example' if you want to see a basic sample run. The actual code
 is 'example_stat.rb' in the 'examples' directory. Modify it as you see fit.
 
-## Known Bugs
+## Known Issues
 
-None that I'm aware of. Please report bugs on the project page at:
+Currently this may not work if you're running a 32-bit system with 64-bit offsets:
+
+  https://github.com/djberg96/sys-filesystem/issues/71
+
+Please report any other issues on the project home page at:
 
   https://github.com/djberg96/sys-filesystem
 
 ## Future Plans
 
-* Add better 64-bit support for Linux and BSD.
-* Other suggestions welcome.
+* Suggestions welcome.
 
 ## Acknowledgements
 
