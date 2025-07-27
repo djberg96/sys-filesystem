@@ -39,7 +39,10 @@ namespace :rubocop do
 end
 
 desc "Run the test suite"
-RSpec::Core::RakeTask.new(:spec)
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.verbose = false
+  t.rspec_opts = '-f documentation'
+end
 
 # Clean up afterwards
 Rake::Task[:spec].enhance do
