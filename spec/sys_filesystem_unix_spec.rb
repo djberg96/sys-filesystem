@@ -534,6 +534,20 @@ RSpec.describe Sys::Filesystem, :unix do
       allow(RbConfig::CONFIG).to receive(:[]).and_call_original
       allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return(host_os)
 
+      # Determine arch and DEFS based on host_os for the new multi-check approach
+      if pointer_size == 8
+        # For 64-bit systems, make arch contain "64"
+        arch_value = host_os.include?('64') ? host_os : host_os.sub(/\w+/, '\064')
+        defs_value = '-DSOMETHING=1'
+      else
+        # For 32-bit systems, ensure neither arch nor DEFS contain "64"
+        arch_value = host_os.gsub(/64/, '32')
+        defs_value = '-DSOMETHING=1'
+      end
+
+      allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return(arch_value)
+      allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return(defs_value)
+
       if ruby_platform == 'java'
         # Mock RUBY_PLATFORM for JRuby tests
         stub_const('RUBY_PLATFORM', 'java')
@@ -543,7 +557,7 @@ RSpec.describe Sys::Filesystem, :unix do
         allow(env_java_mock).to receive(:[]).with('sun.arch.data.model').and_return(java_arch.to_s)
         stub_const('ENV_JAVA', env_java_mock)
       else
-        # Mock the pack method for regular Ruby
+        # Mock the pack method for regular Ruby (last resort check)
         packed_data = 'x' * pointer_size
         allow_any_instance_of(Array).to receive(:pack).with('P').and_return(packed_data)
       end
@@ -656,6 +670,56 @@ RSpec.describe Sys::Filesystem, :unix do
           result = test_linux64_with_config(host_os, 8)
           expect(result).to be_truthy, "Expected linux64? to match partial Linux strings for #{host_os}"
         end
+      end
+    end
+
+    context 'multi-check priority order' do
+      it 'uses arch check first when arch contains 64' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('x86_64-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('x86_64-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('')
+
+        # Should not need to call pack method since arch check succeeds
+        expect_any_instance_of(Array).not_to receive(:pack)
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'uses DEFS check when arch does not contain 64 but DEFS does' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('special-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('special-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-D__LP64__=1')
+
+        # Should not need to call pack method since DEFS check succeeds
+        expect_any_instance_of(Array).not_to receive(:pack)
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'falls back to pack method when neither arch nor DEFS contain 64' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('custom-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('custom-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-DSOMETHING=1')
+
+        # Should call pack method as last resort
+        allow_any_instance_of(Array).to receive(:pack).with('P').and_return('12345678')
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'returns false when all checks fail on 32-bit' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('custom-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('custom-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-DSOMETHING=1')
+
+        # Pack method returns 4 bytes (32-bit)
+        allow_any_instance_of(Array).to receive(:pack).with('P').and_return('1234')
+
+        expect(functions_class.send(:linux64?)).to be_falsey
       end
     end
   end
