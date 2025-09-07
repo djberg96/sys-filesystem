@@ -551,7 +551,7 @@ RSpec.describe Sys::Filesystem, :unix do
         # Determine arch and DEFS based on host_os for the new multi-check approach
         if pointer_size == 8
           # For 64-bit systems, make arch contain "64"
-          arch_value = host_os.include?('64') ? host_os : host_os.sub(/\w+/, '\064')
+          arch_value = host_os.include?('64') ? host_os : host_os + '64'
           defs_value = '-DSOMETHING=1'
         else
           # For 32-bit systems, ensure neither arch nor DEFS contain "64"
