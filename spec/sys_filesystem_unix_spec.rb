@@ -524,4 +524,218 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(Sys::Filesystem::Functions.attached_functions[:statvfs64]).to be_nil
     end
   end
+
+  describe 'linux64? method' do
+    let(:functions_class) { Sys::Filesystem::Functions }
+
+    # Helper method to test linux64? with mocked config
+    def test_linux64_with_config(host_os, pointer_size, ruby_platform = nil, java_arch = nil)
+      # Mock RbConfig::CONFIG
+      allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return(host_os)
+
+      # When running under JRuby, we need to handle it differently
+      if RUBY_PLATFORM == 'java'
+        # Under JRuby, always mock ENV_JAVA since that's the path the code will take
+        if java_arch
+          # This is a JRuby-specific test
+          allow(ENV_JAVA).to receive(:[]).with('sun.arch.data.model').and_return(java_arch.to_s)
+        else
+          # This is meant to test regular Ruby logic, but under JRuby we need to mock ENV_JAVA
+          # to make it take the "regular Ruby" path by returning nil/empty
+          expected_arch = pointer_size == 8 ? '64' : '32'
+          allow(ENV_JAVA).to receive(:[]).with('sun.arch.data.model').and_return(expected_arch)
+        end
+      else
+        # Running under regular Ruby
+        # Determine arch and DEFS based on host_os for the new multi-check approach
+        if pointer_size == 8
+          # For 64-bit systems, make arch contain "64"
+          arch_value = host_os.include?('64') ? host_os : host_os + '64'
+          defs_value = '-DSOMETHING=1'
+        else
+          # For 32-bit systems, ensure neither arch nor DEFS contain "64"
+          arch_value = host_os.gsub(/64/, '32')
+          defs_value = '-DSOMETHING=1'
+        end
+
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return(arch_value)
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return(defs_value)
+
+        if ruby_platform == 'java'
+          # Mock RUBY_PLATFORM for JRuby tests
+          stub_const('RUBY_PLATFORM', 'java')
+
+          # Mock ENV_JAVA for JRuby
+          env_java_mock = double('ENV_JAVA')
+          allow(env_java_mock).to receive(:[]).with('sun.arch.data.model').and_return(java_arch.to_s)
+          stub_const('ENV_JAVA', env_java_mock)
+        else
+          # Mock the pack method for regular Ruby (last resort check)
+          packed_data = 'x' * pointer_size
+          allow_any_instance_of(Array).to receive(:pack).with('P').and_return(packed_data)
+        end
+      end
+
+      functions_class.send(:linux64?)
+    end
+
+    context 'with different Linux distributions on 64-bit architectures' do
+      let(:linux_distros) do
+        {
+          'x86_64-linux-gnu' => 'Ubuntu/Debian x86_64',
+          'x86_64-pc-linux-gnu' => 'Generic x86_64 Linux',
+          'aarch64-linux-gnu' => 'ARM64 (Raspberry Pi 4, AWS Graviton)',
+          's390x-linux-gnu' => 'IBM Z mainframe',
+          'powerpc64le-linux-gnu' => 'POWER8/9 little-endian',
+          'powerpc64-linux-gnu' => 'POWER8/9 big-endian',
+          'mips64el-linux-gnuabi64' => 'MIPS64 little-endian',
+          'alpha-linux-gnu' => 'DEC Alpha',
+          'sparc64-linux-gnu' => 'SPARC64',
+          'riscv64-linux-gnu' => 'RISC-V 64-bit'
+        }
+      end
+
+      it 'returns true for 64-bit Linux systems' do
+        linux_distros.each do |host_os, description|
+          result = test_linux64_with_config(host_os, 8)
+          expect(result).to be_truthy, "Expected linux64? to return true for #{host_os} (#{description})"
+        end
+      end
+    end
+
+    context 'with different Linux distributions on 32-bit architectures' do
+      let(:linux_32bit_distros) do
+        {
+          'i386-linux-gnu' => '32-bit x86',
+          'i486-linux-gnu' => '32-bit x86',
+          'i586-linux-gnu' => '32-bit x86',
+          'i686-linux-gnu' => '32-bit x86',
+          'arm-linux-gnueabihf' => 'ARM 32-bit hard-float',
+          'armv7l-linux-gnueabihf' => 'ARMv7 32-bit',
+          'mips-linux-gnu' => 'MIPS 32-bit',
+          'mipsel-linux-gnu' => 'MIPS 32-bit little-endian',
+          'powerpc-linux-gnu' => 'PowerPC 32-bit',
+          's390-linux-gnu' => 'IBM S/390 32-bit'
+        }
+      end
+
+      it 'returns false for 32-bit Linux systems' do
+        linux_32bit_distros.each do |host_os, description|
+          result = test_linux64_with_config(host_os, 4)
+          expect(result).to be_falsey, "Expected linux64? to return false for #{host_os} (#{description})"
+        end
+      end
+    end
+
+    context 'with non-Linux operating systems' do
+      let(:non_linux_os) do
+        {
+          'darwin21.6.0' => 'macOS',
+          'freebsd13.1' => 'FreeBSD',
+          'openbsd7.2' => 'OpenBSD',
+          'netbsd9.3' => 'NetBSD',
+          'dragonfly6.4' => 'DragonFlyBSD',
+          'solaris2.11' => 'Solaris',
+          'aix7.2.0.0' => 'AIX',
+          'mingw32' => 'Windows MSYS2',
+          'cygwin' => 'Cygwin'
+        }
+      end
+
+      it 'returns false for non-Linux systems regardless of architecture' do
+        non_linux_os.each do |host_os, description|
+          # Test both 32-bit and 64-bit scenarios
+          [4, 8].each do |pointer_size|
+            result = test_linux64_with_config(host_os, pointer_size)
+            expect(result).to be_falsey,
+              "Expected linux64? to return false for #{host_os} (#{description}) with #{pointer_size * 8}-bit pointers"
+          end
+        end
+      end
+    end
+
+    context 'with JRuby on different platforms' do
+      it 'returns true for 64-bit Linux on JRuby' do
+        result = test_linux64_with_config('x86_64-linux-gnu', nil, 'java', 64)
+        expect(result).to be_truthy
+      end
+
+      it 'returns false for 32-bit Linux on JRuby' do
+        result = test_linux64_with_config('i386-linux-gnu', nil, 'java', 32)
+        expect(result).to be_falsey
+      end
+
+      it 'returns false for non-Linux systems on JRuby' do
+        result = test_linux64_with_config('darwin21.6.0', nil, 'java', 64)
+        expect(result).to be_falsey
+      end
+    end
+
+    context 'edge cases' do
+      it 'handles case-insensitive Linux detection' do
+        ['LINUX-gnu', 'Linux-gnu', 'linux-GNU'].each do |host_os|
+          result = test_linux64_with_config(host_os, 8)
+          expect(result).to be_truthy, "Expected linux64? to handle case-insensitive matching for #{host_os}"
+        end
+      end
+
+      it 'handles partial Linux matches in host_os string' do
+        ['some-linux-variant', 'embedded-linux-system', 'custom-linux-build'].each do |host_os|
+          result = test_linux64_with_config(host_os, 8)
+          expect(result).to be_truthy, "Expected linux64? to match partial Linux strings for #{host_os}"
+        end
+      end
+    end
+
+    context 'multi-check priority order', unless: RUBY_PLATFORM == 'java' do
+      it 'uses arch check first when arch contains 64' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('x86_64-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('x86_64-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('')
+
+        # Should not need to call pack method since arch check succeeds
+        expect_any_instance_of(Array).not_to receive(:pack)
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'uses DEFS check when arch does not contain 64 but DEFS does' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('special-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('special-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-D__LP64__=1')
+
+        # Should not need to call pack method since DEFS check succeeds
+        expect_any_instance_of(Array).not_to receive(:pack)
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'falls back to pack method when neither arch nor DEFS contain 64' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('custom-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('custom-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-DSOMETHING=1')
+
+        # Should call pack method as last resort
+        allow_any_instance_of(Array).to receive(:pack).with('P').and_return('12345678')
+
+        expect(functions_class.send(:linux64?)).to be_truthy
+      end
+
+      it 'returns false when all checks fail on 32-bit' do
+        allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+        allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('custom-linux-gnu')
+        allow(RbConfig::CONFIG).to receive(:[]).with('arch').and_return('custom-linux')
+        allow(RbConfig::CONFIG).to receive(:[]).with('DEFS').and_return('-DSOMETHING=1')
+
+        # Pack method returns 4 bytes (32-bit)
+        allow_any_instance_of(Array).to receive(:pack).with('P').and_return('1234')
+
+        expect(functions_class.send(:linux64?)).to be_falsey
+      end
+    end
+  end
 end
