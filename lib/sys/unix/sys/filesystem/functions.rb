@@ -16,7 +16,7 @@ module Sys
             ENV_JAVA['sun.arch.data.model'].to_i == 64
         else
           RbConfig::CONFIG['host_os'] =~ /linux/i &&
-            RbConfig::SIZEOF['void*'] == 8
+            [nil].pack('P').size == 8
         end
       end
 
