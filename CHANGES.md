@@ -1,3 +1,8 @@
+## 1.5.4 - 7-Sep-2025
+* Added a fallback check for 64-bit Linux in case the config info doesn't
+  include "64" anywhere in it. Thanks go to Chris Hofstaedtler for the
+  report.
+
 ## 1.5.3 - 3-Oct-2024
 * Decided to unroll the changes in 1.5.2 because doing runtime compiler
   checks was making more people unhappy than happy, and I already had

@@ -81,7 +81,7 @@ Apache-2.0
 
 ## Copyright
 
-(C) 2003-2024 Daniel J. Berger
+(C) 2003-2025 Daniel J. Berger
 All Rights Reserved
 
 ## Warranty
