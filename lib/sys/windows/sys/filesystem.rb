@@ -427,18 +427,18 @@ module Sys
     #
     def self.get_options(flags)
       str = ''
-      str << ' casepres' if CASE_PRESERVED_NAMES & flags > 0
-      str << ' casesens' if CASE_SENSITIVE_SEARCH & flags > 0
-      str << ' compression' if FILE_COMPRESSION & flags > 0
-      str << ' namedstreams' if NAMED_STREAMS & flags > 0
-      str << ' pacls' if PERSISTENT_ACLS & flags > 0
-      str << ' ro' if READ_ONLY_VOLUME & flags > 0
-      str << ' encryption' if SUPPORTS_ENCRYPTION & flags > 0
-      str << ' objids' if SUPPORTS_OBJECT_IDS & flags > 0
-      str << ' rpoints' if SUPPORTS_REPARSE_POINTS & flags > 0
-      str << ' sparse' if SUPPORTS_SPARSE_FILES & flags > 0
-      str << ' unicode' if UNICODE_ON_DISK & flags > 0
-      str << ' compressed' if VOLUME_IS_COMPRESSED & flags > 0
+      str += ' casepres' if CASE_PRESERVED_NAMES & flags > 0
+      str += ' casesens' if CASE_SENSITIVE_SEARCH & flags > 0
+      str += ' compression' if FILE_COMPRESSION & flags > 0
+      str += ' namedstreams' if NAMED_STREAMS & flags > 0
+      str += ' pacls' if PERSISTENT_ACLS & flags > 0
+      str += ' ro' if READ_ONLY_VOLUME & flags > 0
+      str += ' encryption' if SUPPORTS_ENCRYPTION & flags > 0
+      str += ' objids' if SUPPORTS_OBJECT_IDS & flags > 0
+      str += ' rpoints' if SUPPORTS_REPARSE_POINTS & flags > 0
+      str += ' sparse' if SUPPORTS_SPARSE_FILES & flags > 0
+      str += ' unicode' if UNICODE_ON_DISK & flags > 0
+      str += ' compressed' if VOLUME_IS_COMPRESSED & flags > 0
 
       str.tr!(' ', ',')
       str[1..-1] # Ignore the first comma
