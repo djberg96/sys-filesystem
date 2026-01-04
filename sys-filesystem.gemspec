@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop')
   spec.add_development_dependency('rubocop-rspec')
 
-  if RUBY_PLATFORM == 'java' && Gem.win_platform?
-    spec.add_dependency('jruby-win32ole')
+  if Gem.win_platform?
+    spec.add_dependency('win32ole')
   end
 
   spec.metadata = {
