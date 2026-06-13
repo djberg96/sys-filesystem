@@ -79,6 +79,18 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
+      # The name of the mounted resource.
+      attr_accessor :mount_source
+
+      # The mount point/directory.
+      attr_accessor :mount_point
+
+      # The type of filesystem mount, e.g. ufs, zfs, nfs, etc.
+      attr_accessor :mount_type
+
+      # A list of comma separated options for the mount, e.g. nosuid, etc.
+      attr_accessor :mount_options
+
       # The filesystem type
       attr_accessor :filesystem_type
 
@@ -118,6 +130,10 @@ module Sys
         @flags            = nil
         @name_max         = nil
         @base_type        = nil
+        @mount_source     = nil
+        @mount_point      = nil
+        @mount_type       = nil
+        @mount_options    = nil
         @filesystem_type  = nil
         @owner            = nil
         @sync_reads       = nil
@@ -258,6 +274,10 @@ module Sys
         obj.flags = native_fs[:f_flags] if native_fs.members.include?(:f_flags)
         obj.name_max = native_fs[:f_namemax] if native_fs.members.include?(:f_namemax)
         obj.base_type = native_fs[:f_fstypename].to_s if native_fs.members.include?(:f_fstypename)
+        obj.mount_type = native_fs[:f_fstypename].to_s if native_fs.members.include?(:f_fstypename)
+        obj.mount_source = native_fs[:f_mntfromname].to_s if native_fs.members.include?(:f_mntfromname)
+        obj.mount_point = native_fs[:f_mntonname].to_s if native_fs.members.include?(:f_mntonname)
+        obj.mount_options = decode_mount_options(native_fs[:f_flags]) if native_fs.members.include?(:f_flags)
         obj.filesystem_type = native_fs[:f_type] if native_fs.members.include?(:f_type)
         obj.owner = native_fs[:f_owner] if native_fs.members.include?(:f_owner)
         obj.sync_reads = native_fs[:f_syncreads] if native_fs.members.include?(:f_syncreads)
@@ -280,8 +300,31 @@ module Sys
         obj.async_writes = fs[:f_asyncwrites]
       end
 
+      enrich_mount_metadata(obj) unless obj.mount_point
+
       obj.freeze
     end
+
+    def self.enrich_mount_metadata(stat)
+      mount = mount_for_path(stat.path)
+      return unless mount
+
+      stat.mount_source = mount.name
+      stat.mount_point = mount.mount_point
+      stat.mount_type = mount.mount_type
+      stat.mount_options = mount.options
+    end
+
+    private_class_method :enrich_mount_metadata
+
+    def self.mount_for_path(path)
+      mount_path = mount_point(path)
+      mounts.find{ |mount| mount.mount_point == mount_path }
+    rescue SystemCallError
+      nil
+    end
+
+    private_class_method :mount_for_path
 
     def self.normalize_filesystem_id(fsid)
       return fsid unless fsid.respond_to?(:to_a)
@@ -322,6 +365,26 @@ module Sys
 
     private_class_method :zfs_property
 
+    def self.decode_mount_options(flags)
+      string = ''
+      visible_flags = flags & MNT_VISFLAGMASK
+
+      Constants::MOUNT_OPTION_NAMES.each do |key, val|
+        if visible_flags & key > 0
+          if string.empty?
+            string += val
+          else
+            string += ", #{val}"
+          end
+        end
+        visible_flags &= ~key
+      end
+
+      string
+    end
+
+    private_class_method :decode_mount_options
+
     # In block form, yields a Sys::Filesystem::Mount object for each mounted
     # filesytem on the host. Otherwise it returns an array of Mount objects.
     #
@@ -356,21 +419,7 @@ module Sys
           obj.mount_point = mnt[:f_mntonname].to_s
           obj.mount_type = mnt[:f_fstypename].to_s
 
-          string = ''
-          flags = mnt[:f_flags] & MNT_VISFLAGMASK
-
-          Constants::MOUNT_OPTION_NAMES.each do |key, val|
-            if flags & key > 0
-              if string.empty?
-                string += val
-              else
-                string += ", #{val}"
-              end
-            end
-            flags &= ~key
-          end
-
-          obj.options = string
+          obj.options = decode_mount_options(mnt[:f_flags])
 
           if block_given?
             yield obj.freeze

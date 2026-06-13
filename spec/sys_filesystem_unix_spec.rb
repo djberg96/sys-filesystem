@@ -155,6 +155,15 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(@stat.base_type).to eq(root_mount.mount_type)
     end
 
+    example 'mount metadata matches the mount table' do
+      root_mount = described_class.mounts.find{ |mount| mount.mount_point == root }
+
+      expect(@stat.mount_source).to eq(root_mount.name)
+      expect(@stat.mount_point).to eq(root_mount.mount_point)
+      expect(@stat.mount_type).to eq(root_mount.mount_type)
+      expect(@stat.mount_options).to eq(root_mount.options)
+    end
+
     example 'filesystem_type is populated from statfs' do
       expect(@stat.filesystem_type).to be_a(Numeric)
     end
