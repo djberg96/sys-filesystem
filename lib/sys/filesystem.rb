@@ -73,6 +73,8 @@ module Sys
       end
 
       def zfs_dataset
+        return mount_source if respond_to?(:mount_source) && mount_source
+
         mount_point = Sys::Filesystem.mount_point(path)
         mount = Sys::Filesystem.mounts.find{ |mnt| mnt.mount_point == mount_point }
 

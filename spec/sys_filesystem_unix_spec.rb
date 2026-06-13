@@ -164,6 +164,13 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(@stat.mount_options).to eq(root_mount.options)
     end
 
+    example 'zfs dataset uses stat mount metadata when available' do
+      skip 'zfs dataset test skipped except on ZFS' unless @stat.base_type == 'zfs'
+
+      expect(described_class).not_to receive(:mounts)
+      expect(@stat.send(:zfs_dataset)).to eq(@stat.mount_source)
+    end
+
     example 'filesystem_type is populated from statfs' do
       expect(@stat.filesystem_type).to be_a(Numeric)
     end
