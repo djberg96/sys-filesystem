@@ -118,6 +118,12 @@ module Sys
         @flags            = nil
         @name_max         = nil
         @base_type        = nil
+        @filesystem_type  = nil
+        @owner            = nil
+        @sync_reads       = nil
+        @sync_writes      = nil
+        @async_reads      = nil
+        @async_writes     = nil
       end
 
       # Returns the total space on the partition.
@@ -242,6 +248,28 @@ module Sys
         obj.base_type = fs[:f_basetype].to_s
       end
 
+      if respond_to?(:statfs, true)
+        native_fs = Statfs.new
+
+        if statfs(path, native_fs) < 0
+          raise Error, "statfs() function failed: #{strerror(FFI.errno)}"
+        end
+
+        obj.flags = native_fs[:f_flags] if native_fs.members.include?(:f_flags)
+        obj.name_max = native_fs[:f_namemax] if native_fs.members.include?(:f_namemax)
+        obj.base_type = native_fs[:f_fstypename].to_s if native_fs.members.include?(:f_fstypename)
+        obj.filesystem_type = native_fs[:f_type] if native_fs.members.include?(:f_type)
+        obj.owner = native_fs[:f_owner] if native_fs.members.include?(:f_owner)
+        obj.sync_reads = native_fs[:f_syncreads] if native_fs.members.include?(:f_syncreads)
+        obj.async_reads = native_fs[:f_asyncreads] if native_fs.members.include?(:f_asyncreads)
+        obj.sync_writes = native_fs[:f_syncwrites] if native_fs.members.include?(:f_syncwrites)
+        obj.async_writes = native_fs[:f_asyncwrites] if native_fs.members.include?(:f_asyncwrites)
+
+        if native_fs.members.include?(:f_fsid)
+          obj.filesystem_id = normalize_filesystem_id(native_fs[:f_fsid])
+        end
+      end
+
       # DragonFlyBSD has additional struct members
       if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
         obj.owner = fs[:f_owner]
@@ -254,6 +282,15 @@ module Sys
 
       obj.freeze
     end
+
+    def self.normalize_filesystem_id(fsid)
+      return fsid unless fsid.respond_to?(:to_a)
+
+      high, low = fsid.to_a
+      ((high & 0xffffffff) << 32) | (low & 0xffffffff)
+    end
+
+    private_class_method :normalize_filesystem_id
 
     # In block form, yields a Sys::Filesystem::Mount object for each mounted
     # filesytem on the host. Otherwise it returns an array of Mount objects.

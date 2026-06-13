@@ -32,6 +32,10 @@ module Sys
         attach_function(:statvfs, %i[string pointer], :int)
       end
 
+      if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
+        attach_function(:statfs, %i[string pointer], :int)
+      end
+
       attach_function(:strerror, [:int], :string)
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
@@ -42,6 +46,7 @@ module Sys
       end
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
+      private_class_method :statfs if method_defined?(:statfs)
 
       begin
         attach_function(:getmntent, [:pointer], :pointer)

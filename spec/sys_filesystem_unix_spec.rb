@@ -102,6 +102,38 @@ RSpec.describe Sys::Filesystem, :unix do
     expect(@stat.name_max).to be_a(Numeric)
   end
 
+  context 'bsd statfs enrichments' do
+    before do
+      skip 'statfs enrichment tests skipped except on BSD' unless bsd
+    end
+
+    example 'base_type is populated from statfs' do
+      expect(@stat.base_type).to be_a(String)
+      expect(@stat.base_type).not_to be_empty
+    end
+
+    example 'base_type matches the mount type' do
+      root_mount = described_class.mounts.find{ |mount| mount.mount_point == root }
+
+      expect(@stat.base_type).to eq(root_mount.mount_type)
+    end
+
+    example 'filesystem_type is populated from statfs' do
+      expect(@stat.filesystem_type).to be_a(Numeric)
+    end
+
+    example 'owner is populated from statfs' do
+      expect(@stat.owner).to be_a(Numeric)
+    end
+
+    example 'read and write counters are populated from statfs' do
+      expect(@stat.sync_reads).to be_a(Numeric)
+      expect(@stat.async_reads).to be_a(Numeric)
+      expect(@stat.sync_writes).to be_a(Numeric)
+      expect(@stat.async_writes).to be_a(Numeric)
+    end
+  end
+
   context 'dragonfly', :dragonfly do
     example 'owner works as expected' do
       expect(@stat).to respond_to(:owner)
