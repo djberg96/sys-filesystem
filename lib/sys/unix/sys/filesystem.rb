@@ -469,12 +469,67 @@ module Sys
     #   Sys::Filesystem.mount('/dev/loop0', '/home/you/tmp', 'ext4', Sys::Filesystem::MNT_RDONLY)
     #
     def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
-      if mount_c(source, target, fstype, flags, data) != 0
+      result =
+        if respond_to?(:nmount_c, true)
+          iov = nmount_iovec(source, target, fstype, data)
+          nmount_c(iov[:pointer], iov[:count], flags)
+        elsif RbConfig::CONFIG['host_os'] =~ /linux/i
+          mount_c(source, target, fstype, flags, data)
+        else
+          mount_c(fstype, target, flags, mount_data_pointer(source, data))
+        end
+
+      if result != 0
         raise Error, "mount() function failed: #{strerror(FFI.errno)}"
       end
 
       self
     end
+
+    def self.nmount_iovec(source, target, fstype, data)
+      options = {
+        'fstype' => fstype,
+        'fspath' => target
+      }
+
+      options['from'] = source if source
+
+      if data
+        unless data.respond_to?(:to_hash)
+          raise ArgumentError, 'data must be a Hash of nmount option names and values'
+        end
+
+        data.to_hash.each{ |key, value| options[key.to_s] = value }
+      end
+
+      strings = options.flat_map do |key, value|
+        [FFI::MemoryPointer.from_string(key), FFI::MemoryPointer.from_string(value.to_s)]
+      end
+
+      pointer = FFI::MemoryPointer.new(Iovec, strings.length)
+
+      strings.each_with_index do |string, index|
+        iov = Iovec.new(pointer + (index * Iovec.size))
+        iov[:iov_base] = string
+        iov[:iov_len] = string.size
+      end
+
+      { pointer: pointer, count: strings.length, strings: strings }
+    end
+
+    private_class_method :nmount_iovec
+
+    def self.mount_data_pointer(source, data)
+      if data
+        FFI::MemoryPointer.from_string(data.to_s)
+      elsif source
+        FFI::MemoryPointer.from_string(source.to_s)
+      else
+        FFI::Pointer::NULL
+      end
+    end
+
+    private_class_method :mount_data_pointer
 
     # Removes the attachment of the (topmost) filesystem mounted on target.
     # You may also specify bitwise OR'd +flags+ to control the precise behavior.
@@ -487,8 +542,8 @@ module Sys
     #
     # * UMOUNT_NOFOLLOW - Don't dereference the target if it's a symbolic link.
     #
-    # Note that BSD platforms may support different flags. Please see the man
-    # pages for details.
+    # On BSD platforms, MNT_FORCE may be used to force an unmount. FreeBSD also
+    # supports MNT_BYFSID for unmounting by filesystem id.
     #
     # Typically this method requires admin privileges.
     #

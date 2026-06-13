@@ -557,6 +557,23 @@ RSpec.describe Sys::Filesystem, :unix do
     example 'umount singleton method is defined' do
       expect(described_class).to respond_to(:umount)
     end
+
+    example 'freebsd nmount iovec is built as expected' do
+      skip 'nmount iovec test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      iov = described_class.send(
+        :nmount_iovec,
+        '/dev/md0',
+        '/mnt/test',
+        'ufs',
+        readonly: ''
+      )
+
+      expect(iov[:count]).to eq(8)
+      expect(iov[:strings].map(&:read_string)).to eq(
+        %w[fstype ufs fspath /mnt/test from /dev/md0 readonly] + ['']
+      )
+    end
   end
 
   context 'FFI' do
@@ -585,6 +602,11 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(Sys::Filesystem::Structs::Mntent.size).to eq(dummy.check_sizeof('struct mntent', 'mntent.h'))
     end
 
+    example 'iovec struct is expected size' do
+      skip 'iovec test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+      expect(Sys::Filesystem::Structs::Iovec.size).to eq(dummy.check_sizeof('struct iovec', 'sys/uio.h'))
+    end
+
     example 'a failed statvfs call behaves as expected' do
       msg = 'statvfs() function failed: No such file or directory'
       expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
@@ -593,6 +615,12 @@ RSpec.describe Sys::Filesystem, :unix do
     example 'statvfs alias is used for statvfs64' do
       expect(Sys::Filesystem::Functions.attached_functions[:statvfs]).to be_a(FFI::Function)
       expect(Sys::Filesystem::Functions.attached_functions[:statvfs64]).to be_nil
+    end
+
+    example 'freebsd nmount binding is private when available' do
+      skip 'nmount test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+      expect(described_class.methods.include?('nmount_c')).to be false
+      expect(Sys::Filesystem::Functions.attached_functions[:nmount_c]).to be_a(FFI::Function)
     end
   end
 

@@ -37,7 +37,16 @@ module Sys
       end
 
       attach_function(:strerror, [:int], :string)
-      attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
+
+      if RbConfig::CONFIG['host_os'] =~ /linux/i
+        attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
+      else
+        attach_function(:mount_c, :mount, %i[string string int pointer], :int)
+      end
+
+      if RbConfig::CONFIG['host_os'] =~ /freebsd/i
+        attach_function(:nmount_c, :nmount, %i[pointer uint int], :int)
+      end
 
       begin
         ffi_lib FFI::Library::LIBC, 'zfs'
@@ -64,6 +73,7 @@ module Sys
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
       private_class_method :statfs if method_defined?(:statfs)
+      private_class_method :nmount_c if method_defined?(:nmount_c)
       if method_defined?(:libzfs_init)
         private_class_method(
           :libzfs_init,

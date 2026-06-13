@@ -256,6 +256,14 @@ module Sys
           :mnt_passno, :int
         )
       end
+
+      # The Iovec struct is used by FreeBSD's nmount(2).
+      class Iovec < FFI::Struct
+        layout(
+          :iov_base, :pointer,
+          :iov_len, :size_t
+        )
+      end
     end
   end
 end
