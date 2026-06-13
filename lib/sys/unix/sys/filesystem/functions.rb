@@ -39,6 +39,23 @@ module Sys
       attach_function(:strerror, [:int], :string)
       attach_function(:mount_c, :mount, %i[string string string ulong string], :int)
 
+      begin
+        ffi_lib FFI::Library::LIBC, 'zfs'
+
+        attach_function(:libzfs_init, [], :pointer)
+        attach_function(:libzfs_fini, [:pointer], :void)
+        attach_function(:zfs_open, %i[pointer string int], :pointer)
+        attach_function(:zfs_close, [:pointer], :void)
+        attach_function(:zfs_name_to_prop, [:string], :int)
+        attach_function(
+          :zfs_prop_get,
+          %i[pointer int pointer size_t pointer pointer size_t int],
+          :int
+        )
+      rescue FFI::NotFoundError
+        # libzfs is optional. ZFS-specific helpers fall back when unavailable.
+      end
+
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i
         attach_function(:umount_c, :unmount, %i[string int], :int)
       else
@@ -47,6 +64,16 @@ module Sys
 
       private_class_method :statvfs, :strerror, :mount_c, :umount_c
       private_class_method :statfs if method_defined?(:statfs)
+      if method_defined?(:libzfs_init)
+        private_class_method(
+          :libzfs_init,
+          :libzfs_fini,
+          :zfs_open,
+          :zfs_close,
+          :zfs_name_to_prop,
+          :zfs_prop_get
+        )
+      end
 
       begin
         attach_function(:getmntent, [:pointer], :pointer)

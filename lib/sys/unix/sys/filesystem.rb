@@ -292,6 +292,36 @@ module Sys
 
     private_class_method :normalize_filesystem_id
 
+    def self.zfs_property(dataset, property)
+      return nil unless respond_to?(:libzfs_init, true)
+
+      handle = libzfs_init
+      return nil if handle.null?
+
+      zfs_handle = nil
+
+      begin
+        prop = zfs_name_to_prop(property)
+        return nil if prop < 0
+
+        zfs_handle = zfs_open(handle, dataset, 1) # ZFS_TYPE_FILESYSTEM
+        return nil if zfs_handle.null?
+
+        buffer = FFI::MemoryPointer.new(:char, 8192)
+
+        if zfs_prop_get(zfs_handle, prop, buffer, buffer.size, nil, nil, 0, 0).zero?
+          buffer.read_string
+        end
+      ensure
+        zfs_close(zfs_handle) if zfs_handle && !zfs_handle.null?
+        libzfs_fini(handle)
+      end
+    rescue FFI::NotFoundError, SystemCallError
+      nil
+    end
+
+    private_class_method :zfs_property
+
     # In block form, yields a Sys::Filesystem::Mount object for each mounted
     # filesytem on the host. Otherwise it returns an array of Mount objects.
     #

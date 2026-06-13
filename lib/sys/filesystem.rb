@@ -31,10 +31,15 @@ module Sys
       def case_insensitive?
         if path =~ /\w+/
           File.identical?(path, path.swapcase)
-        elsif RbConfig::CONFIG['host_os'] =~ /darwin|mac|windows|mswin|mingw/i
-          true # Assumes HFS/APFS on Mac
         else
-          false
+          zfs_case = zfs_case_insensitive?
+          return zfs_case unless zfs_case.nil?
+
+          if RbConfig::CONFIG['host_os'] =~ /darwin|mac|windows|mswin|mingw/i
+            true # Assumes HFS/APFS on Mac
+          else
+            false
+          end
         end
       end
 
@@ -42,6 +47,38 @@ module Sys
       #
       def case_sensitive?
         !case_insensitive?
+      end
+
+      private
+
+      def zfs_case_insensitive?
+        return nil unless base_type == 'zfs'
+
+        dataset = zfs_dataset
+        return nil unless dataset
+
+        value = Sys::Filesystem.send(:zfs_property, dataset, 'casesensitivity')
+        return nil unless value
+
+        case value.strip
+          when 'insensitive'
+            true
+          when 'sensitive'
+            false
+          else
+            nil
+        end
+      rescue SystemCallError
+        nil
+      end
+
+      def zfs_dataset
+        mount_point = Sys::Filesystem.mount_point(path)
+        mount = Sys::Filesystem.mounts.find{ |mnt| mnt.mount_point == mount_point }
+
+        mount&.name
+      rescue SystemCallError
+        nil
       end
     end
   end

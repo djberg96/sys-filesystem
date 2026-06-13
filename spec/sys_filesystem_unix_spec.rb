@@ -16,6 +16,43 @@ RSpec.describe Sys::Filesystem, :unix do
   let(:darwin)  { RbConfig::CONFIG['host_os'] =~ /mac|darwin/i }
   let(:root)    { '/' }
 
+  def expected_case_insensitive(stat)
+    if stat.path =~ /\w+/
+      File.identical?(stat.path, stat.path.swapcase)
+    else
+      zfs_case = zfs_case_insensitive(stat)
+      return zfs_case unless zfs_case.nil?
+
+      if darwin
+        true
+      else
+        false
+      end
+    end
+  end
+
+  def zfs_case_insensitive(stat)
+    return nil unless stat.base_type == 'zfs'
+
+    mount_point = described_class.mount_point(stat.path)
+    mount = described_class.mounts.find{ |mnt| mnt.mount_point == mount_point }
+    return nil unless mount
+
+    value = described_class.send(:zfs_property, mount.name, 'casesensitivity')
+    return nil unless value
+
+    case value.strip
+      when 'insensitive'
+        true
+      when 'sensitive'
+        false
+      else
+        nil
+    end
+  rescue SystemCallError
+    nil
+  end
+
   before do
     @stat  = described_class.stat(root)
     @size  = 58720256
@@ -203,15 +240,17 @@ RSpec.describe Sys::Filesystem, :unix do
   end
 
   example 'stat case_insensitive method works as expected' do
-    expected = darwin ? true : false
-    expect(@stat.case_insensitive?).to eq(expected)
-    expect(described_class.stat(Dir.home).case_insensitive?).to eq(expected)
+    home_stat = described_class.stat(Dir.home)
+
+    expect(@stat.case_insensitive?).to eq(expected_case_insensitive(@stat))
+    expect(home_stat.case_insensitive?).to eq(expected_case_insensitive(home_stat))
   end
 
   example 'stat case_sensitive method works as expected' do
-    expected = darwin ? false : true
-    expect(@stat.case_sensitive?).to eq(expected)
-    expect(described_class.stat(Dir.home).case_sensitive?).to eq(expected)
+    home_stat = described_class.stat(Dir.home)
+
+    expect(@stat.case_sensitive?).to eq(!expected_case_insensitive(@stat))
+    expect(home_stat.case_sensitive?).to eq(!expected_case_insensitive(home_stat))
   end
 
   example 'numeric helper methods are defined' do
