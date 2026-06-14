@@ -53,6 +53,62 @@ RSpec.describe Sys::Filesystem, :unix do
     nil
   end
 
+  def write_struct_members(struct, values)
+    values.each do |member, value|
+      struct[member] = value if struct.members.include?(member)
+    end
+  end
+
+  def stub_stat_syscalls
+    statvfs_values = {
+      f_bsize: 1_048_576,
+      f_frsize: 4096,
+      f_blocks: 1_000_000,
+      f_bfree: 400_000,
+      f_bavail: 300_000,
+      f_files: 2_000_000,
+      f_ffree: 1_500_000,
+      f_favail: 1_250_000,
+      f_fsid: 1234,
+      f_flag: 1,
+      f_namemax: 255,
+      f_owner: 501,
+      f_type: 42,
+      f_syncreads: 10,
+      f_asyncreads: 20,
+      f_syncwrites: 30,
+      f_asyncwrites: 40
+    }
+
+    statfs_values = {
+      f_flags: 1,
+      f_namemax: 255,
+      f_fstypename: 'fixturefs',
+      f_mntfromname: '/dev/fixture',
+      f_mntonname: root,
+      f_type: 42,
+      f_owner: 501,
+      f_syncreads: 10,
+      f_asyncreads: 20,
+      f_syncwrites: 30,
+      f_asyncwrites: 40
+    }
+
+    allow(described_class).to receive(:statvfs) do |_path, fs|
+      write_struct_members(fs, statvfs_values)
+      0
+    end
+
+    if described_class.respond_to?(:statfs, true)
+      allow(described_class).to receive(:statfs) do |_path, fs|
+        write_struct_members(fs, statfs_values)
+        0
+      end
+    end
+
+    allow(described_class).to receive(:enrich_mount_metadata)
+  end
+
   before do
     @stat  = described_class.stat(root)
     @size  = 58720256
@@ -403,6 +459,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(Pathname)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
@@ -465,6 +523,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(File)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_file = File.open(root){ |file| described_class.stat(file) }
     end
 
@@ -527,6 +587,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(Dir)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
