@@ -1,3 +1,10 @@
+## 1.6.0 - ???
+* Big refactor for BSD mainly, adds statfs, and zfs related properties if
+  you're using ZFS. Also works for Linux on ZFS.
+* Split out constants into platform specific files for easier maintenance.
+* Add MNT_NFS4ACLS constant for FreeBSD.
+* Update mount and umount methods, preferring nmount where supported.
+
 ## 1.5.5 - 6-Dec-2025
 * Replaced string concatenation operators with addition assignment operators
   since the current code generates a frozen string warning with Ruby 3.4 and
