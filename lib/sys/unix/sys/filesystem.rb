@@ -265,6 +265,10 @@ module Sys
         obj.base_type = fs[:f_basetype].to_s
       end
 
+      # Keep statvfs as the portable source for capacity/inode data, but use
+      # native statfs where available for mount metadata that POSIX statvfs
+      # does not expose. On FreeBSD this includes the filesystem type name,
+      # mount source/target, native MNT_* flags, owner, and I/O counters.
       if respond_to?(:statfs, true)
         native_fs = Statfs.new
 
