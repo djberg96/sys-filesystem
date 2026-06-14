@@ -104,6 +104,38 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(described_class::MNT_QUARANTINE).to eq(0x00000400)
       expect(described_class::MNT_FORCE).to eq(1)
     end
+
+    example 'generic constants avoid darwin-specific flags' do
+      command = [
+        RbConfig.ruby,
+        '-Ilib',
+        '-e',
+        'require "sys/unix/sys/filesystem/constants/generic"; ' \
+        'c = Sys::Filesystem::Constants; ' \
+        'abort unless c::MNT_RDONLY == 1; ' \
+        'abort unless c::MOUNT_OPTION_NAMES[c::MNT_NOSUID] == "nosuid"; ' \
+        'abort if c.const_defined?(:MNT_CPROTECT); ' \
+        'abort if c.const_defined?(:MNT_QUARANTINE)'
+      ]
+
+      expect(system(*command)).to be(true)
+    end
+
+    example 'dragonfly constants use the shared bsd set' do
+      command = [
+        RbConfig.ruby,
+        '-Ilib',
+        '-e',
+        'require "sys/unix/sys/filesystem/constants/dragonfly"; ' \
+        'c = Sys::Filesystem::Constants; ' \
+        'abort unless c::MNT_RDONLY == 1; ' \
+        'abort unless c::MNT_LOCAL == 0x1000; ' \
+        'abort unless c::MOUNT_OPTION_NAMES[c::MNT_NOATIME] == "noatime"; ' \
+        'abort if c.const_defined?(:MNT_CPROTECT)'
+      ]
+
+      expect(system(*command)).to be(true)
+    end
   end
 
   example 'stat path works as expected' do
