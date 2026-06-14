@@ -58,6 +58,54 @@ RSpec.describe Sys::Filesystem, :unix do
     @size  = 58720256
   end
 
+  context 'platform constants' do
+    example 'freebsd mount constants match sys/mount.h' do
+      skip 'FreeBSD constant test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(described_class::MNT_RDONLY).to eq(0x0000000000000001)
+      expect(described_class::MNT_NFS4ACLS).to eq(0x0000000000000010)
+      expect(described_class.const_defined?(:MNT_NODEV)).to be(false)
+      expect(described_class::MNT_LOCAL).to eq(0x0000000000001000)
+      expect(described_class::MNT_ROOTFS).to eq(0x0000000000004000)
+      expect(described_class::MNT_NOATIME).to eq(0x0000000010000000)
+      expect(described_class::MNT_FORCE).to eq(0x0000000000080000)
+      expect(described_class::MNT_BYFSID).to eq(0x0000000008000000)
+    end
+
+    example 'freebsd mount option names decode nfsv4acls distinctly from nodev' do
+      skip 'FreeBSD option-name test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(described_class.send(:decode_mount_options, described_class::MNT_NFS4ACLS)).to eq('nfsv4acls')
+      expect(described_class::Constants::MOUNT_OPTION_NAMES.value?('nodev')).to be(false)
+    end
+
+    example 'freebsd root mount options agree with stat flags' do
+      skip 'FreeBSD root option test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(@stat.mount_options).to eq(described_class.send(:decode_mount_options, @stat.flags))
+    end
+
+    example 'linux mount constants expose linux flags' do
+      skip 'Linux constant test skipped except on Linux' unless linux
+
+      expect(described_class::MS_RDONLY).to eq(1)
+      expect(described_class::MS_NODEV).to eq(4)
+      expect(described_class::MNT_NODEV).to eq(described_class::MS_NODEV)
+      expect(described_class::MNT_FORCE).to eq(1)
+      expect(described_class::MNT_DETACH).to eq(2)
+      expect(described_class::UMOUNT_NOFOLLOW).to eq(8)
+    end
+
+    example 'darwin mount constants expose darwin flags' do
+      skip 'Darwin constant test skipped except on Darwin' unless darwin
+
+      expect(described_class::MNT_NODEV).to eq(0x00000010)
+      expect(described_class::MNT_CPROTECT).to eq(0x00000080)
+      expect(described_class::MNT_QUARANTINE).to eq(0x00000400)
+      expect(described_class::MNT_FORCE).to eq(1)
+    end
+  end
+
   example 'stat path works as expected' do
     expect(@stat).to respond_to(:path)
     expect(@stat.path).to eq(root)
