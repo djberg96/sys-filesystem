@@ -12,6 +12,7 @@ module Sys
     extend Sys::Filesystem::Functions
 
     private_class_method :new
+    private_class_method(*Sys::Filesystem::Functions.attached_functions.keys)
 
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')

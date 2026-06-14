@@ -713,8 +713,10 @@ RSpec.describe Sys::Filesystem, :unix do
     let(:dummy) { Class.new { extend Mkmf::Lite } }
 
     example 'ffi functions are private' do
-      expect(described_class.methods.include?('statvfs')).to be false
-      expect(described_class.methods.include?('strerror')).to be false
+      Sys::Filesystem::Functions.attached_functions.each_key do |function_name|
+        expect(described_class.methods).not_to include(function_name)
+        expect(described_class.private_methods).to include(function_name)
+      end
     end
 
     example 'statfs struct is expected size' do
