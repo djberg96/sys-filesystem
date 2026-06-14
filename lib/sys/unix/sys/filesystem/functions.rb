@@ -20,7 +20,12 @@ module Sys
         end
       end
 
+      def self.zfs_supported?
+        !!(RbConfig::CONFIG['host_os'] =~ /freebsd|linux/i)
+      end
+
       private_class_method :linux64?
+      private_class_method :zfs_supported?
 
       if linux64?
         begin
@@ -48,21 +53,23 @@ module Sys
         attach_function(:nmount_c, :nmount, %i[pointer uint int], :int)
       end
 
-      begin
-        ffi_lib FFI::Library::LIBC, 'zfs'
+      if zfs_supported?
+        begin
+          ffi_lib FFI::Library::LIBC, 'zfs'
 
-        attach_function(:libzfs_init, [], :pointer)
-        attach_function(:libzfs_fini, [:pointer], :void)
-        attach_function(:zfs_open, %i[pointer string int], :pointer)
-        attach_function(:zfs_close, [:pointer], :void)
-        attach_function(:zfs_name_to_prop, [:string], :int)
-        attach_function(
-          :zfs_prop_get,
-          %i[pointer int pointer size_t pointer pointer size_t int],
-          :int
-        )
-      rescue FFI::NotFoundError
-        # libzfs is optional. ZFS-specific helpers fall back when unavailable.
+          attach_function(:libzfs_init, [], :pointer)
+          attach_function(:libzfs_fini, [:pointer], :void)
+          attach_function(:zfs_open, %i[pointer string int], :pointer)
+          attach_function(:zfs_close, [:pointer], :void)
+          attach_function(:zfs_name_to_prop, [:string], :int)
+          attach_function(
+            :zfs_prop_get,
+            %i[pointer int pointer size_t pointer pointer size_t int],
+            :int
+          )
+        rescue FFI::NotFoundError, LoadError
+          # libzfs is optional. ZFS-specific helpers fall back when unavailable.
+        end
       end
 
       if RbConfig::CONFIG['host_os'] =~ /darwin|osx|mach|bsd|dragonfly/i

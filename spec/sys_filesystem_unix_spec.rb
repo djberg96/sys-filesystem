@@ -751,6 +751,20 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(described_class.methods.include?('nmount_c')).to be false
       expect(Sys::Filesystem::Functions.attached_functions[:nmount_c]).to be_a(FFI::Function)
     end
+
+    example 'libzfs loading is limited to zfs-capable unix platforms' do
+      functions = Sys::Filesystem::Functions
+
+      allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('darwin24')
+      expect(functions.send(:zfs_supported?)).to be_falsey
+
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('freebsd15.0')
+      expect(functions.send(:zfs_supported?)).to be_truthy
+
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('linux-gnu')
+      expect(functions.send(:zfs_supported?)).to be_truthy
+    end
   end
 
   describe 'linux64? method' do
