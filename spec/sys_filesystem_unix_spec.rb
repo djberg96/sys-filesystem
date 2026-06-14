@@ -187,6 +187,39 @@ RSpec.describe Sys::Filesystem, :unix do
     end
   end
 
+  context 'zfs properties' do
+    before do
+      skip 'zfs property tests skipped except on ZFS' unless @stat.base_type == 'zfs'
+    end
+
+    example 'generic zfs_property returns property values' do
+      expect(@stat.zfs_property('casesensitivity')).to be_a(String)
+      expect(@stat.zfs_property(:compression)).to be_a(String)
+    end
+
+    example 'convenience methods match generic zfs_property' do
+      {
+        zfs_atime: 'atime',
+        zfs_casesensitivity: 'casesensitivity',
+        zfs_compression: 'compression',
+        zfs_compressratio: 'compressratio',
+        zfs_devices: 'devices',
+        zfs_exec: 'exec',
+        zfs_quota: 'quota',
+        zfs_readonly: 'readonly',
+        zfs_recordsize: 'recordsize',
+        zfs_reservation: 'reservation',
+        zfs_setuid: 'setuid'
+      }.each do |method_name, property|
+        expect(@stat.public_send(method_name)).to eq(@stat.zfs_property(property))
+      end
+    end
+
+    example 'unknown zfs properties return nil' do
+      expect(@stat.zfs_property('definitely_not_a_zfs_property')).to be_nil
+    end
+  end
+
   context 'dragonfly', :dragonfly do
     example 'owner works as expected' do
       expect(@stat).to respond_to(:owner)

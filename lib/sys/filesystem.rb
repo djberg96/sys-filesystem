@@ -21,6 +21,20 @@ module Sys
     # Stat objects are returned by the Sys::Filesystem.stat method. Here
     # we're adding universal methods.
     class Stat
+      ZFS_PROPERTIES = {
+        zfs_atime: 'atime',
+        zfs_casesensitivity: 'casesensitivity',
+        zfs_compression: 'compression',
+        zfs_compressratio: 'compressratio',
+        zfs_devices: 'devices',
+        zfs_exec: 'exec',
+        zfs_quota: 'quota',
+        zfs_readonly: 'readonly',
+        zfs_recordsize: 'recordsize',
+        zfs_reservation: 'reservation',
+        zfs_setuid: 'setuid'
+      }.freeze
+
       # Returns true if the filesystem is case sensitive for the current path.
       # Typically this will be any path on MS Windows or Macs using HFS.
       #
@@ -49,15 +63,32 @@ module Sys
         !case_insensitive?
       end
 
+      # Returns a native ZFS property value for this path's dataset.
+      # Returns nil if the path is not on ZFS or libzfs is unavailable.
+      def zfs_property(property)
+        return nil unless base_type == 'zfs'
+        return nil unless Sys::Filesystem.respond_to?(:zfs_property, true)
+
+        dataset = zfs_dataset
+        return nil unless dataset
+
+        Sys::Filesystem.send(:zfs_property, dataset, property.to_s)
+      rescue SystemCallError
+        nil
+      end
+
+      ZFS_PROPERTIES.each do |method_name, property|
+        define_method(method_name) do
+          zfs_property(property)
+        end
+      end
+
       private
 
       def zfs_case_insensitive?
         return nil unless base_type == 'zfs'
 
-        dataset = zfs_dataset
-        return nil unless dataset
-
-        value = Sys::Filesystem.send(:zfs_property, dataset, 'casesensitivity')
+        value = zfs_property('casesensitivity')
         return nil unless value
 
         case value.strip
