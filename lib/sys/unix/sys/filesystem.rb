@@ -12,32 +12,7 @@ module Sys
     extend Sys::Filesystem::Functions
 
     private_class_method :new
-
-    # Readable versions of constant names
-    OPT_NAMES = {
-      MNT_RDONLY => 'read-only',
-      MNT_SYNCHRONOUS => 'synchronous',
-      MNT_NOEXEC => 'noexec',
-      MNT_NOSUID => 'nosuid',
-      MNT_NODEV => 'nodev',
-      MNT_UNION => 'union',
-      MNT_ASYNC => 'asynchronous',
-      MNT_CPROTECT => 'content-protection',
-      MNT_EXPORTED => 'exported',
-      MNT_QUARANTINE => 'quarantined',
-      MNT_LOCAL => 'local',
-      MNT_QUOTA => 'quotas',
-      MNT_ROOTFS => 'rootfs',
-      MNT_DONTBROWSE => 'nobrowse',
-      MNT_IGNORE_OWNERSHIP => 'noowners',
-      MNT_AUTOMOUNTED => 'automounted',
-      MNT_JOURNALED => 'journaled',
-      MNT_NOUSERXATTR => 'nouserxattr',
-      MNT_DEFWRITE => 'defwrite',
-      MNT_NOATIME => 'noatime'
-    }.freeze
-
-    private_constant :OPT_NAMES
+    private_class_method(*Sys::Filesystem::Functions.attached_functions.keys)
 
     # File used to read mount informtion from.
     if File.exist?('/etc/mtab')
@@ -105,6 +80,18 @@ module Sys
       # The filesystem type, e.g. UFS.
       attr_accessor :base_type
 
+      # The name of the mounted resource.
+      attr_accessor :mount_source
+
+      # The mount point/directory.
+      attr_accessor :mount_point
+
+      # The type of filesystem mount, e.g. ufs, zfs, nfs, etc.
+      attr_accessor :mount_type
+
+      # A list of comma separated options for the mount, e.g. nosuid, etc.
+      attr_accessor :mount_options
+
       # The filesystem type
       attr_accessor :filesystem_type
 
@@ -144,6 +131,16 @@ module Sys
         @flags            = nil
         @name_max         = nil
         @base_type        = nil
+        @mount_source     = nil
+        @mount_point      = nil
+        @mount_type       = nil
+        @mount_options    = nil
+        @filesystem_type  = nil
+        @owner            = nil
+        @sync_reads       = nil
+        @sync_writes      = nil
+        @async_reads      = nil
+        @async_writes     = nil
       end
 
       # Returns the total space on the partition.
@@ -268,6 +265,36 @@ module Sys
         obj.base_type = fs[:f_basetype].to_s
       end
 
+      # Keep statvfs as the portable source for capacity/inode data, but use
+      # native statfs where available for mount metadata that POSIX statvfs
+      # does not expose. On FreeBSD this includes the filesystem type name,
+      # mount source/target, native MNT_* flags, owner, and I/O counters.
+      if respond_to?(:statfs, true)
+        native_fs = Statfs.new
+
+        if statfs(path, native_fs) < 0
+          raise Error, "statfs() function failed: #{strerror(FFI.errno)}"
+        end
+
+        obj.flags = native_fs[:f_flags] if native_fs.members.include?(:f_flags)
+        obj.name_max = native_fs[:f_namemax] if native_fs.members.include?(:f_namemax)
+        obj.base_type = native_fs[:f_fstypename].to_s if native_fs.members.include?(:f_fstypename)
+        obj.mount_type = native_fs[:f_fstypename].to_s if native_fs.members.include?(:f_fstypename)
+        obj.mount_source = native_fs[:f_mntfromname].to_s if native_fs.members.include?(:f_mntfromname)
+        obj.mount_point = native_fs[:f_mntonname].to_s if native_fs.members.include?(:f_mntonname)
+        obj.mount_options = decode_mount_options(native_fs[:f_flags]) if native_fs.members.include?(:f_flags)
+        obj.filesystem_type = native_fs[:f_type] if native_fs.members.include?(:f_type)
+        obj.owner = native_fs[:f_owner] if native_fs.members.include?(:f_owner)
+        obj.sync_reads = native_fs[:f_syncreads] if native_fs.members.include?(:f_syncreads)
+        obj.async_reads = native_fs[:f_asyncreads] if native_fs.members.include?(:f_asyncreads)
+        obj.sync_writes = native_fs[:f_syncwrites] if native_fs.members.include?(:f_syncwrites)
+        obj.async_writes = native_fs[:f_asyncwrites] if native_fs.members.include?(:f_asyncwrites)
+
+        if native_fs.members.include?(:f_fsid)
+          obj.filesystem_id = normalize_filesystem_id(native_fs[:f_fsid])
+        end
+      end
+
       # DragonFlyBSD has additional struct members
       if RbConfig::CONFIG['host_os'] =~ /dragonfly/i
         obj.owner = fs[:f_owner]
@@ -278,8 +305,105 @@ module Sys
         obj.async_writes = fs[:f_asyncwrites]
       end
 
+      enrich_mount_metadata(obj) unless obj.mount_point
+
       obj.freeze
     end
+
+    def self.enrich_mount_metadata(stat)
+      mount = mount_for_path(stat.path)
+      return unless mount
+
+      stat.mount_source = mount.name
+      stat.mount_point = mount.mount_point
+      stat.mount_type = mount.mount_type
+      stat.mount_options = mount.options
+    end
+
+    private_class_method :enrich_mount_metadata
+
+    def self.mount_for_path(path)
+      mount_path = mount_point(path)
+      mounts.find{ |mount| mount.mount_point == mount_path }
+    rescue SystemCallError
+      nil
+    end
+
+    private_class_method :mount_for_path
+
+    def self.normalize_filesystem_id(fsid)
+      return fsid unless fsid.respond_to?(:to_a)
+
+      high, low = fsid.to_a
+      ((high & 0xffffffff) << 32) | (low & 0xffffffff)
+    end
+
+    private_class_method :normalize_filesystem_id
+
+    def self.zfs_property(dataset, property)
+      return nil unless respond_to?(:libzfs_init, true)
+
+      cache = zfs_property_cache if property == 'casesensitivity'
+      key = [dataset, property]
+
+      return cache[key] if cache&.key?(key)
+
+      handle = libzfs_init
+      return nil if handle.null?
+
+      zfs_handle = nil
+      value = nil
+
+      begin
+        prop = zfs_name_to_prop(property)
+        return nil if prop < 0
+
+        zfs_handle = zfs_open(handle, dataset, 1) # ZFS_TYPE_FILESYSTEM
+        return nil if zfs_handle.null?
+
+        buffer = FFI::MemoryPointer.new(:char, 8192)
+
+        if zfs_prop_get(zfs_handle, prop, buffer, buffer.size, nil, nil, 0, 0).zero?
+          value = buffer.read_string
+        end
+      ensure
+        zfs_close(zfs_handle) if zfs_handle && !zfs_handle.null?
+        libzfs_fini(handle)
+      end
+
+      cache[key] = value if cache && value
+      value
+    rescue FFI::NotFoundError, SystemCallError
+      nil
+    end
+
+    private_class_method :zfs_property
+
+    def self.zfs_property_cache
+      @zfs_property_cache ||= {}
+    end
+
+    private_class_method :zfs_property_cache
+
+    def self.decode_mount_options(flags)
+      string = ''
+      visible_flags = flags & MNT_VISFLAGMASK
+
+      Constants::MOUNT_OPTION_NAMES.each do |key, val|
+        if visible_flags & key > 0
+          if string.empty?
+            string += val
+          else
+            string += ", #{val}"
+          end
+        end
+        visible_flags &= ~key
+      end
+
+      string
+    end
+
+    private_class_method :decode_mount_options
 
     # In block form, yields a Sys::Filesystem::Mount object for each mounted
     # filesytem on the host. Otherwise it returns an array of Mount objects.
@@ -315,21 +439,7 @@ module Sys
           obj.mount_point = mnt[:f_mntonname].to_s
           obj.mount_type = mnt[:f_fstypename].to_s
 
-          string = ''
-          flags = mnt[:f_flags] & MNT_VISFLAGMASK
-
-          OPT_NAMES.each do |key, val|
-            if flags & key > 0
-              if string.empty?
-                string += val
-              else
-                string += ", #{val}"
-              end
-            end
-            flags &= ~key
-          end
-
-          obj.options = string
+          obj.options = decode_mount_options(mnt[:f_flags])
 
           if block_given?
             yield obj.freeze
@@ -428,12 +538,67 @@ module Sys
     #   Sys::Filesystem.mount('/dev/loop0', '/home/you/tmp', 'ext4', Sys::Filesystem::MNT_RDONLY)
     #
     def self.mount(source, target, fstype = 'ext2', flags = 0, data = nil)
-      if mount_c(source, target, fstype, flags, data) != 0
+      result =
+        if respond_to?(:nmount_c, true)
+          iov = nmount_iovec(source, target, fstype, data)
+          nmount_c(iov[:pointer], iov[:count], flags)
+        elsif RbConfig::CONFIG['host_os'] =~ /linux/i
+          mount_c(source, target, fstype, flags, data)
+        else
+          mount_c(fstype, target, flags, mount_data_pointer(source, data))
+        end
+
+      if result != 0
         raise Error, "mount() function failed: #{strerror(FFI.errno)}"
       end
 
       self
     end
+
+    def self.nmount_iovec(source, target, fstype, data)
+      options = {
+        'fstype' => fstype,
+        'fspath' => target
+      }
+
+      options['from'] = source if source
+
+      if data
+        unless data.respond_to?(:to_hash)
+          raise ArgumentError, 'data must be a Hash of nmount option names and values'
+        end
+
+        data.to_hash.each{ |key, value| options[key.to_s] = value }
+      end
+
+      strings = options.flat_map do |key, value|
+        [FFI::MemoryPointer.from_string(key), FFI::MemoryPointer.from_string(value.to_s)]
+      end
+
+      pointer = FFI::MemoryPointer.new(Iovec, strings.length)
+
+      strings.each_with_index do |string, index|
+        iov = Iovec.new(pointer + (index * Iovec.size))
+        iov[:iov_base] = string
+        iov[:iov_len] = string.size
+      end
+
+      { pointer: pointer, count: strings.length, strings: strings }
+    end
+
+    private_class_method :nmount_iovec
+
+    def self.mount_data_pointer(source, data)
+      if data
+        FFI::MemoryPointer.from_string(data.to_s)
+      elsif source
+        FFI::MemoryPointer.from_string(source.to_s)
+      else
+        FFI::Pointer::NULL
+      end
+    end
+
+    private_class_method :mount_data_pointer
 
     # Removes the attachment of the (topmost) filesystem mounted on target.
     # You may also specify bitwise OR'd +flags+ to control the precise behavior.
@@ -446,8 +611,8 @@ module Sys
     #
     # * UMOUNT_NOFOLLOW - Don't dereference the target if it's a symbolic link.
     #
-    # Note that BSD platforms may support different flags. Please see the man
-    # pages for details.
+    # On BSD platforms, MNT_FORCE may be used to force an unmount. FreeBSD also
+    # supports MNT_BYFSID for unmounting by filesystem id.
     #
     # Typically this method requires admin privileges.
     #

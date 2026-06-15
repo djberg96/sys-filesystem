@@ -16,9 +16,182 @@ RSpec.describe Sys::Filesystem, :unix do
   let(:darwin)  { RbConfig::CONFIG['host_os'] =~ /mac|darwin/i }
   let(:root)    { '/' }
 
+  def expected_case_insensitive(stat)
+    if stat.path =~ /\w+/
+      File.identical?(stat.path, stat.path.swapcase)
+    else
+      zfs_case = zfs_case_insensitive(stat)
+      return zfs_case unless zfs_case.nil?
+
+      if darwin
+        true
+      else
+        false
+      end
+    end
+  end
+
+  def zfs_case_insensitive(stat)
+    return nil unless stat.base_type == 'zfs'
+
+    mount_point = described_class.mount_point(stat.path)
+    mount = described_class.mounts.find{ |mnt| mnt.mount_point == mount_point }
+    return nil unless mount
+
+    value = described_class.send(:zfs_property, mount.name, 'casesensitivity')
+    return nil unless value
+
+    case value.strip
+      when 'insensitive'
+        true
+      when 'sensitive'
+        false
+      else
+        nil
+    end
+  rescue SystemCallError
+    nil
+  end
+
+  def write_struct_members(struct, values)
+    values.each do |member, value|
+      struct[member] = value if struct.members.include?(member)
+    end
+  end
+
+  def stub_stat_syscalls
+    statvfs_values = {
+      f_bsize: 1_048_576,
+      f_frsize: 4096,
+      f_blocks: 1_000_000,
+      f_bfree: 400_000,
+      f_bavail: 300_000,
+      f_files: 2_000_000,
+      f_ffree: 1_500_000,
+      f_favail: 1_250_000,
+      f_fsid: 1234,
+      f_flag: 1,
+      f_namemax: 255,
+      f_owner: 501,
+      f_type: 42,
+      f_syncreads: 10,
+      f_asyncreads: 20,
+      f_syncwrites: 30,
+      f_asyncwrites: 40
+    }
+
+    statfs_values = {
+      f_flags: 1,
+      f_namemax: 255,
+      f_fstypename: 'fixturefs',
+      f_mntfromname: '/dev/fixture',
+      f_mntonname: root,
+      f_type: 42,
+      f_owner: 501,
+      f_syncreads: 10,
+      f_asyncreads: 20,
+      f_syncwrites: 30,
+      f_asyncwrites: 40
+    }
+
+    allow(described_class).to receive(:statvfs) do |_path, fs|
+      write_struct_members(fs, statvfs_values)
+      0
+    end
+
+    if described_class.respond_to?(:statfs, true)
+      allow(described_class).to receive(:statfs) do |_path, fs|
+        write_struct_members(fs, statfs_values)
+        0
+      end
+    end
+
+    allow(described_class).to receive(:enrich_mount_metadata)
+  end
+
   before do
     @stat  = described_class.stat(root)
     @size  = 58720256
+  end
+
+  context 'platform constants' do
+    example 'freebsd mount constants match sys/mount.h' do
+      skip 'FreeBSD constant test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(described_class::MNT_RDONLY).to eq(0x0000000000000001)
+      expect(described_class::MNT_NFS4ACLS).to eq(0x0000000000000010)
+      expect(described_class.const_defined?(:MNT_NODEV)).to be(false)
+      expect(described_class::MNT_LOCAL).to eq(0x0000000000001000)
+      expect(described_class::MNT_ROOTFS).to eq(0x0000000000004000)
+      expect(described_class::MNT_NOATIME).to eq(0x0000000010000000)
+      expect(described_class::MNT_FORCE).to eq(0x0000000000080000)
+      expect(described_class::MNT_BYFSID).to eq(0x0000000008000000)
+    end
+
+    example 'freebsd mount option names decode nfsv4acls distinctly from nodev' do
+      skip 'FreeBSD option-name test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(described_class.send(:decode_mount_options, described_class::MNT_NFS4ACLS)).to eq('nfsv4acls')
+      expect(described_class::Constants::MOUNT_OPTION_NAMES.value?('nodev')).to be(false)
+    end
+
+    example 'freebsd root mount options agree with stat flags' do
+      skip 'FreeBSD root option test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      expect(@stat.mount_options).to eq(described_class.send(:decode_mount_options, @stat.flags))
+    end
+
+    example 'linux mount constants expose linux flags' do
+      skip 'Linux constant test skipped except on Linux' unless linux
+
+      expect(described_class::MS_RDONLY).to eq(1)
+      expect(described_class::MS_NODEV).to eq(4)
+      expect(described_class::MNT_NODEV).to eq(described_class::MS_NODEV)
+      expect(described_class::MNT_FORCE).to eq(1)
+      expect(described_class::MNT_DETACH).to eq(2)
+      expect(described_class::UMOUNT_NOFOLLOW).to eq(8)
+    end
+
+    example 'darwin mount constants expose darwin flags' do
+      skip 'Darwin constant test skipped except on Darwin' unless darwin
+
+      expect(described_class::MNT_NODEV).to eq(0x00000010)
+      expect(described_class::MNT_CPROTECT).to eq(0x00000080)
+      expect(described_class::MNT_QUARANTINE).to eq(0x00000400)
+      expect(described_class::MNT_FORCE).to eq(1)
+    end
+
+    example 'generic constants avoid darwin-specific flags' do
+      command = [
+        RbConfig.ruby,
+        '-Ilib',
+        '-e',
+        'require "sys/unix/sys/filesystem/constants/generic"; ' \
+        'c = Sys::Filesystem::Constants; ' \
+        'abort unless c::MNT_RDONLY == 1; ' \
+        'abort unless c::MOUNT_OPTION_NAMES[c::MNT_NOSUID] == "nosuid"; ' \
+        'abort if c.const_defined?(:MNT_CPROTECT); ' \
+        'abort if c.const_defined?(:MNT_QUARANTINE)'
+      ]
+
+      expect(system(*command)).to be(true)
+    end
+
+    example 'dragonfly constants use the shared bsd set' do
+      command = [
+        RbConfig.ruby,
+        '-Ilib',
+        '-e',
+        'require "sys/unix/sys/filesystem/constants/dragonfly"; ' \
+        'c = Sys::Filesystem::Constants; ' \
+        'abort unless c::MNT_RDONLY == 1; ' \
+        'abort unless c::MNT_LOCAL == 0x1000; ' \
+        'abort unless c::MOUNT_OPTION_NAMES[c::MNT_NOATIME] == "noatime"; ' \
+        'abort if c.const_defined?(:MNT_CPROTECT)'
+      ]
+
+      expect(system(*command)).to be(true)
+    end
   end
 
   example 'stat path works as expected' do
@@ -102,6 +275,87 @@ RSpec.describe Sys::Filesystem, :unix do
     expect(@stat.name_max).to be_a(Numeric)
   end
 
+  context 'bsd statfs enrichments' do
+    before do
+      skip 'statfs enrichment tests skipped except on BSD' unless bsd
+    end
+
+    example 'base_type is populated from statfs' do
+      expect(@stat.base_type).to be_a(String)
+      expect(@stat.base_type).not_to be_empty
+    end
+
+    example 'base_type matches the mount type' do
+      root_mount = described_class.mounts.find{ |mount| mount.mount_point == root }
+
+      expect(@stat.base_type).to eq(root_mount.mount_type)
+    end
+
+    example 'mount metadata matches the mount table' do
+      root_mount = described_class.mounts.find{ |mount| mount.mount_point == root }
+
+      expect(@stat.mount_source).to eq(root_mount.name)
+      expect(@stat.mount_point).to eq(root_mount.mount_point)
+      expect(@stat.mount_type).to eq(root_mount.mount_type)
+      expect(@stat.mount_options).to eq(root_mount.options)
+    end
+
+    example 'zfs dataset uses stat mount metadata when available' do
+      skip 'zfs dataset test skipped except on ZFS' unless @stat.base_type == 'zfs'
+
+      expect(described_class).not_to receive(:mounts)
+      expect(@stat.send(:zfs_dataset)).to eq(@stat.mount_source)
+    end
+
+    example 'filesystem_type is populated from statfs' do
+      expect(@stat.filesystem_type).to be_a(Numeric)
+    end
+
+    example 'owner is populated from statfs' do
+      expect(@stat.owner).to be_a(Numeric)
+    end
+
+    example 'read and write counters are populated from statfs' do
+      expect(@stat.sync_reads).to be_a(Numeric)
+      expect(@stat.async_reads).to be_a(Numeric)
+      expect(@stat.sync_writes).to be_a(Numeric)
+      expect(@stat.async_writes).to be_a(Numeric)
+    end
+  end
+
+  context 'zfs properties' do
+    before do
+      skip 'zfs property tests skipped except on ZFS' unless @stat.base_type == 'zfs'
+    end
+
+    example 'generic zfs_property returns property values' do
+      expect(@stat.zfs_property('casesensitivity')).to be_a(String)
+      expect(@stat.zfs_property(:compression)).to be_a(String)
+    end
+
+    example 'convenience methods match generic zfs_property' do
+      {
+        zfs_atime: 'atime',
+        zfs_casesensitivity: 'casesensitivity',
+        zfs_compression: 'compression',
+        zfs_compressratio: 'compressratio',
+        zfs_devices: 'devices',
+        zfs_exec: 'exec',
+        zfs_quota: 'quota',
+        zfs_readonly: 'readonly',
+        zfs_recordsize: 'recordsize',
+        zfs_reservation: 'reservation',
+        zfs_setuid: 'setuid'
+      }.each do |method_name, property|
+        expect(@stat.public_send(method_name)).to eq(@stat.zfs_property(property))
+      end
+    end
+
+    example 'unknown zfs properties return nil' do
+      expect(@stat.zfs_property('definitely_not_a_zfs_property')).to be_nil
+    end
+  end
+
   context 'dragonfly', :dragonfly do
     example 'owner works as expected' do
       expect(@stat).to respond_to(:owner)
@@ -171,15 +425,17 @@ RSpec.describe Sys::Filesystem, :unix do
   end
 
   example 'stat case_insensitive method works as expected' do
-    expected = darwin ? true : false
-    expect(@stat.case_insensitive?).to eq(expected)
-    expect(described_class.stat(Dir.home).case_insensitive?).to eq(expected)
+    home_stat = described_class.stat(Dir.home)
+
+    expect(@stat.case_insensitive?).to eq(expected_case_insensitive(@stat))
+    expect(home_stat.case_insensitive?).to eq(expected_case_insensitive(home_stat))
   end
 
   example 'stat case_sensitive method works as expected' do
-    expected = darwin ? false : true
-    expect(@stat.case_sensitive?).to eq(expected)
-    expect(described_class.stat(Dir.home).case_sensitive?).to eq(expected)
+    home_stat = described_class.stat(Dir.home)
+
+    expect(@stat.case_sensitive?).to eq(!expected_case_insensitive(@stat))
+    expect(home_stat.case_sensitive?).to eq(!expected_case_insensitive(home_stat))
   end
 
   example 'numeric helper methods are defined' do
@@ -203,6 +459,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(Pathname)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_pathname = described_class.stat(Pathname.new(root))
     end
 
@@ -265,6 +523,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(File)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_file = File.open(root){ |file| described_class.stat(file) }
     end
 
@@ -327,6 +587,8 @@ RSpec.describe Sys::Filesystem, :unix do
 
   context 'Filesystem.stat(Dir)' do
     before do
+      stub_stat_syscalls
+      @stat = described_class.stat(root)
       @stat_dir = Dir.open(root){ |dir| described_class.stat(dir) }
     end
 
@@ -486,6 +748,23 @@ RSpec.describe Sys::Filesystem, :unix do
     example 'umount singleton method is defined' do
       expect(described_class).to respond_to(:umount)
     end
+
+    example 'freebsd nmount iovec is built as expected' do
+      skip 'nmount iovec test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+
+      iov = described_class.send(
+        :nmount_iovec,
+        '/dev/md0',
+        '/mnt/test',
+        'ufs',
+        readonly: ''
+      )
+
+      expect(iov[:count]).to eq(8)
+      expect(iov[:strings].map(&:read_string)).to eq(
+        %w[fstype ufs fspath /mnt/test from /dev/md0 readonly] + ['']
+      )
+    end
   end
 
   context 'FFI' do
@@ -496,8 +775,10 @@ RSpec.describe Sys::Filesystem, :unix do
     let(:dummy) { Class.new { extend Mkmf::Lite } }
 
     example 'ffi functions are private' do
-      expect(described_class.methods.include?('statvfs')).to be false
-      expect(described_class.methods.include?('strerror')).to be false
+      Sys::Filesystem::Functions.attached_functions.each_key do |function_name|
+        expect(described_class.methods).not_to include(function_name)
+        expect(described_class.private_methods).to include(function_name)
+      end
     end
 
     example 'statfs struct is expected size' do
@@ -514,6 +795,11 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(Sys::Filesystem::Structs::Mntent.size).to eq(dummy.check_sizeof('struct mntent', 'mntent.h'))
     end
 
+    example 'iovec struct is expected size' do
+      skip 'iovec test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+      expect(Sys::Filesystem::Structs::Iovec.size).to eq(dummy.check_sizeof('struct iovec', 'sys/uio.h'))
+    end
+
     example 'a failed statvfs call behaves as expected' do
       msg = 'statvfs() function failed: No such file or directory'
       expect{ described_class.stat('/whatever') }.to raise_error(Sys::Filesystem::Error, msg)
@@ -522,6 +808,26 @@ RSpec.describe Sys::Filesystem, :unix do
     example 'statvfs alias is used for statvfs64' do
       expect(Sys::Filesystem::Functions.attached_functions[:statvfs]).to be_a(FFI::Function)
       expect(Sys::Filesystem::Functions.attached_functions[:statvfs64]).to be_nil
+    end
+
+    example 'freebsd nmount binding is private when available' do
+      skip 'nmount test skipped except on FreeBSD' unless RbConfig::CONFIG['host_os'] =~ /freebsd/i
+      expect(described_class.methods.include?('nmount_c')).to be false
+      expect(Sys::Filesystem::Functions.attached_functions[:nmount_c]).to be_a(FFI::Function)
+    end
+
+    example 'libzfs loading is limited to zfs-capable unix platforms' do
+      functions = Sys::Filesystem::Functions
+
+      allow(RbConfig::CONFIG).to receive(:[]).and_call_original
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('darwin24')
+      expect(functions.send(:zfs_supported?)).to be_falsey
+
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('freebsd15.0')
+      expect(functions.send(:zfs_supported?)).to be_truthy
+
+      allow(RbConfig::CONFIG).to receive(:[]).with('host_os').and_return('linux-gnu')
+      expect(functions.send(:zfs_supported?)).to be_truthy
     end
   end
 
