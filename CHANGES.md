@@ -1,4 +1,4 @@
-## 1.6.0 - ???
+## 1.6.0 - 15-Jun-2026
 * Big refactor for BSD mainly, adds statfs, and zfs related properties if
   you're using ZFS. Also works for Linux on ZFS.
 * Split out constants into platform specific files for easier maintenance.
