@@ -38,7 +38,7 @@ RSpec.describe Sys::Filesystem, :unix do
     mount = described_class.mounts.find{ |mnt| mnt.mount_point == mount_point }
     return nil unless mount
 
-    value = described_class.send(:zfs_property, mount.name, 'casesensitivity')
+    value = described_class::ZFS.property(mount.name, 'casesensitivity')
     return nil unless value
 
     case value.strip
@@ -353,6 +353,106 @@ RSpec.describe Sys::Filesystem, :unix do
 
     example 'unknown zfs properties return nil' do
       expect(@stat.zfs_property('definitely_not_a_zfs_property')).to be_nil
+    end
+  end
+
+  context 'Filesystem::ZFS' do
+    let(:zfs_class) { described_class::ZFS }
+    let(:handle) { instance_double(FFI::Pointer, null?: false) }
+    let(:zfs_handle) { instance_double(FFI::Pointer, null?: false) }
+
+    def stub_libzfs_binding(zfs_handle = self.zfs_handle)
+      allow(described_class).to receive(:respond_to?).and_call_original
+      allow(described_class).to receive(:respond_to?).with(:libzfs_init, true).and_return(true)
+      allow(described_class).to receive(:libzfs_fini)
+      allow(described_class).to receive(:zfs_close)
+
+      allow(described_class).to receive_messages(
+        libzfs_init: handle,
+        zfs_name_to_prop: 1,
+        zfs_open: zfs_handle
+      )
+    end
+
+    def stub_libzfs_property(value)
+      stub_libzfs_binding
+
+      allow(described_class).to receive(:zfs_prop_get) do |*_args|
+        buffer = _args[2]
+        buffer.write_string(value)
+        0
+      end
+    end
+
+    example 'available? returns false when libzfs is not bound' do
+      allow(described_class).to receive(:respond_to?).and_call_original
+      allow(described_class).to receive(:respond_to?).with(:libzfs_init, true).and_return(false)
+
+      expect(zfs_class.available?).to be(false)
+    end
+
+    example 'available? initializes and finalizes libzfs' do
+      stub_libzfs_binding
+
+      expect(zfs_class.available?).to be(true)
+      expect(described_class).to have_received(:libzfs_fini).with(handle)
+    end
+
+    example 'property returns a libzfs property value' do
+      stub_libzfs_property('lz4')
+
+      expect(zfs_class.property('tank/root', :compression)).to eq('lz4')
+      expect(described_class).to have_received(:zfs_open).with(handle, 'tank/root', 1)
+      expect(described_class).to have_received(:zfs_close).with(zfs_handle)
+      expect(described_class).to have_received(:libzfs_fini).with(handle)
+    end
+
+    example 'properties returns a property hash' do
+      stub_libzfs_property('on')
+
+      expect(zfs_class.properties('tank/root', :atime, 'readonly')).to eq(
+        'atime' => 'on',
+        'readonly' => 'on'
+      )
+    end
+
+    example 'convenience class methods delegate to property' do
+      stub_libzfs_property('sensitive')
+
+      expect(zfs_class.casesensitivity('tank/root')).to eq('sensitive')
+    end
+
+    example 'open returns a dataset object' do
+      stub_libzfs_property('lz4')
+
+      dataset = zfs_class.open('tank/root')
+
+      expect(dataset).to be_a(described_class::ZFS::Dataset)
+      expect(dataset.name).to eq('tank/root')
+    end
+
+    example 'open returns nil when the dataset cannot be opened' do
+      null_zfs_handle = instance_double(FFI::Pointer, null?: true)
+
+      stub_libzfs_binding(null_zfs_handle)
+
+      expect(zfs_class.open('tank/missing')).to be_nil
+    end
+
+    example 'dataset convenience methods delegate to ZFS.property' do
+      dataset = described_class::ZFS::Dataset.new('tank/root')
+
+      allow(zfs_class).to receive(:property).with('tank/root', 'compression').and_return('zstd')
+
+      expect(dataset.compression).to eq('zstd')
+    end
+
+    example 'open yields a dataset object' do
+      stub_libzfs_property('lz4')
+
+      expect{ |block| zfs_class.open('tank/root', &block) }.to yield_with_args(
+        an_instance_of(described_class::ZFS::Dataset)
+      )
     end
   end
 

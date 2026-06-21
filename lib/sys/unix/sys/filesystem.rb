@@ -341,49 +341,10 @@ module Sys
     private_class_method :normalize_filesystem_id
 
     def self.zfs_property(dataset, property)
-      return nil unless respond_to?(:libzfs_init, true)
-
-      cache = zfs_property_cache if property == 'casesensitivity'
-      key = [dataset, property]
-
-      return cache[key] if cache&.key?(key)
-
-      handle = libzfs_init
-      return nil if handle.null?
-
-      zfs_handle = nil
-      value = nil
-
-      begin
-        prop = zfs_name_to_prop(property)
-        return nil if prop < 0
-
-        zfs_handle = zfs_open(handle, dataset, 1) # ZFS_TYPE_FILESYSTEM
-        return nil if zfs_handle.null?
-
-        buffer = FFI::MemoryPointer.new(:char, 8192)
-
-        if zfs_prop_get(zfs_handle, prop, buffer, buffer.size, nil, nil, 0, 0).zero?
-          value = buffer.read_string
-        end
-      ensure
-        zfs_close(zfs_handle) if zfs_handle && !zfs_handle.null?
-        libzfs_fini(handle)
-      end
-
-      cache[key] = value if cache && value
-      value
-    rescue FFI::NotFoundError, SystemCallError
-      nil
+      ZFS.property(dataset, property)
     end
 
     private_class_method :zfs_property
-
-    def self.zfs_property_cache
-      @zfs_property_cache ||= {}
-    end
-
-    private_class_method :zfs_property_cache
 
     def self.decode_mount_options(flags)
       string = ''

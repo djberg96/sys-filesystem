@@ -43,6 +43,11 @@ Filesystem.mounts{ |mount| p mount }
    
 # Find the mount point of any particular file
 puts Filesystem.mount_point('/home/djberge/some_file.txt') => '/home'
+
+# Read a ZFS dataset property through libzfs, when available.
+if Filesystem::ZFS.available?
+  puts Filesystem::ZFS.compression('zroot/ROOT/default')
+end
 ```
 
 ## Notes
