@@ -61,12 +61,31 @@ module Sys
           attach_function(:libzfs_fini, [:pointer], :void)
           attach_function(:zfs_open, %i[pointer string int], :pointer)
           attach_function(:zfs_close, [:pointer], :void)
+          attach_function(:zfs_get_name, [:pointer], :string)
+          attach_function(:zfs_get_type, [:pointer], :int)
           attach_function(:zfs_name_to_prop, [:string], :int)
           attach_function(
             :zfs_prop_get,
             %i[pointer int pointer size_t pointer pointer size_t int],
             :int
           )
+          callback(:zfs_iter_f, %i[pointer pointer], :int)
+
+          {
+            zfs_iter_root: [%i[pointer zfs_iter_f pointer], :int],
+            zfs_iter_children: [%i[pointer zfs_iter_f pointer], :int],
+            zfs_create: [%i[pointer string int pointer], :int],
+            zfs_create_ancestors: [%i[pointer string], :int],
+            zfs_destroy: [%i[pointer int], :int],
+            zfs_snapshot: [%i[pointer string int pointer], :int],
+            zfs_dataset_exists: [%i[pointer string int], :int],
+            zfs_mount: [%i[pointer string int], :int],
+            zfs_unmount: [%i[pointer string int], :int]
+          }.each do |function_name, (arguments, return_type)|
+            attach_function(function_name, arguments, return_type)
+          rescue FFI::NotFoundError
+            # libzfs differs slightly across platforms and versions.
+          end
         rescue FFI::NotFoundError, LoadError
           # libzfs is optional. ZFS-specific helpers fall back when unavailable.
         end
@@ -87,9 +106,25 @@ module Sys
           :libzfs_fini,
           :zfs_open,
           :zfs_close,
+          :zfs_get_name,
+          :zfs_get_type,
           :zfs_name_to_prop,
           :zfs_prop_get
         )
+
+        %i[
+          zfs_iter_root
+          zfs_iter_children
+          zfs_create
+          zfs_create_ancestors
+          zfs_destroy
+          zfs_snapshot
+          zfs_dataset_exists
+          zfs_mount
+          zfs_unmount
+        ].each do |function_name|
+          private_class_method function_name if method_defined?(function_name)
+        end
       end
 
       begin

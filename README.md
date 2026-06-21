@@ -47,6 +47,8 @@ puts Filesystem.mount_point('/home/djberge/some_file.txt') => '/home'
 # Read a ZFS dataset property through libzfs, when available.
 if Filesystem::ZFS.available?
   puts Filesystem::ZFS.compression('zroot/ROOT/default')
+  p Filesystem::ZFS.list
+  p Filesystem::ZFS.exists?('tank/projects')
 end
 ```
 

@@ -362,13 +362,36 @@ RSpec.describe Sys::Filesystem, :unix do
     let(:zfs_handle) { instance_double(FFI::Pointer, null?: false) }
 
     def stub_libzfs_binding(zfs_handle = self.zfs_handle)
+      zfs_functions = %i[
+        libzfs_init
+        zfs_name_to_prop
+        zfs_open
+        zfs_prop_get
+        zfs_get_name
+        zfs_get_type
+        zfs_iter_root
+        zfs_iter_children
+        zfs_create
+        zfs_create_ancestors
+        zfs_destroy
+        zfs_snapshot
+        zfs_dataset_exists
+        zfs_mount
+        zfs_unmount
+      ]
+
       allow(described_class).to receive(:respond_to?).and_call_original
-      allow(described_class).to receive(:respond_to?).with(:libzfs_init, true).and_return(true)
+      zfs_functions.each do |function_name|
+        allow(described_class).to receive(:respond_to?).with(function_name, true).and_return(true)
+      end
+
       allow(described_class).to receive(:libzfs_fini)
       allow(described_class).to receive(:zfs_close)
 
       allow(described_class).to receive_messages(
         libzfs_init: handle,
+        zfs_get_name: 'tank/root',
+        zfs_get_type: described_class::ZFS::ZFS_TYPE_FILESYSTEM,
         zfs_name_to_prop: 1,
         zfs_open: zfs_handle
       )
@@ -405,6 +428,95 @@ RSpec.describe Sys::Filesystem, :unix do
       expect(described_class).to have_received(:zfs_open).with(handle, 'tank/root', 1)
       expect(described_class).to have_received(:zfs_close).with(zfs_handle)
       expect(described_class).to have_received(:libzfs_fini).with(handle)
+    end
+
+    example 'list returns dataset objects' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_iter_root) do |_handle, callback, _data|
+        callback.call(zfs_handle, nil)
+      end
+
+      expect(zfs_class.list.map(&:name)).to eq(['tank/root'])
+      expect(zfs_class.list.first.type).to eq(:filesystem)
+    end
+
+    example 'children returns child dataset objects' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_iter_children) do |_handle, callback, _data|
+        callback.call(zfs_handle, nil)
+      end
+
+      expect(zfs_class.children('tank').map(&:name)).to eq(['tank/root'])
+    end
+
+    example 'exists? checks for a dataset' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_dataset_exists).and_return(1)
+
+      expect(zfs_class.exists?('tank/root')).to be(true)
+      expect(described_class).to have_received(:zfs_dataset_exists).with(handle, 'tank/root', 15)
+    end
+
+    example 'invalid dataset types raise an argument error' do
+      stub_libzfs_binding
+
+      expect{ zfs_class.exists?('tank/root', type: :bogus) }.to raise_error(ArgumentError, /invalid ZFS type/)
+    end
+
+    example 'create creates a filesystem dataset' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_create).and_return(0)
+
+      expect(zfs_class.create('tank/root')).to be(true)
+      expect(described_class).to have_received(:zfs_create).with(handle, 'tank/root', 1, nil)
+    end
+
+    example 'create can create ancestors first' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_create_ancestors).and_return(0)
+      allow(described_class).to receive(:zfs_create).and_return(0)
+
+      expect(zfs_class.create('tank/parent/root', parents: true)).to be(true)
+      expect(described_class).to have_received(:zfs_create_ancestors).with(handle, 'tank/parent/root')
+    end
+
+    example 'destroy destroys an opened dataset' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_destroy).and_return(0)
+
+      expect(zfs_class.destroy('tank/root')).to be(true)
+      expect(described_class).to have_received(:zfs_destroy).with(zfs_handle, 0)
+    end
+
+    example 'snapshot creates a snapshot' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_snapshot).and_return(0)
+
+      expect(zfs_class.snapshot('tank/root@today', recursive: true)).to be(true)
+      expect(described_class).to have_received(:zfs_snapshot).with(handle, 'tank/root@today', 1, nil)
+    end
+
+    example 'mount mounts a filesystem dataset' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_mount).and_return(0)
+
+      expect(zfs_class.mount('tank/root', options: 'ro', flags: 1)).to be(true)
+      expect(described_class).to have_received(:zfs_mount).with(zfs_handle, 'ro', 1)
+    end
+
+    example 'unmount unmounts a filesystem dataset' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_unmount).and_return(0)
+
+      expect(zfs_class.unmount('tank/root', mountpoint: '/tank/root', flags: 1)).to be(true)
+      expect(described_class).to have_received(:zfs_unmount).with(zfs_handle, '/tank/root', 1)
+    end
+
+    example 'mutating methods return false when libzfs fails' do
+      stub_libzfs_binding
+      allow(described_class).to receive(:zfs_create).and_return(-1)
+
+      expect(zfs_class.create('tank/root')).to be(false)
     end
 
     example 'properties returns a property hash' do
