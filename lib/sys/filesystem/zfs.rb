@@ -48,13 +48,22 @@ module Sys
 
       # Represents a ZFS filesystem dataset.
       class Dataset
-        attr_reader :name, :type
+        # The dataset name, e.g. "tank/home" or "tank/home@snap".
+        attr_reader :name
+
+        # The dataset type as a Symbol, e.g. :filesystem or :snapshot.
+        attr_reader :type
 
         def initialize(name, type = nil)
           @name = name.to_s
           @type = type
         end
 
+        # Returns a ZFS property value for this dataset.
+        #
+        # The property may be provided as a String or Symbol. Returns nil if
+        # libzfs is unavailable, the dataset cannot be opened, or the property
+        # is not known to libzfs.
         def property(property)
           ZFS.property(name, property)
         end
@@ -66,6 +75,12 @@ module Sys
         end
       end
 
+      # Returns all root ZFS datasets visible to libzfs.
+      #
+      # The type keyword may be :filesystem, :snapshot, :volume, :bookmark,
+      # :dataset, :all, or a native zfs_type_t integer mask. Returns an array
+      # of Sys::Filesystem::ZFS::Dataset objects, or an empty array when libzfs
+      # is unavailable or the iterator cannot be used.
       def self.list(type: :dataset)
         return [] unless zfs_functions?(:zfs_iter_root, :zfs_get_name, :zfs_get_type)
 
@@ -82,6 +97,11 @@ module Sys
         []
       end
 
+      # Returns the immediate children for a ZFS dataset.
+      #
+      # The type keyword follows the same rules as .list. Returns an array of
+      # Sys::Filesystem::ZFS::Dataset objects, or an empty array if the parent
+      # cannot be opened or libzfs cannot enumerate children.
       def self.children(dataset, type: :dataset)
         return [] unless zfs_functions?(:zfs_iter_children, :zfs_get_name, :zfs_get_type)
 
@@ -100,6 +120,10 @@ module Sys
         []
       end
 
+      # Returns true if the named ZFS dataset exists.
+      #
+      # The type keyword may be used to restrict the lookup to a specific ZFS
+      # dataset type. Returns false if libzfs is unavailable.
       def self.exists?(dataset, type: :dataset)
         return false unless zfs_functions?(:zfs_dataset_exists)
 
@@ -112,6 +136,13 @@ module Sys
         false
       end
 
+      # Creates a ZFS dataset.
+      #
+      # By default this creates a filesystem dataset. The type keyword may be
+      # set to :filesystem or :volume, or to a native zfs_type_t integer
+      # supported by the platform libzfs. If parents is true, missing ancestor
+      # datasets are created first when the platform libzfs supports it.
+      # Returns true on success and false on libzfs failure.
       def self.create(dataset, type: :filesystem, parents: false)
         return false unless zfs_functions?(:zfs_create)
 
@@ -128,6 +159,12 @@ module Sys
         false
       end
 
+      # Destroys a ZFS dataset.
+      #
+      # The type keyword controls how the dataset is opened before destroy.
+      # For snapshots, set type: :snapshot. If defer_destroy is true, libzfs is
+      # asked to defer snapshot destruction where supported. Returns true on
+      # success and false on libzfs failure.
       def self.destroy(dataset, defer_destroy: false, type: :dataset)
         return false unless zfs_functions?(:zfs_destroy)
 
@@ -142,6 +179,12 @@ module Sys
         false
       end
 
+      # Creates a ZFS snapshot.
+      #
+      # The snapshot argument should include the dataset and snapshot name,
+      # e.g. "tank/home@before-upgrade". If recursive is true, libzfs is asked
+      # to snapshot child datasets as well. Returns true on success and false
+      # on libzfs failure.
       def self.snapshot(snapshot, recursive: false)
         return false unless zfs_functions?(:zfs_snapshot)
 
@@ -154,6 +197,11 @@ module Sys
         false
       end
 
+      # Mounts a ZFS filesystem dataset.
+      #
+      # The options argument is passed through to libzfs as the mount option
+      # string. The flags argument is the platform-specific mount flag integer.
+      # Returns true on success and false on libzfs failure.
       def self.mount(dataset, options: nil, flags: 0)
         return false unless zfs_functions?(:zfs_mount)
 
@@ -168,6 +216,11 @@ module Sys
         false
       end
 
+      # Unmounts a ZFS filesystem dataset.
+      #
+      # If mountpoint is nil, libzfs chooses the mounted path for the dataset.
+      # The flags argument is the platform-specific unmount flag integer.
+      # Returns true on success and false on libzfs failure.
       def self.unmount(dataset, mountpoint: nil, flags: 0)
         return false unless zfs_functions?(:zfs_unmount)
 
@@ -182,6 +235,7 @@ module Sys
         false
       end
 
+      # Returns true if libzfs is available and can be initialized.
       def self.available?
         return false unless Filesystem.respond_to?(:libzfs_init, true)
 
@@ -195,6 +249,11 @@ module Sys
         Filesystem.send(:libzfs_fini, handle) if handle && !handle.null?
       end
 
+      # Opens a ZFS dataset and returns a Dataset wrapper.
+      #
+      # The type keyword controls the native zfs_open type mask. In block form,
+      # yields the Dataset wrapper. Returns nil if libzfs is unavailable or the
+      # dataset cannot be opened.
       def self.open(dataset, type: :filesystem)
         return nil unless Filesystem.respond_to?(:libzfs_init, true)
 
@@ -221,6 +280,11 @@ module Sys
         end
       end
 
+      # Returns a ZFS property value for a dataset.
+      #
+      # The property may be provided as a String or Symbol. Returns nil if
+      # libzfs is unavailable, the dataset cannot be opened, or the property is
+      # not known to libzfs.
       def self.property(dataset, property)
         return nil unless zfs_functions?(:zfs_name_to_prop, :zfs_prop_get)
 
@@ -251,6 +315,7 @@ module Sys
         nil
       end
 
+      # Returns a Hash of property names to ZFS property values for a dataset.
       def self.properties(dataset, *properties)
         properties.flatten.to_h do |property|
           [property.to_s, self.property(dataset, property)]
