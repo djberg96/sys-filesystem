@@ -10,6 +10,7 @@
 * examples/example_stat.rb
 * lib/sys-filesystem.rb
 * lib/sys/filesystem.rb
+* lib/sys/filesystem/zfs.rb
 * lib/sys/unix/sys/filesystem.rb
 * lib/sys/unix/sys/filesystem/constants.rb
 * lib/sys/unix/sys/filesystem/functions.rb

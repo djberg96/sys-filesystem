@@ -1,3 +1,9 @@
+## 1.6.1 - TBD
+* Added Sys::Filesystem::ZFS as a public libzfs-backed interface for reading
+  ZFS dataset properties on supported Unix platforms.
+* Added basic ZFS dataset administration methods for listing, checking,
+  creating, destroying, snapshotting, mounting, and unmounting datasets.
+
 ## 1.6.0 - 15-Jun-2026
 * Big refactor for BSD mainly, adds statfs, and zfs related properties if
   you're using ZFS. Also works for Linux on ZFS.

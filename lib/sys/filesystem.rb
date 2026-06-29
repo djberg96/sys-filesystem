@@ -8,6 +8,8 @@ else
   require_relative 'unix/sys/filesystem'
 end
 
+require_relative 'filesystem/zfs'
+
 # Methods and properties universal to all platforms
 
 # The Sys module serves as a namespace only.
@@ -67,12 +69,11 @@ module Sys
       # Returns nil if the path is not on ZFS or libzfs is unavailable.
       def zfs_property(property)
         return nil unless base_type == 'zfs'
-        return nil unless Sys::Filesystem.respond_to?(:zfs_property, true)
 
         dataset = zfs_dataset
         return nil unless dataset
 
-        Sys::Filesystem.send(:zfs_property, dataset, property.to_s)
+        Sys::Filesystem::ZFS.property(dataset, property)
       rescue SystemCallError
         nil
       end
